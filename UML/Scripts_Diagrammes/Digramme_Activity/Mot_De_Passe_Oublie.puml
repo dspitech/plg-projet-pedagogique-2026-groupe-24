@@ -1,0 +1,32 @@
+@startuml
+title Mot de passe oublié - Diagramme d'activité
+
+start
+
+:Saisie de l'adresse email;
+
+if (L'email existe en base ?) then (oui)
+    :Envoyer l'email avec le lien de réinitialisation;
+    :L'utilisateur clique sur le lien;
+    
+    partition "Validation du nouveau mot de passe" {
+        repeat
+            :Saisie du nouveau mot de passe;
+            if (Le mot de passe respecte les critères ?) then (oui)
+                :Hachage du mot de passe;
+                :Mise à jour de la base de données;
+                :Journaliser l'action (Audit Log);
+                break
+            else (non)
+                :Afficher les erreurs de conformité;
+            endif
+        repeat while (Réessayer ?) is (oui)
+    }
+    
+else (non)
+    :Afficher le message "Email inconnu";
+endif
+
+stop
+
+@enduml

@@ -1,0 +1,28 @@
+@startuml
+title Contacter le support - Diagramme d'activité
+
+start
+
+:Connexion utilisateur;
+:Accès au tableau de bord;
+:Sélection du Support;
+:Remplir le formulaire;
+
+repeat
+  if (Champs valides ?) then (oui)
+    if (Service disponible ?) then (oui)
+      :Envoyer la demande au backend;
+      :Notifier l'équipe support;
+      :Journaliser la demande;
+      stop
+    else (non)
+      :Afficher "Service indisponible";
+      stop
+    endif
+  else (non)
+    :Afficher "Champs invalides";
+    :Remplir le formulaire;
+  endif
+repeat while (Champs invalides ?)
+
+@enduml

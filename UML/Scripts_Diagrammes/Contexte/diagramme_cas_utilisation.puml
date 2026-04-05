@@ -1,0 +1,66 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Utilisateur" as User
+actor "Administrateur" as Admin
+actor "Cloud Azure" as Azure
+actor "Système de sécurité" as Security
+
+rectangle "Cloud Script Manager" {
+
+  package "Authentification" {
+    usecase "Se connecter" as UC1
+    usecase "Créer un compte" as UC2
+  }
+
+  package "Consultation et Interaction" {
+    usecase "Consulter les scripts" as UC3
+    usecase "Rechercher un script" as UC4
+    usecase "Télécharger un script" as UC5
+    usecase "Copier un script" as UC6
+    usecase "Consulter la documentation" as UC7
+    usecase "Envoyer un commentaire" as UC8
+    usecase "Contacter le support" as UC9
+  }
+
+  package "Administration" {
+    usecase "Gérer les scripts (CRUD)" as UC10
+    usecase "Gérer utilisateurs et rôles" as UC11
+    usecase "Gérer les commentaires" as UC12
+    usecase "Gérer les demandes support" as UC13
+    usecase "Consulter les logs" as UC14
+    usecase "Sécuriser les accès" as UC15
+  }
+}
+
+User -[#1e88e5]-> UC1
+User -[#1e88e5]-> UC2
+User -[#1e88e5]-> UC3
+User -[#1e88e5]-> UC4
+User -[#1e88e5]-> UC5
+User -[#1e88e5]-> UC6
+User -[#1e88e5]-> UC7
+User -[#1e88e5]-> UC8
+User -[#1e88e5]-> UC9
+
+Admin -[#e53935]-> UC1
+Admin -[#e53935]-> UC2
+Admin -[#e53935]-> UC10
+Admin -[#e53935]-> UC11
+Admin -[#e53935]-> UC12
+Admin -[#e53935]-> UC13
+Admin -[#e53935]-> UC14
+Admin -[#e53935]-> UC15
+
+UC3 -[#43a047]-> Azure
+UC5 -[#43a047]-> Azure
+UC10 -[#43a047]-> Azure
+UC11 -[#43a047]-> Azure
+
+UC1 -[#8e24aa]-> Security
+UC2 -[#8e24aa]-> Security
+UC14 -[#8e24aa]-> Security
+
+@enduml

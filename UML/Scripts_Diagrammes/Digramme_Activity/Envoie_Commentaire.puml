@@ -1,0 +1,28 @@
+@startuml
+title Envoi de commentaire - Diagramme d'activité
+
+start
+
+:Connexion utilisateur;
+:Accès au tableau de bord;
+:Sélection du script;
+:Saisie du commentaire;
+
+repeat
+  if (Champs valides ?) then (oui)
+    if (Droits ok ?) then (oui)
+      :Enregistrer le commentaire;
+      :Publication ou modération;
+      :Journaliser l'action;
+      stop
+    else (non)
+      :Afficher "Accès refusé";
+      stop
+    endif
+  else (non)
+    :Afficher "Commentaire invalide";
+    :Saisie du commentaire;
+  endif
+repeat while (Champs invalides ?)
+
+@enduml

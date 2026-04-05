@@ -1,0 +1,53 @@
+@startuml
+title Téléchargement d'un script 
+
+autonumber
+skinparam style strictuml
+skinparam MaxMessageSize 200
+
+actor "Utilisateur" as User
+
+box "Front-End" #LightBlue
+    participant "Interface Web/App" as UI
+end box
+
+box "Back-End" #LightYellow
+    participant "API Gateway" as API
+    participant "Service Script" as Service
+    database "Base de Données" as DB
+end box
+
+User -> UI : Accéder à la page "Scripts"
+activate UI
+UI --> User : Affiche liste des scripts
+deactivate UI
+
+User -> UI : Cliquer sur "Télécharger" pour un script
+activate UI
+UI -> API : GET /api/scripts/{id}/download
+activate API
+
+API -> Service : Vérifier disponibilité et droits d'accès
+activate Service
+Service -> DB : Rechercher script et vérifier permissions
+activate DB
+DB --> Service : Script trouvé / droits OK ?
+deactivate DB
+
+alt Script disponible et droits OK
+    Service --> API : Script disponible
+    deactivate Service
+    API --> UI : Envoi du fichier
+    deactivate API
+    UI --> User : Téléchargement du script
+else Script non disponible ou droits insuffisants
+    Service --> API : Erreur 403 / 404
+    deactivate Service
+    API --> UI : Message d'erreur
+    deactivate API
+    UI --> User : Affiche message "Téléchargement impossible"
+end
+
+deactivate UI
+
+@enduml

@@ -1,0 +1,72 @@
+@startuml
+title Diagremme de séquence -  Mot de passe oublié 
+
+autonumber
+skinparam style strictuml
+skinparam MaxMessageSize 200
+
+actor "Utilisateur" as User
+
+box "Front-End" #LightBlue
+    participant "Interface Web/App" as UI
+end box
+
+box "Back-End" #LightYellow
+    participant "API Gateway / Auth" as API
+    participant "Service Utilisateur" as Service
+    database "Base de Données" as DB
+end box
+
+User -> UI : Accéder à la page "Mot de passe oublié"
+activate UI
+UI --> User : Affiche formulaire (saisie email)
+deactivate UI
+
+User -> UI : Saisir email et soumettre
+activate UI
+UI -> UI : Validation côté client (format email)
+UI -> API : POST /api/password/forgot (JSON Payload)
+activate API
+
+API -> Service : Vérifier existence de l'email
+activate Service
+Service -> DB : Rechercher utilisateur par email
+activate DB
+DB --> Service : Données utilisateur / Email trouvé ?
+deactivate DB
+
+alt Email trouvé
+    Service --> API : Email valide
+    API --> UI : Envoyer lien de réinitialisation
+    UI --> User : Affiche message "Lien envoyé à votre email"
+    
+    User -> UI : Cliquer sur le lien et saisir nouveau mot de passe
+    activate UI
+    UI -> UI : Validation côté client (force mot de passe)
+    UI -> API : POST /api/password/reset (nouveau mot de passe)
+    
+    Service -> Service : Vérifier conformité mot de passe
+    alt Mot de passe conforme
+        Service -> Service : Hachage mot de passe (Argon2/BCrypt)
+        Service -> DB : Mise à jour du mot de passe
+        activate DB
+        DB --> Service : Confirmation
+        deactivate DB
+        Service --> API : Succès 200
+        API --> UI : Confirmation mise à jour
+        UI --> User : Affiche message "Mot de passe mis à jour"
+    else Mot de passe non conforme
+        Service --> API : Erreur 400
+        API --> UI : Affiche exigences mot de passe
+        UI --> User : Ressaisir mot de passe
+    end
+else Email non trouvé
+    Service --> API : Erreur 404 / Email inconnu
+    API --> UI : Affiche message "Email inconnu"
+end
+
+deactivate UI
+deactivate Service
+deactivate API
+
+@enduml

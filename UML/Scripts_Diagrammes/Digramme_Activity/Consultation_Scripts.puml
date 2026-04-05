@@ -1,0 +1,17 @@
+@startuml
+title Consultation des scripts - Diagramme d'activité
+
+start
+:Connexion utilisateur;
+:Accès tableau de bord;
+:Sélection "Consultation scripts";
+
+if (Scripts disponibles ?) then (oui)
+  :Afficher liste scripts;
+  stop
+else (non)
+  :Afficher "Aucun script disponible";
+  stop
+endif
+
+@enduml

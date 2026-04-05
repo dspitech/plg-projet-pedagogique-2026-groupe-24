@@ -1,0 +1,108 @@
+@startuml
+title Consultation de la documentation 
+
+autonumber
+skinparam style strictuml
+skinparam MaxMessageSize 200
+
+actor "Utilisateur" as User
+
+box "Front-End" #LightBlue
+    participant "Interface Web/App" as UI
+end box
+
+box "Back-End" #LightYellow
+    participant "API Gateway" as API
+    participant "Service Documentation" as Service
+    database "Base de Données" as DB
+end box
+
+User -> UI : Accéder à la page "Documentation"
+activate UI
+UI --> User : Affiche interface documentation
+deactivate UI
+
+User -> UI : Cliquer sur un document / section
+activate UI
+UI -> API : GET /api/docs/{id}
+activate API
+
+API -> Service : Récupérer contenu de la documentation
+activate Service
+Service -> DB : Requête du document demandé
+activate DB
+DB --> Service : Contenu du document
+deactivate DB
+Service --> API : Retour contenu documentation
+deactivate Service
+
+API --> UI : Envoi du contenu
+deactivate API
+UI --> User : Affiche la documentation
+
+@enduml
+```
+
+### 9. Envoi d’un commentaire
+
+```plantuml
+@startuml
+title Envoi de commentaire 
+
+autonumber
+skinparam style strictuml
+skinparam MaxMessageSize 200
+
+actor "Utilisateur" as User
+
+box "Front-End" #LightBlue
+    participant "Interface Web/App" as UI
+end box
+
+box "Back-End" #LightYellow
+    participant "API Gateway" as API
+    participant "Service Commentaire" as Service
+    database "Base de Données" as DB
+end box
+
+User -> UI : Accéder à la page du script
+activate UI
+UI --> User : Affiche interface de commentaire
+deactivate UI
+
+User -> UI : Saisir et soumettre commentaire
+activate UI
+UI -> UI : Validation côté client (champs remplis, longueur)
+UI -> API : POST /api/scripts/{id}/comment
+activate API
+
+API -> Service : Vérifier droits et contenu
+activate Service
+Service -> DB : Enregistrer commentaire
+activate DB
+DB --> Service : Confirmation d'enregistrement
+deactivate DB
+
+alt Commentaire valide et droits ok
+    Service --> API : Succès 201 Created
+    deactivate Service
+    API --> UI : Confirmation succès
+    deactivate API
+    UI --> User : Affiche "Commentaire publié / en attente de modération"
+else Commentaire invalide
+    Service --> API : Erreur 400 / Validation failed
+    deactivate Service
+    API --> UI : Message d'erreur
+    deactivate API
+    UI --> User : Affiche "Commentaire invalide, ressaisir"
+else Droits insuffisants
+    Service --> API : Erreur 403
+    deactivate Service
+    API --> UI : Message d'erreur
+    deactivate API
+    UI --> User : Affiche "Accès refusé"
+end
+
+deactivate UI
+
+@enduml

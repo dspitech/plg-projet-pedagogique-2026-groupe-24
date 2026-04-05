@@ -1,0 +1,18 @@
+@startuml
+title Copie d'un script - Diagramme d'activité
+
+start
+:Connexion utilisateur;
+:Accès tableau de bord;
+:Sélection script;
+
+if (Droits ok ?) then (oui)
+  :Copie contenu script;
+  :Journalisation;
+  stop
+else (non)
+  :Afficher "Accès refusé";
+  stop
+endif
+
+@enduml

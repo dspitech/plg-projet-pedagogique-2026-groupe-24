@@ -1,0 +1,53 @@
+@startuml
+title Copie d'un script 
+
+autonumber
+skinparam style strictuml
+skinparam MaxMessageSize 200
+
+actor "Utilisateur" as User
+
+box "Front-End" #LightBlue
+    participant "Interface Web/App" as UI
+end box
+
+box "Back-End" #LightYellow
+    participant "API Gateway" as API
+    participant "Service Script" as Service
+    database "Base de Données" as DB
+end box
+
+User -> UI : Accéder à la page "Scripts"
+activate UI
+UI --> User : Affiche liste des scripts
+deactivate UI
+
+User -> UI : Cliquer sur "Copier" pour un script
+activate UI
+UI -> API : POST /api/scripts/{id}/copy
+activate API
+
+API -> Service : Vérifier droits et disponibilité
+activate Service
+Service -> DB : Rechercher script et vérifier permissions
+activate DB
+DB --> Service : Script trouvé / droits OK ?
+deactivate DB
+
+alt Copie autorisée
+    Service --> API : Contenu du script
+    deactivate Service
+    API --> UI : Envoi du script à copier
+    deactivate API
+    UI --> User : Script copié dans presse-papier / affiché
+else Copie interdite
+    Service --> API : Erreur 403
+    deactivate Service
+    API --> UI : Message d'erreur
+    deactivate API
+    UI --> User : Affiche "Copie non autorisée"
+end
+
+deactivate UI
+
+@enduml

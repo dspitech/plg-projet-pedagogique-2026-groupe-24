@@ -1,0 +1,60 @@
+@startuml
+title Contacter le support 
+
+autonumber
+skinparam style strictuml
+skinparam MaxMessageSize 200
+
+actor "Utilisateur" as User
+
+box "Front-End" #LightBlue
+    participant "Interface Web/App" as UI
+end box
+
+box "Back-End" #LightYellow
+    participant "API Gateway" as API
+    participant "Service Support" as Service
+    database "Base de Données" as DB
+end box
+
+User -> UI : Accéder à la page "Support"
+activate UI
+UI --> User : Affiche formulaire de contact
+deactivate UI
+
+User -> UI : Remplir et soumettre formulaire
+activate UI
+UI -> UI : Validation côté client (champs remplis, email valide)
+UI -> API : POST /api/support/request
+activate API
+
+API -> Service : Vérifier disponibilité du service et données
+activate Service
+Service -> DB : Enregistrer demande de support
+activate DB
+DB --> Service : Confirmation d'enregistrement
+deactivate DB
+
+alt Champs valides et service disponible
+    Service --> API : Succès 201 Created
+    deactivate Service
+    API --> UI : Confirmation envoi
+    deactivate API
+    UI --> User : Affiche "Demande envoyée, réponse prochaine"
+else Champs invalides
+    Service --> API : Erreur 400
+    deactivate Service
+    API --> UI : Message d'erreur
+    deactivate API
+    UI --> User : Affiche "Champs invalides, ressaisir"
+else Service indisponible
+    Service --> API : Erreur 503
+    deactivate Service
+    API --> UI : Message d'erreur
+    deactivate API
+    UI --> User : Affiche "Service indisponible, réessayer plus tard"
+end
+
+deactivate UI
+
+@enduml

@@ -1,0 +1,62 @@
+@startuml
+title Diagramme de séquence - Création de compte
+
+autonumber
+skinparam style strictuml
+skinparam MaxMessageSize 200
+
+actor "Utilisateur" as User
+
+box "Front-End" #LightBlue
+    participant "Interface Web/App" as UI
+end box
+
+box "Back-End" #LightYellow
+    participant "API Gateway / Auth" as API
+    participant "Service Utilisateur" as Service
+    database "Base de Données" as DB
+end box
+
+User -> UI : Accéder à la page d'inscription
+activate UI
+UI --> User : Affiche le formulaire (Email, Mot de passe, Pseudo)
+deactivate UI
+
+User -> UI : Remplit et soumet le formulaire
+activate UI
+UI -> UI : Validation côté client (format email, force mot de passe)
+
+UI -> API : POST /api/register (JSON Payload)
+activate API
+
+API -> Service : Traitement de la demande
+activate Service
+
+Service -> DB : Vérifier si l'email existe
+activate DB
+DB --> Service : Résultat (Disponible / Déjà utilisé)
+deactivate DB
+
+alt Email déjà utilisé ou format invalide
+    Service --> API : Erreur 400 / Conflict
+    API --> UI : Réponse d'erreur (JSON)
+    UI --> User : Affiche message "Email déjà utilisé ou invalide"
+else Email valide
+    Service -> Service : Hachage mot de passe (Argon2/BCrypt)
+    Service -> DB : Persister nouvel utilisateur
+    activate DB
+    DB --> Service : Confirmation ID utilisateur
+    deactivate DB
+    
+    Service --> API : Succès 201 Created
+    deactivate Service
+    
+    API --> UI : JWT Token + message succès
+    deactivate API
+    
+    UI --> User : Redirection vers Dashboard / Message de bienvenue
+end
+
+deactivate UI
+
+@enduml

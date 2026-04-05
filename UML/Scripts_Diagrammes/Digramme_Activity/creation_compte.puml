@@ -1,0 +1,29 @@
+@startuml
+title Création de compte - Diagramme d'activité
+
+start
+:Saisie des informations utilisateur;
+
+if (Champs valides ?) then (oui)
+  if (Email unique ?) then (oui)
+    if (Mot de passe conforme ?) then (oui)
+      :Hash du mot de passe;
+      :Création du compte dans la DB;
+      :Attribution rôle utilisateur;
+      :Journalisation;
+      :Confirmation de création;
+      stop
+    else (non)
+      :Afficher erreur mot de passe;
+      ->Saisie des informations utilisateur;
+    endif
+  else (non)
+    :Afficher erreur email déjà utilisé;
+    ->Saisie des informations utilisateur;
+  endif
+else (non)
+  :Afficher erreur champs incomplets;
+  ->Saisie des informations utilisateur;
+endif
+
+@enduml

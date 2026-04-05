@@ -1,0 +1,32 @@
+@startuml
+title Connexion - Diagramme d'activité
+
+start
+:Saisie identifiants;
+
+if (Champs valides ?) then (oui)
+  if (Utilisateur existe ?) then (oui)
+    if (Mot de passe correct ?) then (oui)
+      if (Compte activé ?) then (oui)
+        :Générer session/token;
+        :Journalisation;
+        :Accès au dashboard;
+        stop
+      else (non)
+        :Afficher "Compte non activé";
+        stop
+      endif
+    else (non)
+      :Afficher "Email ou mot de passe incorrect";
+      ->Saisie identifiants;
+    endif
+  else (non)
+    :Proposer création de compte;
+    stop
+  endif
+else (non)
+  :Afficher erreur champs invalides;
+  ->Saisie identifiants;
+endif
+
+@enduml

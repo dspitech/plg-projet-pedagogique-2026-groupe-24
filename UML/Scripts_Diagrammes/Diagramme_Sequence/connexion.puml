@@ -1,0 +1,61 @@
+@startuml
+title Diagremme de séquence - Connexion Utilisateur 
+
+autonumber
+skinparam style strictuml
+skinparam MaxMessageSize 200
+
+actor "Utilisateur" as User
+
+box "Front-End" #LightBlue
+    participant "Interface Web/App" as UI
+end box
+
+box "Back-End" #LightYellow
+    participant "API Gateway / Auth" as API
+    participant "Service Utilisateur" as Service
+    database "Base de Données" as DB
+end box
+
+User -> UI : Accéder à la page de connexion
+activate UI
+UI --> User : Affiche formulaire de connexion (Email / Mot de passe)
+deactivate UI
+
+User -> UI : Saisir identifiants et soumettre
+activate UI
+UI -> UI : Validation côté client (format email, champs remplis)
+
+UI -> API : POST /api/login (JSON Payload)
+activate API
+
+API -> Service : Vérifier identifiants
+activate Service
+
+Service -> DB : Rechercher utilisateur par email
+activate DB
+DB --> Service : Données utilisateur (Email + Hash mot de passe)
+deactivate DB
+
+alt Identifiants corrects
+    Service -> Service : Vérifier mot de passe (Hash)
+    Service --> API : Authentification réussie
+    deactivate Service
+    
+    API --> UI : JWT Token + message succès
+    deactivate API
+    
+    UI --> User : Redirection vers Dashboard / Message de bienvenue
+else Identifiants incorrects
+    Service --> API : Erreur 401 / Auth failed
+    deactivate Service
+    
+    API --> UI : Réponse d'erreur (JSON)
+    deactivate API
+    
+    UI --> User : Affiche message "Email ou mot de passe incorrect"
+end
+
+deactivate UI
+
+@enduml

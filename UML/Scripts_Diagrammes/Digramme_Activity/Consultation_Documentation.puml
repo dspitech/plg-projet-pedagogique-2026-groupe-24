@@ -1,0 +1,23 @@
+@startuml
+title Consultation documentation - Diagramme d'activité
+
+start
+:Connexion utilisateur;
+:Accès tableau de bord;
+:Sélection script;
+
+if (Droits ok ?) then (oui)
+  if (Documentation disponible ?) then (oui)
+    :Afficher documentation;
+    :Journalisation;
+    stop
+  else (non)
+    :Afficher "Documentation indisponible";
+    stop
+  endif
+else (non)
+  :Afficher "Accès refusé";
+  stop
+endif
+
+@enduml
