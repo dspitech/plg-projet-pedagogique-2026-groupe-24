@@ -28,8 +28,6 @@ Application web frontend de type dashboard pour centraliser, documenter et consu
 - [Qualite et conventions](#qualite-et-conventions)
 - [UML et documentation de conception](#uml-et-documentation-de-conception)
 - [Etat actuel et limites connues](#etat-actuel-et-limites-connues)
-- [Roadmap recommandee](#roadmap-recommandee)
-- [Licence](#licence)
 
 ## Objectif du projet
 
@@ -227,10 +225,6 @@ Ces documents servent de reference de conception et de support pedagogique.
 
 ## Etat actuel et limites connues
 
-- Le projet est majoritairement frontend.
-- Les donnees metier sont encore statiques/locales.
-- Le catalogue de scripts est structurellement pret mais non alimente a grande echelle.
-- L'authentification est de demonstration (pas de securisation complete des routes).
-- La base de tests est initialisee mais reste a etendre.
-- Des lockfiles npm et bun sont presents simultanement (`package-lock.json`, `bun.lock`, `bun.lockb`) : choisir un gestionnaire principal pour eviter les divergences.
+- Seulement le frontend est mise en place.
+- Les prochaines étapes est de mettre en place le Back-end 
 
