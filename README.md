@@ -114,7 +114,7 @@ Fonctionnalites visibles cote frontend:
 ### Installation
 
 ```bash
-git clone <URL_DU_REPO>
+git clone https://github.com/dspitech/plg-projet-pedagogique-2026-groupe-24.git
 cd plg-projet-pedagogique-2026-groupe-24/Site-Web
 npm install
 ```
