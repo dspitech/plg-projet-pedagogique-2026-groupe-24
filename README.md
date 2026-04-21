@@ -307,20 +307,6 @@ src/
 
 ---
 
-
-##  Lancement du projet
-Comment lancer le projet en local
-```bash
-git clone https://github.com/dspitech/plg-projet-pedagogique-2026-groupe-24.git
-cd plg-projet-pedagogique-2026-groupe-24
-npm install
-npm run dev
-```
-Ouvrir [http://localhost:5173](http://localhost:5173).
-
-
----
-
 ## Tâche 2 -  22/04/2026 — Formulaires de création (Catégories & Scripts)
 
 Cette tâche introduit deux **formulaires professionnels** permettant aux utilisateurs de créer de nouvelles catégories et de nouveaux scripts directement depuis l'interface.
@@ -376,5 +362,15 @@ Dans cette partie, on crée un fomrulaire pour l'ajout d'un nouveau script.
 ![image](https://hackmd.io/_uploads/SJeMisEp-x.png)
 
 ---
+
+##  Lancement du projet
+Comment lancer le projet en local
+```bash
+git clone https://github.com/dspitech/plg-projet-pedagogique-2026-groupe-24.git
+cd plg-projet-pedagogique-2026-groupe-24
+npm install
+npm run dev
+```
+Ouvrir [http://localhost:5173](http://localhost:5173).
 
 
