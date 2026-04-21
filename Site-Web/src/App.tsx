@@ -7,6 +7,8 @@ import Index from "./pages/Index";
 import ScriptsPage from "./pages/ScriptsPage";
 import CategoryPage from "./pages/CategoryPage";
 import CategoriesPage from "./pages/CategoriesPage";
+import NewCategoryPage from "./pages/NewCategoryPage";
+import NewScriptPage from "./pages/NewScriptPage";
 import ScriptDetailPage from "./pages/ScriptDetailPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProviderPage from "./pages/ProviderPage";
@@ -32,7 +34,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Navigate to="/" replace />} />
           <Route path="/scripts" element={<ScriptsPage />} />
+          <Route path="/scripts/new" element={<NewScriptPage />} />
           <Route path="/categories" element={<CategoriesPage />} />
+          <Route path="/categories/new" element={<NewCategoryPage />} />
           <Route path="/category/:categoryId" element={<CategoryPage />} />
           <Route path="/provider/:providerId" element={<ProviderPage />} />
           <Route path="/resources" element={<ResourcesPage />} />

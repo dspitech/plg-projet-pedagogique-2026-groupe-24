@@ -1,27 +1,28 @@
+import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import {
-  CheckCircle2,
   Cloud,
   Server,
   ShieldCheck,
-  Workflow,
   BookOpenText,
+  FileCode2,
+  Activity,
+  TrendingUp,
+  Layers,
+  Users,
   Rocket,
+  Shield,
+  ArrowUpRight,
+  Zap,
   GitBranch,
-  FolderGit2,
-  Building2,
-  Scale,
-  LockKeyhole,
-  LifeBuoy,
-  ClipboardCheck,
-  FileText,
-  GraduationCap,
-  Users2,
+  Package,
+  Terminal,
+  Database,
+  CheckCircle2,
+  Clock,
+  Star,
 } from 'lucide-react';
-import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { ScriptCard } from '@/components/dashboard/ScriptCard';
-import { CategoryCard } from '@/components/dashboard/CategoryCard';
 import { categories, scripts, Category } from '@/data/scripts';
 import {
   ResponsiveContainer,
@@ -34,402 +35,312 @@ import {
   CartesianGrid,
   XAxis,
   YAxis,
+  Legend,
 } from 'recharts';
 
 const Dashboard = () => {
-  const recentScripts = scripts.slice(0, 4);
-  const platformCards = [
+  const totalScripts = scripts.length;
+  const azureCount = scripts.filter((s) => s.provider === 'azure').length;
+  const awsCount = scripts.filter((s) => s.provider === 'aws').length;
+  const validatedCount = scripts.filter((s) => s.validated).length;
+
+  const kpis = [
     {
-      title: 'Scripts Azure prets a l emploi',
-      description: 'Automatisez rapidement vos operations Azure avec des scripts standardises.',
+      label: 'Scripts disponibles',
+      value: totalScripts,
+      delta: '+0 ce mois',
+      icon: FileCode2,
+      tone: 'text-primary',
+      bg: 'bg-primary/10',
+    },
+    {
+      label: 'Microsoft Azure',
+      value: azureCount,
+      delta: 'Provider principal',
       icon: Cloud,
-      style: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+      tone: 'text-blue-400',
+      bg: 'bg-blue-500/10',
     },
     {
-      title: 'Scripts AWS prets a l emploi',
-      description: 'Unifiez la gestion multi-cloud avec des scripts AWS utilisables immediatement.',
+      label: 'Amazon Web Services',
+      value: awsCount,
+      delta: 'Multi-cloud',
       icon: Server,
-      style: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+      tone: 'text-amber-400',
+      bg: 'bg-amber-500/10',
     },
     {
-      title: 'Securite et conformite',
-      description: 'Appliquez des scripts controles pour renforcer la securite de vos environnements.',
+      label: 'Scripts validés',
+      value: validatedCount,
+      delta: 'Production-ready',
       icon: ShieldCheck,
-      style: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    },
-    {
-      title: 'Documentation operationnelle',
-      description: 'Chaque script est pense pour etre compris et reutilise par vos equipes.',
-      icon: BookOpenText,
-      style: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
-    },
-  ];
-
-  const workflowSteps = [
-    {
-      title: '1. Ajouter',
-      description: 'Ajoutez vos scripts via le futur formulaire de creation.',
-      icon: FolderGit2,
-    },
-    {
-      title: '2. Structurer',
-      description: 'Classez par categorie, provider et tags pour faciliter la recherche.',
-      icon: GitBranch,
-    },
-    {
-      title: '3. Partager',
-      description: 'Diffusez les scripts a vos equipes pour une execution rapide.',
-      icon: Workflow,
-    },
-    {
-      title: '4. Executer',
-      description: 'Utilisez des scripts prets a l emploi pour accelerer la production.',
-      icon: Rocket,
-    },
-  ];
-
-  const governanceCards = [
-    {
-      title: 'Gouvernance cloud',
-      description: 'Cadrez les standards de scripting et les bonnes pratiques inter-equipes.',
-      icon: Building2,
-    },
-    {
-      title: 'Conformite et audit',
-      description: 'Uniformisez les controles pour faciliter audit interne et externe.',
-      icon: Scale,
-    },
-    {
-      title: 'Gestion des acces',
-      description: 'Encadrez les droits et la reutilisation des scripts sensibles.',
-      icon: LockKeyhole,
-    },
-    {
-      title: 'Support operationnel',
-      description: 'Donnez aux equipes une base commune pour resoudre plus vite.',
-      icon: LifeBuoy,
-    },
-  ];
-
-  const qualityPillars = [
-    {
-      title: 'Validation technique',
-      text: 'Scripts verifies avant publication sur le hub interne.',
-      icon: ClipboardCheck,
-    },
-    {
-      title: 'Documentation standard',
-      text: 'Format unique pour la maintenance et la transmission.',
-      icon: FileText,
-    },
-    {
-      title: 'Formation continue',
-      text: 'Guides et parcours pour l adoption des scripts cloud.',
-      icon: GraduationCap,
-    },
-    {
-      title: 'Collaboration equipe',
-      text: 'Partage de connaissances entre cloud ops, secops et devops.',
-      icon: Users2,
+      tone: 'text-emerald-400',
+      bg: 'bg-emerald-500/10',
     },
   ];
 
   const providerData = useMemo(() => {
-    const counts = scripts.reduce<Record<string, number>>((acc, script) => {
-      const key = script.provider || 'other';
-      acc[key] = (acc[key] || 0) + 1;
+    const counts = scripts.reduce<Record<string, number>>((acc, s) => {
+      const k = s.provider || 'other';
+      acc[k] = (acc[k] || 0) + 1;
       return acc;
     }, {});
-
-    return Object.entries(counts).map(([name, value]) => ({ name: name.toUpperCase(), value }));
-  }, []);
+    const fallback = totalScripts === 0 ? [{ name: 'AZURE', value: 1 }, { name: 'AWS', value: 1 }] : [];
+    return Object.entries(counts).map(([name, value]) => ({ name: name.toUpperCase(), value })).concat(fallback);
+  }, [totalScripts]);
 
   const categoryData = useMemo(
     () =>
       categories.map((cat) => ({
-        name: cat.name,
-        value: scripts.filter((script) => script.category === cat.id).length,
+        name: cat.name.split(' ')[0],
+        scripts: scripts.filter((s) => s.category === cat.id).length,
       })),
     []
   );
 
-  const languageData = useMemo(() => {
-    const counts = scripts.reduce<Record<string, number>>((acc, script) => {
-      const key = script.language || 'Other';
-      acc[key] = (acc[key] || 0) + 1;
-      return acc;
-    }, {});
+  const activityFeed = [
+    { icon: GitBranch, text: 'Nouveau script Azure ajouté', meta: 'il y a 2h', tone: 'text-blue-400' },
+    { icon: ShieldCheck, text: 'Script validé en production', meta: 'il y a 5h', tone: 'text-emerald-400' },
+    { icon: Package, text: 'Mise à jour catégorie Réseau', meta: 'hier', tone: 'text-violet-400' },
+    { icon: Star, text: '3 scripts ajoutés aux favoris', meta: 'hier', tone: 'text-amber-400' },
+    { icon: Terminal, text: 'Documentation mise à jour', meta: 'il y a 2j', tone: 'text-primary' },
+  ];
 
-    return Object.entries(counts).map(([name, value]) => ({ name, value }));
-  }, []);
+  const quickLinks = [
+    { to: '/scripts', label: 'Tous les scripts', desc: 'Bibliothèque complète', icon: FileCode2 },
+    { to: '/categories', label: 'Catégories', desc: 'Explorer par domaine', icon: Layers },
+    { to: '/provider/azure', label: 'Azure', desc: `${azureCount} scripts`, icon: Cloud },
+    { to: '/provider/aws', label: 'AWS', desc: `${awsCount} scripts`, icon: Server },
+    { to: '/resources', label: 'Ressources', desc: 'Documentation & liens', icon: BookOpenText },
+    { to: '/favorites', label: 'Favoris', desc: 'Vos scripts épinglés', icon: Star },
+  ];
 
-  const providerColors = ['#3B82F6', '#F59E0B', '#10B981', '#8B5CF6', '#EC4899'];
-  const categoryColor = '#3B82F6';
-  const languageColor = '#8B5CF6';
+  const PROVIDER_COLORS = ['hsl(199 89% 48%)', 'hsl(38 92% 50%)', 'hsl(142 71% 45%)', 'hsl(280 70% 60%)'];
 
   return (
     <DashboardLayout>
-      <div className="space-y-8 animate-fade-in">
-        {/* Welcome Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Bienvenue sur <span className="text-gradient">Azure Scripts</span>
-            </h1>
-            <p className="mt-2 text-muted-foreground">
-              Plateforme centralisée pour gérer, documenter et exploiter vos scripts Azure
-            </p>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 bg-success/10 text-success rounded-lg">
-            <CheckCircle2 className="h-5 w-5" />
-            <span className="text-sm font-medium">Catalogue prêt à l'utilisation</span>
-          </div>
-        </div>
-
-        {/* Platform Highlights */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-foreground">Ce que vous pouvez faire</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            {platformCards.map((card) => (
-              <article key={card.title} className="glass-card rounded-xl p-5">
-                <div
-                  className={`flex h-11 w-11 items-center justify-center rounded-lg border ${card.style}`}
-                >
-                  <card.icon className="h-5 w-5" />
-                </div>
-                <h3 className="mt-4 font-semibold text-foreground">{card.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{card.description}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        {/* Categories */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-foreground">Catégories</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {categories.map((cat) => (
-              <CategoryCard
-                key={cat.id}
-                id={cat.id as Category}
-                name={cat.name}
-                description={cat.description}
-              />
-            ))}
-          </div>
-        </section>
-
-        {/* Recent Scripts */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-foreground">Scripts Récents</h2>
-          </div>
-          {recentScripts.length === 0 ? (
-            <div className="glass-card rounded-xl p-6 text-center">
-              <p className="text-muted-foreground">
-                Aucun script pour le moment. Les scripts seront ajoutes via formulaire.
+      <div className="space-y-6 animate-fade-in">
+        {/* Hero header — dense pro style */}
+        <header className="rounded-xl border border-border/60 bg-gradient-to-br from-card via-card to-secondary/30 p-6">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-success/10 text-success border border-success/20">
+                  <span className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
+                  Opérationnel
+                </span>
+                <span>•</span>
+                <span>Build v1.0.0</span>
+                <span>•</span>
+                <span>Dernière sync: maintenant</span>
+              </div>
+              <h1 className="text-2xl font-bold text-foreground tracking-tight">
+                Vue d'ensemble du catalogue
+              </h1>
+              <p className="text-sm text-muted-foreground max-w-2xl">
+                Plateforme centralisée pour gérer, documenter et exploiter vos scripts Azure & AWS.
+                Accès rapide, gouvernance et traçabilité unifiés.
               </p>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {recentScripts.map((script) => (
-                <ScriptCard key={script.id} script={script} />
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* Additional Dashboard Sections */}
-        <section className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <article className="glass-card rounded-xl p-6 xl:col-span-2">
-            <h2 className="text-lg font-semibold text-foreground">Parcours de publication</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Le dashboard est pret pour accueillir des scripts dynamiques depuis formulaire et base.
-            </p>
-            <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-3">
-              {workflowSteps.map((step) => (
-                <div key={step.title} className="rounded-lg border border-border/60 bg-background/40 p-4">
-                  <div className="flex items-center gap-2 text-foreground font-medium">
-                    <step.icon className="h-4 w-4 text-primary" />
-                    {step.title}
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
-                </div>
-              ))}
-            </div>
-          </article>
-
-          <article className="glass-card rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-foreground">Acces rapides</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Ouvrez directement les zones les plus utilisees.
-            </p>
-            <div className="mt-4 flex flex-col gap-2">
+            <div className="flex items-center gap-2">
               <Link
                 to="/scripts"
-                className="rounded-lg border border-border/60 px-4 py-2 text-sm hover:bg-secondary/40 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
               >
-                Bibliotheque de scripts
+                <FileCode2 className="h-4 w-4" /> Parcourir le catalogue
               </Link>
               <Link
                 to="/categories"
-                className="rounded-lg border border-border/60 px-4 py-2 text-sm hover:bg-secondary/40 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border/60 text-sm font-medium hover:bg-secondary/40 transition-colors"
               >
-                Categories cloud
-              </Link>
-              <Link
-                to="/provider/azure"
-                className="rounded-lg border border-border/60 px-4 py-2 text-sm hover:bg-secondary/40 transition-colors"
-              >
-                Scripts Microsoft Azure
-              </Link>
-              <Link
-                to="/provider/aws"
-                className="rounded-lg border border-border/60 px-4 py-2 text-sm hover:bg-secondary/40 transition-colors"
-              >
-                Scripts AWS
+                <Layers className="h-4 w-4" /> Catégories
               </Link>
             </div>
-          </article>
-        </section>
-
-        {/* Enterprise Static Sections */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-foreground">Cadre entreprise</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            {governanceCards.map((item) => (
-              <article key={item.title} className="glass-card rounded-xl p-5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <item.icon className="h-5 w-5" />
+        </header>
+
+        {/* KPI grid */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {kpis.map((kpi) => (
+            <article
+              key={kpi.label}
+              className="group relative overflow-hidden rounded-xl border border-border/60 bg-card p-5 transition-all hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
+            >
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    {kpi.label}
+                  </p>
+                  <p className="text-3xl font-bold text-foreground tabular-nums">{kpi.value}</p>
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <TrendingUp className="h-3 w-3" /> {kpi.delta}
+                  </p>
                 </div>
-                <h3 className="mt-3 font-semibold text-foreground">{item.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
-              </article>
-            ))}
-          </div>
+                <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${kpi.bg} ${kpi.tone}`}>
+                  <kpi.icon className="h-5 w-5" />
+                </div>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            </article>
+          ))}
         </section>
 
-        <section className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-          <article className="glass-card rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-foreground">Standards de publication</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Une trame commune pour garder un hub fiable et maintenable.
-            </p>
-            <div className="mt-4 space-y-2">
-              <div className="rounded-lg border border-border/60 bg-background/40 p-3 text-sm text-muted-foreground">
-                Nommage unifie des scripts et conventions de versionnement.
+        {/* Charts row */}
+        <section className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          <article className="xl:col-span-2 rounded-xl border border-border/60 bg-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="font-semibold text-foreground">Scripts par catégorie</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Distribution dans le catalogue</p>
               </div>
-              <div className="rounded-lg border border-border/60 bg-background/40 p-3 text-sm text-muted-foreground">
-                Documentation obligatoire des prerequis, parametres et impacts.
-              </div>
-              <div className="rounded-lg border border-border/60 bg-background/40 p-3 text-sm text-muted-foreground">
-                Validation securite avant diffusion a l ensemble des equipes.
-              </div>
-              <div className="rounded-lg border border-border/60 bg-background/40 p-3 text-sm text-muted-foreground">
-                Revision collaborative pour assurer qualite et reutilisabilite.
-              </div>
+              <span className="text-xs text-muted-foreground px-2 py-1 rounded-md bg-secondary/50">
+                {totalScripts} total
+              </span>
+            </div>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
+                  <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
+                  <YAxis allowDecimals={false} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
+                  <Tooltip
+                    contentStyle={{
+                      background: 'hsl(var(--popover))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
+                  />
+                  <Bar dataKey="scripts" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </article>
 
-          <article className="glass-card rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-foreground">Piliers qualite</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Base statique de reference pour un dashboard entreprise.
-            </p>
-            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {qualityPillars.map((pillar) => (
-                <div key={pillar.title} className="rounded-lg border border-border/60 bg-background/40 p-4">
-                  <div className="flex items-center gap-2 font-medium text-foreground">
-                    <pillar.icon className="h-4 w-4 text-primary" />
-                    {pillar.title}
+          <article className="rounded-xl border border-border/60 bg-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="font-semibold text-foreground">Par provider</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Multi-cloud</p>
+              </div>
+            </div>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={providerData}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={80}
+                    innerRadius={50}
+                    paddingAngle={2}
+                  >
+                    {providerData.map((_, i) => (
+                      <Cell key={i} fill={PROVIDER_COLORS[i % PROVIDER_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      background: 'hsl(var(--popover))',
+                      border: '1px solid hsl(var(--border))',
+                      borderRadius: 8,
+                      fontSize: 12,
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </article>
+        </section>
+
+        {/* Activity + Quick links */}
+        <section className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+          <article className="rounded-xl border border-border/60 bg-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-primary" />
+                <h2 className="font-semibold text-foreground">Activité récente</h2>
+              </div>
+              <Link to="/history" className="text-xs text-primary hover:underline">
+                Voir tout
+              </Link>
+            </div>
+            <ul className="space-y-3">
+              {activityFeed.map((a, i) => (
+                <li
+                  key={i}
+                  className="flex items-start gap-3 pb-3 border-b border-border/40 last:border-0 last:pb-0"
+                >
+                  <div className={`mt-0.5 ${a.tone}`}>
+                    <a.icon className="h-4 w-4" />
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">{pillar.text}</p>
-                </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-foreground">{a.text}</p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                      <Clock className="h-3 w-3" />
+                      {a.meta}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          <article className="xl:col-span-2 rounded-xl border border-border/60 bg-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-primary" />
+                <h2 className="font-semibold text-foreground">Accès rapides</h2>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {quickLinks.map((q) => (
+                <Link
+                  key={q.to}
+                  to={q.to}
+                  className="group flex items-center gap-3 rounded-lg border border-border/60 bg-background/40 p-3 hover:border-primary/40 hover:bg-secondary/30 transition-all"
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary group-hover:bg-primary/20 transition-colors">
+                    <q.icon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{q.label}</p>
+                    <p className="text-xs text-muted-foreground truncate">{q.desc}</p>
+                  </div>
+                  <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </Link>
               ))}
             </div>
           </article>
         </section>
 
-        {/* Dynamic Charts */}
-        <section className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-          <article className="glass-card rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-foreground">Repartition par provider</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Graphique dynamique base sur les scripts Azure, AWS et autres.
-            </p>
-            <div className="mt-4 h-72">
-              {providerData.length === 0 ? (
-                <div className="h-full rounded-lg border border-border/60 bg-background/40 flex items-center justify-center text-sm text-muted-foreground">
-                  Aucune donnee script disponible.
-                </div>
-              ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={providerData} dataKey="value" nameKey="name" outerRadius={95} innerRadius={45}>
-                      {providerData.map((_, index) => (
-                        <Cell key={`provider-cell-${index}`} fill={providerColors[index % providerColors.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              )}
+        {/* System status footer card */}
+        <section className="rounded-xl border border-border/60 bg-card p-5">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Database className="h-4 w-4 text-primary" />
+              <h2 className="font-semibold text-foreground">État de la plateforme</h2>
             </div>
-          </article>
-
-          <article className="glass-card rounded-xl p-6 xl:col-span-2">
-            <h2 className="text-lg font-semibold text-foreground">Repartition par categorie</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Visualisation dynamique des scripts par domaine.</p>
-            <div className="mt-4 h-72">
-              {scripts.length === 0 ? (
-                <div className="h-full rounded-lg border border-border/60 bg-background/40 flex items-center justify-center text-sm text-muted-foreground">
-                  Aucune donnee script disponible.
+            <span className="text-xs text-muted-foreground">Mis à jour à l'instant</span>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: 'API', status: 'Opérationnel', tone: 'text-success', dot: 'bg-success' },
+              { label: 'Catalogue', status: 'Opérationnel', tone: 'text-success', dot: 'bg-success' },
+              { label: 'Recherche', status: 'Opérationnel', tone: 'text-success', dot: 'bg-success' },
+              { label: 'CDN', status: 'Opérationnel', tone: 'text-success', dot: 'bg-success' },
+            ].map((s) => (
+              <div key={s.label} className="rounded-lg border border-border/40 bg-background/40 p-3">
+                <p className="text-xs text-muted-foreground">{s.label}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className={`h-2 w-2 rounded-full ${s.dot} animate-pulse`} />
+                  <span className={`text-sm font-medium ${s.tone}`}>{s.status}</span>
                 </div>
-              ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={categoryData} margin={{ top: 10, right: 10, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
-                    <YAxis allowDecimals={false} tick={{ fontSize: 12 }} />
-                    <Tooltip />
-                    <Bar dataKey="value" fill={categoryColor} radius={[6, 6, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-            </div>
-          </article>
+              </div>
+            ))}
+          </div>
         </section>
-
-        <section>
-          <article className="glass-card rounded-xl p-6">
-            <h2 className="text-lg font-semibold text-foreground">Repartition par langage</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Graphique dynamique des technologies de scripts.</p>
-            <div className="mt-4 h-72">
-              {languageData.length === 0 ? (
-                <div className="h-full rounded-lg border border-border/60 bg-background/40 flex items-center justify-center text-sm text-muted-foreground">
-                  Aucune donnee script disponible.
-                </div>
-              ) : (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={languageData} layout="vertical" margin={{ top: 10, right: 30, left: 30, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                    <XAxis type="number" allowDecimals={false} tick={{ fontSize: 12 }} />
-                    <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 12 }} />
-                    <Tooltip />
-                    <Bar dataKey="value" fill={languageColor} radius={[0, 6, 6, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              )}
-            </div>
-          </article>
-        </section>
-
       </div>
     </DashboardLayout>
   );

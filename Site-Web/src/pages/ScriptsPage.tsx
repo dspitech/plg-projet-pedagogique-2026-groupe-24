@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Search, Filter, Grid, List } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Search, Filter, Grid, List, Plus } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ScriptCard } from '@/components/dashboard/ScriptCard';
+import { Button } from '@/components/ui/button';
 import { scripts, categories, Criticality, Category } from '@/data/scripts';
 import { cn } from '@/lib/utils';
 
@@ -45,9 +46,14 @@ export default function ScriptsPage() {
     <DashboardLayout>
       <div className="space-y-6 animate-fade-in">
         {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Bibliothèque de Scripts</h1>
-          <p className="mt-1 text-muted-foreground">Consultez et filtrez les scripts disponibles</p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Bibliothèque de Scripts</h1>
+            <p className="mt-1 text-muted-foreground">Consultez et filtrez les scripts disponibles</p>
+          </div>
+          <Button asChild>
+            <Link to="/scripts/new"><Plus className="h-4 w-4" /> Nouveau script</Link>
+          </Button>
         </div>
 
         {/* Filters */}
