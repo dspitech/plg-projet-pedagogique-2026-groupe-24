@@ -18,14 +18,16 @@ import {
   ChevronLeft,
   ChevronRight,
   Terminal,
+  Users as UsersIcon,
+  ScrollText,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/hooks/useUserData';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
-type NavItem = { id: string; name: string; icon: typeof Home; path: string };
+type NavItem = { id: string; name: string; icon: typeof Home; path: string; adminOnly?: boolean };
 
-const sections: { label?: string; items: NavItem[] }[] = [
+const sections: { label?: string; items: NavItem[]; adminOnly?: boolean }[] = [
   {
     label: 'Navigation',
     items: [
@@ -53,6 +55,14 @@ const sections: { label?: string; items: NavItem[] }[] = [
     ],
   },
   {
+    label: 'Administration',
+    adminOnly: true,
+    items: [
+      { id: 'users', name: 'Utilisateurs', icon: UsersIcon, path: '/admin/users', adminOnly: true },
+      { id: 'audit', name: 'Logs & Audit', icon: ScrollText, path: '/admin/audit-logs', adminOnly: true },
+    ],
+  },
+  {
     label: 'Compte',
     items: [
       { id: 'profile', name: 'Profil', icon: User, path: '/profile' },
@@ -65,18 +75,20 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { signOut, hasRole, profile, roles } = useAuth();
 
   const isActive = (path: string) => {
     if (path === '/') return location.pathname === '/';
     return location.pathname.startsWith(path);
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     toast.success('Vous avez été déconnecté');
     navigate('/login');
   };
+
+  const visibleSections = sections.filter((s) => !s.adminOnly || hasRole('global_admin'));
 
   return (
     <aside
@@ -85,7 +97,6 @@ export function Sidebar() {
         collapsed ? 'w-16' : 'w-64'
       )}
     >
-      {/* Logo */}
       <div className="flex h-16 items-center justify-between px-4 border-b border-sidebar-border shrink-0">
         <Link to="/" className="flex items-center gap-3 min-w-0">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary">
@@ -93,9 +104,7 @@ export function Sidebar() {
           </div>
           {!collapsed && (
             <div className="flex flex-col min-w-0">
-              <span className="text-sm font-semibold text-sidebar-foreground truncate">
-                Cloud Scripts
-              </span>
+              <span className="text-sm font-semibold text-sidebar-foreground truncate">Cloud Scripts</span>
               <span className="text-xs text-muted-foreground truncate">Dashboard Pro</span>
             </div>
           )}
@@ -109,9 +118,8 @@ export function Sidebar() {
         </button>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-3 space-y-5">
-        {sections.map((section, idx) => (
+        {visibleSections.map((section, idx) => (
           <div key={idx} className="space-y-1">
             {!collapsed && section.label && (
               <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/70">
@@ -133,7 +141,22 @@ export function Sidebar() {
         ))}
       </nav>
 
-      {/* Footer */}
+      {!collapsed && profile && (
+        <div className="border-t border-sidebar-border p-3 shrink-0">
+          <div className="flex items-center gap-2 px-2 py-2 rounded-md bg-sidebar-accent/30">
+            <div className="h-8 w-8 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold">
+              {profile.name.slice(0, 2).toUpperCase() || profile.email.slice(0, 2).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-sidebar-foreground truncate">{profile.name || profile.email}</p>
+              <p className="text-[10px] text-muted-foreground truncate">
+                {roles.includes('global_admin') ? 'Admin Global' : roles[0] ?? 'Aucun rôle'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="border-t border-sidebar-border p-3 shrink-0">
         <button
           onClick={handleLogout}
