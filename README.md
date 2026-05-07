@@ -37,9 +37,9 @@
     - [Tâche 4 — Système d'authentification & gestion des administrateurs (03/05/2026)](#tâche-4--système-dauthentification--gestion-des-administrateurs-03052026)
     - [Tâche 5 — Améliorations du dashboard : page utilisateur (06/05/2026)](#tâche-5--améliorations-du-dashboard--page-utilisateur-06052026)
     - [Tâche 6 — Configuration de la page Logs & Audits (06/05/2026)](#tâche-6--configuration-de-la-page-logs--audits-06052026)
-    - [Tâche 7 — Refonte de la page profil (07/05/2026)](#tâche-7--refonte-de-la-page-profil-06052027)
-    - [Tâche 8 — Création & configuration de la page catégorie (07/05/2026)](#tâche-8--Page-catégorie-06052028)
-- [UML et documentation de conception](#uml-et-documentation-de-conception)
+    - [Tâche 7 — Refonte de la page profil (07/05/2026)](#tâche-7--refonte-de-la-page-profil-07052026)
+    - [Tâche 8 — Création & configuration de la page catégorie (07/05/2026)](#tâche-8--création--configuration-de-la-page-catégorie-07052026)
+    - [UML et documentation de conception](#uml-et-documentation-de-conception)
 
 
 ---
