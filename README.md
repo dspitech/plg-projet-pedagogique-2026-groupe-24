@@ -6,12 +6,12 @@
 
 ## Équipe
 
-| Membre | Rôle |
-|--------|------|
-| Amir Minihadji AMINA | Développeur |
-| LO Pape | Développeur |
-| Neylie NDJUMKENG-NGUEMO | Développeur |
-| **Mhand BOUFALA** | Superviseur |
+| Membre | 
+|--------|
+| Amir Minihadji AMINA |
+| LO Pape | 
+| Neylie NDJUMKENG-NGUEMO |
+| **Mhand BOUFALA** - (**Superviseur**) |
 
 ---
 
@@ -37,8 +37,10 @@
     - [Tâche 4 — Système d'authentification & gestion des administrateurs (03/05/2026)](#tâche-4--système-dauthentification--gestion-des-administrateurs-03052026)
     - [Tâche 5 — Améliorations du dashboard : page utilisateur (06/05/2026)](#tâche-5--améliorations-du-dashboard--page-utilisateur-06052026)
     - [Tâche 6 — Configuration de la page Logs & Audits (06/05/2026)](#tâche-6--configuration-de-la-page-logs--audits-06052026)
+    - [Tâche 7 — Refonte de la page profil (07/05/2026)](#tâche-7--refonte-de-la-page-profil-06052027)
+    - [Tâche 8 — Création & configuration de la page catégorie (07/05/2026)](#tâche-8--Page-catégorie-06052028)
 - [UML et documentation de conception](#uml-et-documentation-de-conception)
-- [État actuel et prochaines étapes](#état-actuel-et-prochaines-étapes)
+
 
 ---
 
@@ -1063,6 +1065,666 @@ Le dossier `UML/` contient des diagrammes PlantUML :
 - Scénarios scripts (connexion, consultation, téléchargement, contact support…)
 
 Ces documents servent de référence de conception et de support.
+
+---
+
+## Tâche 7 — Refonte de la page profil (07/05/2026)
+
+## Objectif
+
+Refonte totale de `src/pages/ProfilePage.tsx` afin de remplacer l'ancienne interface statique par une page de profil **professionnelle, dynamique et entièrement connectée à Supabase**.
+
+Les objectifs principaux sont :
+
+- Afficher et éditer les informations personnelles d'un utilisateur en temps réel
+- Synchroniser toutes les données avec la table `profiles` de Supabase
+- Permettre l'upload et la prévisualisation d'un avatar via Supabase Storage
+- Garantir qu'un utilisateur ne peut modifier **que son propre profil** (Row Level Security)
+- Offrir une expérience utilisateur fluide avec validation, retours visuels et gestion d'erreurs
+
+---
+
+## Schéma de la base de données
+
+La table `profiles` a été étendue avec de nouveaux champs. Voici la définition SQL complète après migration :
+
+```sql
+create table public.profiles (
+  id               uuid                     not null,
+  name             text                     not null default ''::text,
+  email            text                     not null,
+  is_active        boolean                  not null default true,
+  is_suspended     boolean                  not null default false,
+  must_change_password boolean              not null default false,
+  last_login       timestamp with time zone          null,
+  created_at       timestamp with time zone not null default now(),
+  updated_at       timestamp with time zone not null default now(),
+
+  -- Nouveaux champs ajoutés lors de cette refonte
+  first_name       text                              null,
+  profession       text                              null,
+  bio              text                              null,
+  phone            text                              null,
+  avatar_url       text                              null,
+  address          text                              null,
+  city             text                              null,
+  country          text                              null,
+  status           text                     not null default 'active'::text,
+
+  constraint profiles_pkey primary key (id),
+  constraint profiles_id_fkey foreign key (id)
+    references auth.users (id) on delete cascade
+) tablespace pg_default;
+
+-- Trigger de mise à jour automatique du champ updated_at
+create trigger profiles_set_updated_at
+  before update on profiles
+  for each row
+  execute function update_updated_at_column();
+```
+
+---
+
+## Nouveaux champs
+
+| Champ        | Type   | Nullable | Description                                              |
+|--------------|--------|----------|----------------------------------------------------------|
+| `first_name` | `text` | Oui      | Prénom de l'utilisateur                                  |
+| `profession` | `text` | Oui      | Intitulé du poste / métier                               |
+| `bio`        | `text` | Oui      | Courte biographie (limitée en longueur côté client)      |
+| `phone`      | `text` | Oui      | Numéro de téléphone (validé côté client)                 |
+| `avatar_url` | `text` | Oui      | URL publique de l'image uploadée dans Supabase Storage   |
+| `address`    | `text` | Oui      | Adresse postale                                          |
+| `city`       | `text` | Oui      | Ville                                                    |
+| `country`    | `text` | Oui      | Pays                                                     |
+| `status`     | `text` | Non      | Statut de présence : `active`, `away`, `busy`, `offline` |
+
+
+![image](https://hackmd.io/_uploads/HJ2xARKCbg.png)
+![image](https://hackmd.io/_uploads/SykXARKRZx.png)
+![image](https://hackmd.io/_uploads/rkuYCCtAWg.png)
+
+## Fonctionnalités implémentées
+
+### Chargement & sauvegarde
+
+- Récupération du profil au montant du composant via `supabase.from('profiles').select()`
+- Sauvegarde directe dans Supabase via `.update()` sur le profil de l'utilisateur connecté
+- Mise à jour optimiste de l'interface avant confirmation serveur
+
+### Validation côté utilisateur
+
+| Champ    | Règle de validation                          |
+|----------|----------------------------------------------|
+| `name`   | Obligatoire, non vide                        |
+| `phone`  | Format numérique, optionnel                  |
+| `bio`    | Longueur maximale contrôlée (ex : 500 chars) |
+
+### Retours utilisateur
+
+- **Toasts** de succès et d'erreur pour chaque action (sauvegarde, upload, erreur réseau)
+- Indicateurs visuels distincts pour les états `loading`, `saving` et `uploading`
+- Prévisualisation instantanée des modifications avant sauvegarde
+
+### statuts
+
+
+
+| Valeur     | Affichage   | Couleur   |
+|------------|-------------|-----------|
+| `active`   | Actif    | Vert      |
+| `away`     | Absent   | Jaune     |
+| `busy`     | Occupé   | Rouge     |
+| `offline`  | Hors ligne | Gris    |
+
+---
+
+## Architecture & UI
+
+### Sections de la page
+
+**Carte identité (panneau gauche)**
+- Photo de profil avec bouton d'upload intégré
+- Nom complet + prénom
+- Profession
+- Badge de statut interactif
+- Badges de rôles
+
+**Formulaire principal (panneau droit)**
+- Section *Informations personnelles* : prénom, nom, profession, téléphone
+- Section *Coordonnées* : adresse, ville, pays
+- Section *Biographie* : textarea avec compteur de caractères
+- Boutons Annuler / Sauvegarder
+
+---
+
+## Upload d'avatar
+
+L'upload est géré via **Supabase Storage** :
+
+- **Bucket** : `avatars` (accès public activé)
+- **Chemin de stockage** : `{user.id}/{nom_du_fichier}`
+- **Formats acceptés** : `image/png`, `image/jpeg`, `image/webp`
+- **Flux** :
+  1. L'utilisateur sélectionne une image via l'input file
+  2. L'image est uploadée dans le bucket `avatars` sous le dossier `{user.id}/`
+  3. L'URL publique générée est sauvegardée dans `profiles.avatar_url`
+  4. La prévisualisation est mise à jour instantanément dans l'interface
+
+```typescript
+// Exemple d'upload
+const { data, error } = await supabase.storage
+  .from('avatars')
+  .upload(`${user.id}/${file.name}`, file, { upsert: true });
+
+const { publicUrl } = supabase.storage
+  .from('avatars')
+  .getPublicUrl(`${user.id}/${file.name}`).data;
+
+await supabase.from('profiles').update({ avatar_url: publicUrl });
+```
+
+---
+
+## Gestion des états
+
+Le composant gère trois états de chargement distincts :
+
+| État        | Description                                      | UI associée                  |
+|-------------|--------------------------------------------------|------------------------------|
+| `loading`   | Chargement initial du profil depuis Supabase     | Skeleton / spinner global    |
+| `saving`    | Sauvegarde du formulaire en cours                | Bouton désactivé + spinner   |
+| `uploading` | Upload de l'avatar en cours                      | Overlay sur l'avatar         |
+
+---
+
+## Sécurité & RLS
+
+La page respecte la politique **Row Level Security (RLS)** de Supabase :
+
+- Chaque utilisateur authentifié ne peut **lire et modifier que son propre profil**
+- Les requêtes `.update()` sont filtrées automatiquement par `auth.uid() = id`
+- Aucune donnée sensible (mot de passe, tokens) n'est exposée côté client
+
+```sql
+-- Exemple de politique RLS attendue sur la table profiles
+create policy "Users can update their own profile"
+  on profiles for update
+  using (auth.uid() = id);
+```
+
+---
+
+## Tâche à venir (correction)
+### Alertes de sécurité 
+
+Les avertissements suivants ont été identifiés dans le dashboard Supabase et **doivent être traités en priorité** avant la mise en production.
+
+> **Priorité haute** — Ces vulnérabilités peuvent permettre des escalades de privilèges ou des fuites de données.
+
+---
+
+### 1. Les utilisateurs authentifiés peuvent insérer des entrées arbitraires dans le journal d'audit
+
+**Risque** : Un utilisateur connecté peut écrire dans la table d'audit, corrompant ainsi les logs de traçabilité.  
+**Correctif** : Restreindre les politiques INSERT sur la table d'audit aux seuls rôles système (`service_role`). Supprimer toute politique RLS qui accorde un accès en écriture aux utilisateurs authentifiés sur cette table.
+
+---
+
+### 2. Tout utilisateur authentifié peut s'octroyer des rôles d'administrateur
+
+**Risque** : Élévation de privilèges  un utilisateur standard peut se promouvoir administrateur.  
+**Correctif** : Retirer les politiques RLS permettant aux utilisateurs de modifier leur propre colonne de rôle. Les changements de rôles doivent être effectués exclusivement via des fonctions `SECURITY DEFINER` appelées depuis le backend ou via le dashboard Supabase.
+
+---
+
+### 3. Le public peut exécuter une fonction `SECURITY DEFINER`
+
+**Risque** : Des fonctions exécutées avec des privilèges élevés sont accessibles sans authentification.  
+**Correctif** : Révoquer l'accès `EXECUTE` au rôle `anon` sur les fonctions concernées. Restreindre à `authenticated` ou `service_role` selon le besoin.
+
+```sql
+revoke execute on function nom_de_la_fonction from anon;
+```
+
+---
+
+### 4. Protection par mot de passe désactivée suite à une fuite
+
+**Risque** : Des mots de passe compromis peuvent toujours être utilisés pour se connecter.  
+**Correctif** : Activer la vérification de mots de passe compromis dans les paramètres d'authentification Supabase (*Auth → Settings → Password Protection*). Forcer la réinitialisation des mots de passe concernés.
+
+---
+
+### 5. Les utilisateurs connectés peuvent exécuter une fonction `SECURITY DEFINER`
+
+**Risque** : Des fonctions privilégiées sont exposées à tous les utilisateurs authentifiés, même non-admins.  
+**Correctif** : Auditer toutes les fonctions `SECURITY DEFINER` et restreindre leur accès au minimum nécessaire. Utiliser des vérifications internes (`auth.uid()`, `auth.role()`) pour limiter les actions autorisées.
+
+---
+
+### 6. Le bucket public `avatars` ne supprime pas les liens des fichiers images
+
+**Risque** : Même après suppression d'un fichier du bucket, son URL publique reste accessible (le CDN Supabase met en cache les fichiers publics).  
+**Correctif** :
+- Passer le bucket `avatars` en **mode privé** et générer des **signed URLs** à durée limitée pour afficher les avatars
+- Ou implémenter une stratégie de nommage unique (ex : UUID) pour chaque upload afin que les anciennes URLs deviennent caduques naturellement
+
+```typescript
+// Alternative : génération d'une signed URL (bucket privé)
+const { data } = await supabase.storage
+  .from('avatars')
+  .createSignedUrl(`${user.id}/${fileName}`, 3600); // expire dans 1h
+```
+
+---
+
+## Fichiers concernés
+
+| Fichier | Modification |
+|--------|-------------|
+| `src/pages/ProfilePage.tsx` | Refonte complète |
+| `supabase/migrations/XXXXXX_add_profile_fields.sql` | Ajout des nouveaux champs |
+| `supabase/storage/avatars` | Création du bucket |
+
+---
+
+## Tâche 8 — Création & configuration de la page catégorie (07/05/2026)
+
+## Objectif
+
+Dans cette partie, nous allons créer et configurer la page catégorie.
+
+---
+
+## Base de données : création de la table
+
+### Table `public.categories`
+
+```sql
+create type category_status as enum ('active', 'inactive', 'archived');
+
+create table public.categories (
+  id          uuid                     not null default gen_random_uuid(),
+  name        text                     not null,
+  description text                              null,
+  color       text                     not null default '#6366f1',
+  icon        text                     not null default 'Folder',
+  status      category_status          not null default 'active',
+  is_visible  boolean                  not null default true,
+  type        text                              null,
+  position    integer                  not null default 0,
+  created_by  uuid                              null references auth.users(id),
+  created_at  timestamp with time zone not null default now(),
+  updated_at  timestamp with time zone not null default now(),
+
+  constraint categories_pkey primary key (id)
+) tablespace pg_default;
+
+-- Trigger de mise à jour automatique du champ updated_at
+create trigger categories_set_updated_at
+  before update on categories
+  for each row
+  execute function update_updated_at_column();
+```
+![image](https://hackmd.io/_uploads/ryebsxq0We.png)
+
+### Détail des colonnes
+
+| Colonne | Type | Nullable | Description |
+|---|---|---|---|
+| `id` | `uuid` | Non | Identifiant unique auto-généré |
+| `name` | `text` | Non | Nom affiché de la catégorie |
+| `description` | `text` | Oui | Description courte |
+| `color` | `text` | Non | Couleur hex (ex : `#3b82f6`) |
+| `icon` | `text` | Non | Nom de l'icône Lucide |
+| `status` | `category_status` | Non | `active`, `inactive` ou `archived` |
+| `is_visible` | `boolean` | Non | Visibilité dans les listes publiques |
+| `type` | `text` | Oui | Famille (cloud, security, devops…) |
+| `position` | `integer` | Non | Ordre d'affichage |
+| `created_by` | `uuid` | Oui | Référence à l'utilisateur créateur |
+
+---
+
+## Sécurité & RLS
+
+Les politiques Row Level Security garantissent un accès différencié selon le rôle de l'utilisateur.
+
+| Action            | Tous auth. | Editor | Admin / Global |
+|------------------|------------|--------|-----------------|
+| SELECT (lecture) | oui        | oui    | oui             |
+| INSERT           | non        | oui    | oui             |
+| UPDATE           | non        | oui    | oui             |
+| DELETE           | non        | non    | oui             
+
+**Code SQL**
+
+```sql
+-- Lecture : tout utilisateur authentifié
+create policy "categories_select"
+  on categories for select
+  using (auth.role() = 'authenticated');
+
+-- Écriture : editor, admin, global_admin
+create policy "categories_insert"
+  on categories for insert
+  with check (
+    exists (
+      select 1 from profiles
+      where id = auth.uid()
+      and role in ('editor', 'admin', 'global_admin')
+    )
+  );
+
+-- Suppression : admin et global_admin uniquement
+create policy "categories_delete"
+  on categories for delete
+  using (
+    exists (
+      select 1 from profiles
+      where id = auth.uid()
+      and role in ('admin', 'global_admin')
+    )
+  );
+```
+
+---
+
+## Interface utilisateur
+
+### Composant principal
+
+**Fichier** : `src/pages/CategoriesPage.tsx`
+
+La page est organisée en plusieurs zones distinctes :
+
+| Section                                                      |
+|--------------------------------------------------------------|
+| En-tête : Titre + boutons Import / Export / Modèle / +      |
+| 6 Cartes statistiques                                        |
+| Barre : Recherche | Filtre statut | Bascule vue             |
+| Actions de sélection en masse (si éléments sélectionnés)     |
+| Vue Grille OU Vue Tableau paginée                           |
+
+![image](https://hackmd.io/_uploads/B19ZqgqA-x.png)
+
+### États gérés
+
+| État | Description | UI |
+|---|---|---|
+| `loading` | Chargement initial depuis Supabase | Skeletons animés |
+| `empty` | Aucune catégorie trouvée | Illustration + message d'action |
+| `saving` | Sauvegarde en cours | Bouton désactivé + spinner |
+| `importing` | Import JSON en cours | Barre de progression 0→100% |
+| `exporting` | Génération PDF/CSV | Barre de progression |
+
+---
+
+## Statistiques & Dashboard
+
+Six cartes statistiques en haut de page offrent une vue instantanée du catalogue :
+
+| Carte | Métrique | Couleur |
+|---|---|---|
+| **Total** | Nombre total de catégories | Neutre |
+| **Actives** | `status = 'active'` | Vert |
+| **Inactives** | `status = 'inactive'` | Jaune |
+| **Archivées** | `status = 'archived'` | Gris |
+| **Visibles** | `is_visible = true` | Bleu |
+| **Masquées** | `is_visible = false` | Violet |
+
+
+---
+
+## Gestion des vues
+
+### Recherche & Filtrage
+
+- **Recherche instantanée** : filtrage en temps réel sur le `name` et la `description`
+- **Filtre par statut** : menu déroulant `Tous | Actives | Inactives | Archivées`
+- Les deux filtres sont combinables et réactifs sans rechargement
+![image](https://hackmd.io/_uploads/ryVr9lqCZe.png)
+
+### Vue Grille
+
+Cartes colorées premium affichant pour chaque catégorie :
+- Icône Lucide dans un rond de couleur
+- Nom et description
+- Badge de statut (`active` / `inactive` / `archived`)
+- Badge de visibilité
+- Menu d'actions (⋯) en overlay au hover
+
+![image](https://hackmd.io/_uploads/S1TLcx9Cbx.png)
+
+### Vue Tableau
+
+Tableau dense avec une ligne par catégorie, incluant toutes les colonnes clés et un menu d'actions en ligne. Adapté aux administrateurs gérant de grands volumes.
+![image](https://hackmd.io/_uploads/rk7O5lcCbe.png)
+
+---
+
+## Modal Création / Édition
+
+Le formulaire est organisé en **2 sections distinctes** :
+
+### Section 1 — Informations générales
+
+| Champ | Type | Règle |
+|---|---|---|
+| `name` | Texte | Obligatoire |
+| `description` | Textarea | Optionnel |
+| `type` | Texte | Optionnel (cloud, devops…) |
+| `status` | Select enum | `active` par défaut |
+| `is_visible` | Toggle | `true` par défaut |
+
+### Section 2 — Personnalisation visuelle
+
+- **Color picker** : palette de couleurs prédéfinies + sélecteur natif HTML pour valeur personnalisée
+- **Sélecteur d'icônes** : grille d'icônes Lucide filtrables par nom, prévisualisation en temps réel
+
+La prévisualisation de la carte finale est mise à jour **instantanément** à chaque modification de couleur ou d'icône.
+
+![image](https://hackmd.io/_uploads/B16c5g5A-e.png)
+
+---
+
+## Actions disponibles
+
+Chaque catégorie expose les actions suivantes (menu contextuel en grille, boutons en tableau) :
+
+| Action | Description | Confirmation requise |
+|---|---|---|
+| **Éditer** | Ouvre la modal pré-remplie | Non |
+| **Activer** | Passe le statut à `active` | Non |
+| **Désactiver** | Passe le statut à `inactive` | Non |
+| **Afficher / Masquer** | Bascule `is_visible` | Non |
+| **Dupliquer** | Crée une copie avec `(copie)` dans le nom | Non |
+| **Archiver** | Passe le statut à `archived` | Non |
+| **Supprimer** | Suppression définitive en base | Oui |
+
+Chaque action déclenche un **toast** de succès ou d'erreur.
+![image](https://hackmd.io/_uploads/Hy3uogc0Ze.png)
+
+---
+
+## Sélection en masse
+
+Une barre d'actions collectives apparaît dès qu'au moins une catégorie est sélectionnée.
+
+| Contrôle | Comportement |
+|---|---|
+| Case à cocher par ligne | Sélection individuelle |
+| **Tout sélectionner** | Coche toutes les catégories de la page courante |
+| **Désélectionner** | Décoche tous les éléments |
+| **Archiver** | Archive en masse les éléments sélectionnés |
+| **Supprimer** | Suppression en masse avec modal de confirmation |
+
+![image](https://hackmd.io/_uploads/By76ogcRZe.png)
+
+
+---
+
+## Pagination
+
+Le tableau est paginé par **10 éléments par page**.
+
+```
+  Affichage 1–10 sur 47 catégories
+  [← Précédent]   Page 1 / 5   [Suivant →]
+```
+
+| Élément | Détail |
+|---|---|
+| Taille de page | 10 éléments |
+| Navigation | Boutons Précédent / Suivant |
+| Indicateur | `Page X / Y` |
+| Compteur | `Affichage N–M sur Total` |
+
+La pagination est réinitialisée à la page 1 lors de toute modification de recherche ou de filtre.
+
+![image](https://hackmd.io/_uploads/Bkvk2xcRbe.png)
+
+---
+
+## Import JSON
+
+Bouton **Importer JSON** en haut de page ouvrant une modal dédiée.
+
+### Flux d'import
+
+```
+1. Ouverture de la modal d'import
+        ↓
+2. Dépôt du fichier (drag & drop) ou sélection via explorateur
+        ↓
+3. Validation JSON (structure, champs requis, types)
+        ↓
+4. Barre de progression 0% → 100% + statut en temps réel
+        ↓
+5. Insertion en base des catégories valides
+        ↓
+6. Modal de résumé final
+```
+
+### Gestion des cas particuliers
+
+| Cas | Comportement |
+|---|---|
+| JSON invalide | Erreur affichée, import bloqué |
+| Champ manquant | Ligne signalée avec message précis |
+| Doublon détecté | Ligne ignorée, comptabilisée dans "ignorées" |
+| Erreur Supabase | Ligne comptabilisée dans "erreurs" |
+
+
+## Modèle JSON
+
+Bouton **Modèle JSON** en haut de page pour faciliter la préparation d'imports.
+
+### Flux
+
+```
+1. Clic sur Modèle JSON
+        ↓
+2. Modal de confirmation
+        ↓
+3. Barre de progression du téléchargement
+        ↓
+4. Modal de confirmation de fin (fichier téléchargé)
+```
+
+Le fichier téléchargé contient **2 à 3 exemples** de catégories avec tous les champs attendus et leurs valeurs types, prêt à être complété et réimporté.
+
+![image](https://hackmd.io/_uploads/B14u3l90We.png)
+![image](https://hackmd.io/_uploads/HJQKnx5Cbg.png)
+![image](https://hackmd.io/_uploads/S1r53g5AWg.png)
+le fichier du modèle Json.
+![image](https://hackmd.io/_uploads/rJPa3g9RZe.png)
+
+### Importer un modèle Json 
+
+On peut importer un modèle Json afin d'automatiser la création des catégories.
+![image](https://hackmd.io/_uploads/rJNSaxcRbg.png)
+![image](https://hackmd.io/_uploads/BkHLTecRZl.png)
+![image](https://hackmd.io/_uploads/ry4w6gqRWx.png)
+![image](https://hackmd.io/_uploads/ByRvpx9C-g.png)
+![image](https://hackmd.io/_uploads/BkOdpeqCbg.png)
+![image](https://hackmd.io/_uploads/SkTKpxqRbx.png)
+![image](https://hackmd.io/_uploads/HyZs6xcRWl.png)
+![image](https://hackmd.io/_uploads/B1N36xqA-g.png)
+
+
+---
+
+## Export
+
+Bouton **Télécharger** en haut de page proposant deux formats (PDF - CSV).
+
+### Flux d'export
+
+```
+1. Clic sur Télécharger
+        ↓
+2. Modal de confirmation (format PDF ou CSV)
+        ↓
+3. Barre de progression pendant la génération
+        ↓
+4. Téléchargement automatique du fichier
+```
+![image](https://hackmd.io/_uploads/SkaZClqAbg.png)
+![image](https://hackmd.io/_uploads/Bylm0lq0Ze.png)
+![image](https://hackmd.io/_uploads/H19E0gqRbe.png)
+
+### Export PDF
+
+- Mise en page professionnelle avec entête et pied de page
+- Tableau de toutes les catégories avec colonnes : Nom, Type, Statut, Visible, Couleur
+- Pagination automatique des pages
+- Date d'export incluse dans le pied de page
+![image](https://hackmd.io/_uploads/Sk_DCx90-l.png)
+
+### Export CSV
+
+- Fichier plat compatible Excel / Google Sheets
+- Encodage UTF-8 avec BOM pour les caractères spéciaux
+- En-têtes de colonnes en première ligne
+![image](https://hackmd.io/_uploads/BkY6CeqC-x.png)
+
+---
+
+
+## Migration Supabase
+
+Une nouvelle migration de la base de donnée a été lancée.
+![image](https://hackmd.io/_uploads/SJu7yb90Wx.png)
+
+
+```
+migrations/
+└── XXXXXX_categories_and_profiles_update.sql
+```
+
+### Contenu de la migration
+
+| Bloc | Description |
+|---|---|
+| **Colonnes `profiles`** | Ajout de `first_name`, `profession`, `bio`, `phone`, `avatar_url`, `address`, `city`, `country`, `status` |
+| **Bucket `avatars`** | Création du bucket Supabase Storage avec lecture publique et écriture réservée au propriétaire |
+| **Enum `category_status`** | Création du type `active \| inactive \| archived` |
+| **Table `categories`** | Création avec toutes les colonnes et contraintes |
+| **Policies RLS** | SELECT / INSERT / UPDATE / DELETE selon les rôles |
+| **Trigger `updated_at`** | Application sur `profiles` et `categories` |
+
+---
+
+## Fichiers concernés
+
+| Fichier | Modification |
+|---|---|
+| `src/pages/CategoriesPage.tsx` | Création complète du module |
+| `src/components/CategoryModal.tsx` | Modal création / édition |
+| `src/components/CategoryCard.tsx` | Carte vue grille |
+| `supabase/migrations/XXXXXX_categories.sql` | Migration complète |
+| `supabase/storage/avatars` | Bucket avatars (partagé avec ProfilePage) |
 
 ---
 

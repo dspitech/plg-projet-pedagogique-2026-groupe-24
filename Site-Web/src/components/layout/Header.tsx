@@ -1,8 +1,16 @@
-import { Search, Bell, User, CalendarDays, Clock3, MapPin, Command } from 'lucide-react';
+import { Search, Bell, User, CalendarDays, Clock3, MapPin, Command, LogOut, Settings } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const ROLE_LABELS = {
   global_admin: 'Admin Global',
@@ -12,7 +20,7 @@ const ROLE_LABELS = {
 } as const;
 
 export function Header() {
-  const { profile, roles } = useAuth();
+  const { profile, roles, signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [now, setNow] = useState(() => new Date());
   const [logsCount, setLogsCount] = useState(0);
@@ -75,6 +83,13 @@ export function Header() {
   const localeLabel = navigator.language.toUpperCase();
   const locationLabel = timeZone;
   const displayName = profile?.name || profile?.email || 'Utilisateur';
+  const avatarUrl = (profile as any)?.avatar_url as string | undefined;
+  const initials = (displayName?.trim()?.[0] ?? 'U').toUpperCase();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/auth');
+  };
 
   return (
     <header className="sticky top-0 z-30 h-16 bg-background/90 backdrop-blur-xl border-b border-border/70">
@@ -134,9 +149,33 @@ export function Header() {
               <p className="text-sm font-semibold text-foreground truncate max-w-[180px]">{displayName}</p>
               <p className="text-xs text-muted-foreground">{roleLabel}</p>
             </div>
-            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <User className="h-5 w-5" />
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="rounded-full ring-offset-background transition hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                  <Avatar className="h-10 w-10 border border-border/70">
+                    <AvatarImage src={avatarUrl} alt={displayName} />
+                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuItem onClick={() => navigate('/profile')} className="gap-2">
+                  <User className="h-5 w-5" />
+                  Profil
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/profile')} className="gap-2">
+                  <Settings className="h-4 w-4" />
+                  Paramètres
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="gap-2 text-destructive focus:text-destructive">
+                  <LogOut className="h-4 w-4" />
+                  Se déconnecter
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

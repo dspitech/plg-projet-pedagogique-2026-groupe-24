@@ -53,6 +53,51 @@ export type Database = {
         }
         Relationships: []
       }
+      categories: {
+        Row: {
+          color: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          icon: string
+          id: string
+          is_visible: boolean
+          name: string
+          position: number
+          status: Database["public"]["Enums"]["category_status"]
+          type: string | null
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          icon?: string
+          id?: string
+          is_visible?: boolean
+          name: string
+          position?: number
+          status?: Database["public"]["Enums"]["category_status"]
+          type?: string | null
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          icon?: string
+          id?: string
+          is_visible?: boolean
+          name?: string
+          position?: number
+          status?: Database["public"]["Enums"]["category_status"]
+          type?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       permissions: {
         Row: {
           action: string
@@ -79,36 +124,63 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
+          avatar_url: string | null
+          bio: string | null
+          city: string | null
+          country: string | null
           created_at: string
           email: string
+          first_name: string | null
           id: string
           is_active: boolean
           is_suspended: boolean
           last_login: string | null
           must_change_password: boolean
           name: string
+          phone: string | null
+          profession: string | null
+          status: string
           updated_at: string
         }
         Insert: {
+          address?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           email: string
+          first_name?: string | null
           id: string
           is_active?: boolean
           is_suspended?: boolean
           last_login?: string | null
           must_change_password?: boolean
           name?: string
+          phone?: string | null
+          profession?: string | null
+          status?: string
           updated_at?: string
         }
         Update: {
+          address?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           email?: string
+          first_name?: string | null
           id?: string
           is_active?: boolean
           is_suspended?: boolean
           last_login?: string | null
           must_change_password?: boolean
           name?: string
+          phone?: string | null
+          profession?: string | null
+          status?: string
           updated_at?: string
         }
         Relationships: []
@@ -188,6 +260,7 @@ export type Database = {
     }
     Enums: {
       app_role: "global_admin" | "admin" | "editor" | "viewer"
+      category_status: "active" | "inactive" | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -316,6 +389,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["global_admin", "admin", "editor", "viewer"],
+      category_status: ["active", "inactive", "archived"],
     },
   },
 } as const
