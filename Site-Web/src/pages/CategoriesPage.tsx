@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Plus,
   Search,
@@ -21,6 +22,7 @@ import {
   ChevronRight,
   Download,
   FileDown,
+  FileCode2,
   FileJson,
   Upload,
   Check,
@@ -151,6 +153,7 @@ export default function CategoriesPage() {
 
   const [items, setItems] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [scriptCountByCategory, setScriptCountByCategory] = useState<Record<string, number>>({});
   const [view, setView] = useState<'grid' | 'table'>('grid');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | Status>('all');
@@ -189,13 +192,23 @@ export default function CategoriesPage() {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('position', { ascending: true })
-      .order('created_at', { ascending: false });
-    if (error) toast.error(error.message);
-    setItems((data as Category[]) ?? []);
+    const [categoriesRes, scriptsRes] = await Promise.all([
+      supabase
+        .from('categories')
+        .select('*')
+        .order('position', { ascending: true })
+        .order('created_at', { ascending: false }),
+      supabase.from('scripts').select('category_id').not('category_id', 'is', null),
+    ]);
+    if (categoriesRes.error) toast.error(categoriesRes.error.message);
+    if (scriptsRes.error) toast.error(scriptsRes.error.message);
+    setItems((categoriesRes.data as Category[]) ?? []);
+    const counts: Record<string, number> = {};
+    (scriptsRes.data ?? []).forEach((row: { category_id: string | null }) => {
+      if (!row.category_id) return;
+      counts[row.category_id] = (counts[row.category_id] ?? 0) + 1;
+    });
+    setScriptCountByCategory(counts);
     setLoading(false);
   };
 
@@ -731,6 +744,7 @@ export default function CategoriesPage() {
               <CategoryCard
                 key={c.id}
                 c={c}
+                scriptCount={scriptCountByCategory[c.id] ?? 0}
                 canWrite={canWrite}
                 canDelete={canDelete}
                 onEdit={() => openEdit(c)}
@@ -768,6 +782,7 @@ export default function CategoriesPage() {
             </div>
             <CategoryTable
               items={paginatedItems}
+              scriptCountByCategory={scriptCountByCategory}
               canWrite={canWrite}
               canDelete={canDelete}
               selectedIds={selectedIds}
@@ -1204,7 +1219,7 @@ function statusBadge(s: Status) {
 
 function CategoryCard({
   c, canWrite, canDelete,
-  onEdit, onDelete, onToggleStatus, onToggleVisible, onDuplicate, onArchive,
+  scriptCount, onEdit, onDelete, onToggleStatus, onToggleVisible, onDuplicate, onArchive,
 }: any) {
   return (
     <div className="group rounded-xl border border-border/60 bg-card overflow-hidden hover:border-primary/40 hover:shadow-lg transition-all">
@@ -1248,10 +1263,16 @@ function CategoryCard({
           {c.description || 'Aucune description'}
         </p>
         <div className="mt-4 flex items-center justify-between">
-          <Badge variant="outline" className={statusBadge(c.status)}>{c.status}</Badge>
-          <span className="text-[11px] text-muted-foreground">
-            {new Date(c.updated_at).toLocaleDateString('fr-FR')}
-          </span>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className={statusBadge(c.status)}>{c.status}</Badge>
+            <Link to={`/scripts?category=${encodeURIComponent(c.id)}`}>
+              <Badge variant="secondary" className="gap-1 hover:bg-primary/15 cursor-pointer transition-colors">
+                <FileCode2 className="h-3.5 w-3.5" />
+                {scriptCount} script(s)
+              </Badge>
+            </Link>
+          </div>
+          <span className="text-[11px] text-muted-foreground">{new Date(c.updated_at).toLocaleDateString('fr-FR')}</span>
         </div>
       </div>
     </div>
@@ -1259,7 +1280,7 @@ function CategoryCard({
 }
 
 function CategoryTable({
-  items, canWrite, canDelete,
+  items, scriptCountByCategory, canWrite, canDelete,
   selectedIds, onToggleSelect,
   onEdit, onDelete, onToggleStatus, onToggleVisible, onDuplicate, onArchive,
 }: any) {
@@ -1272,6 +1293,7 @@ function CategoryTable({
               <th className="px-4 py-3 text-left">Choix</th>
               <th className="px-4 py-3 text-left">Catégorie</th>
               <th className="px-4 py-3 text-left">Type</th>
+              <th className="px-4 py-3 text-left">Scripts</th>
               <th className="px-4 py-3 text-left">Statut</th>
               <th className="px-4 py-3 text-left">Visibilité</th>
               <th className="px-4 py-3 text-left">Mise à jour</th>
@@ -1305,6 +1327,15 @@ function CategoryTable({
                   </div>
                 </td>
                 <td className="px-4 py-3 text-muted-foreground">{c.type || '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">
+                  <Link
+                    to={`/scripts?category=${encodeURIComponent(c.id)}`}
+                    className="inline-flex items-center gap-1.5 hover:text-primary transition-colors"
+                  >
+                    <FileCode2 className="h-3.5 w-3.5" />
+                    {scriptCountByCategory[c.id] ?? 0}
+                  </Link>
+                </td>
                 <td className="px-4 py-3"><Badge variant="outline" className={statusBadge(c.status)}>{c.status}</Badge></td>
                 <td className="px-4 py-3 text-muted-foreground">
                   {c.is_visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}

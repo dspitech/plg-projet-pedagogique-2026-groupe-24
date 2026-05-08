@@ -39,6 +39,7 @@
     - [Tâche 6 — Configuration de la page Logs & Audits (06/05/2026)](#tâche-6--configuration-de-la-page-logs--audits-06052026)
     - [Tâche 7 — Refonte de la page profil (07/05/2026)](#tâche-7--refonte-de-la-page-profil-07052026)
     - [Tâche 8 — Création & configuration de la page catégorie (07/05/2026)](#tâche-8--création--configuration-de-la-page-catégorie-07052026)
+    [Tâche 9 — Création & configuration de la page Scripts + améliorations Catégories (08/05/2026)](#tâche-8--création--configuration-de-la-page-catégorie-08052026)
     - [UML et documentation de conception](#uml-et-documentation-de-conception)
 
 
@@ -1728,3 +1729,211 @@ migrations/
 
 ---
 
+## Tâche 9 — Création & configuration de la page Scripts + améliorations Catégories (08/05/2026)
+
+## Objectif 
+
+Créer, configurer et transformer la page de scripts en un **centre de gestion professionnel** connecté à Supabase, avec CRUD complet.
+
+---
+
+## Base de données : création de la table `scripts`
+
+### Table `scripts` :
+
+| Colonne | Type | Description |
+|---|---|---|
+| `name` | text | Nom du script |
+| `description` | text | Description |
+| `script_type` | enum | powershell, bash, python, azure_cli, aws_cli, terraform, bicep, arm, cloudformation, ansible, kubernetes, docker, sql, javascript, typescript, go, ruby, perl, yaml, json, other |
+| `content` | text | Code source |
+| `features` | text | Fonctionnalités |
+| `prerequisites` | text | Prérequis |
+| `usage_example` | text | Exemple d'utilisation |
+| `screenshots[]` | text[] | URLs des captures d'écran |
+| `criticality` | enum | low / medium / high / critical |
+| `version` | text | Version du script |
+| `status` | enum | draft / active / inactive / archived / deprecated |
+| `tags[]` | text[] | Tags |
+| `category_id` | FK | → table `categories` |
+| `author_id` | uuid | → auth.uid() |
+| `license` | text | Licence |
+| `language` | text | Langage de programmation |
+| `compatibility` | text | Compatibilité |
+| `dependencies` | text | Dépendances |
+| `documentation` | text | Documentation |
+| `version_history` | jsonb | Historique des versions |
+| `downloads_count` | int | Compteur de téléchargements |
+| `views_count` | int | Compteur de vues |
+| `average_rating` | float | Note moyenne |
+| `favorites_count` | int | Nombre de favoris |
+| `visibility` | enum | public / private |
+| `is_validated` | bool | Script validé |
+| `created_at` | timestamptz | Date de création |
+| `updated_at` | timestamptz | Mise à jour automatique (trigger) |
+
+![image](https://hackmd.io/_uploads/HJkNNVsR-x.png)
+![image](https://hackmd.io/_uploads/BJcS4NjRbx.png)
+![image](https://hackmd.io/_uploads/B1MDENjRbe.png)
+![image](https://hackmd.io/_uploads/ryTd44sAbx.png)
+
+### Sécurité - RLS (Row Level Security)
+
+| Opération | Accès autorisé |
+|---|---|
+| **Lecture** | Scripts publics, scripts dont on est l'auteur, rôles editor / admin / global_admin |
+| **Écriture** | Rôles editor / admin / global_admin — ou propriétaire (update uniquement) |
+| **Suppression** | Rôles admin / global_admin uniquement |
+
+![image](https://hackmd.io/_uploads/HkL9VNiRbx.png)
+
+> Trigger `updated_at` automatique configuré sur la table.
+
+---
+
+## Réalisations de la session
+
+### 1. Formulaire de création (`/scripts/new`)
+
+- Mise ne place du formulaire avec tous les champs.
+- Intégration de **Monaco Editor** pour l'édition du code source
+- Connexion Supabase : création effective d'un script en base
+- Chargement dynamique des catégories depuis la table `categories`
+- Liste Type / Langage fortement élargie avec fallback `other`
+- Formulaire en colonnes
+- Validation client + Update supabase.
+![image](https://hackmd.io/_uploads/r13Zr4oRbg.png)
+![image](https://hackmd.io/_uploads/B1-XrNsA-e.png)
+![image](https://hackmd.io/_uploads/HkK4BVsCbx.png)
+![image](https://hackmd.io/_uploads/ByarSNsC-g.png)
+![image](https://hackmd.io/_uploads/SkrwBEiAWl.png)
+
+
+### 2. Page liste (`/scripts`)
+- Dashboard avec **6 cards statistiques animées** :
+  - Total, Actifs, Archivés, Critiques, Publics, Téléchargements
+  - Animations `fade-in`, hover translate + blur glow
+![image](https://hackmd.io/_uploads/H1H5BNo0Ze.png)
+
+- **3 modes d'affichage** avec des botuons d'actions :
+  - Grille 
+  - Cards 
+  - Tableau 
+![image](https://hackmd.io/_uploads/Bk3jrEs0Ze.png)
+![image](https://hackmd.io/_uploads/B1bTS4o0-l.png)
+![image](https://hackmd.io/_uploads/rkBCBVo0Wl.png)
+
+
+- **Recherche & filtres** :
+  - Recherche dynamique temps réel (nom, description, tags)
+  - Filtres rapides : statut, type, catégorie
+  - Panneau Recherche avancée : criticité, visibilité, auteur, tag, plage de dates
+  - Sauvegarde des filtres dans `localStorage` + bouton de réinitialisation
+![image](https://hackmd.io/_uploads/r1dZIVoR-l.png)
+
+- **Actions globales** : Sélectionner tout / Désélectionner / Archiver / Supprimer (avec confirmation)
+![image](https://hackmd.io/_uploads/HyIBL4i0Zg.png)
+
+- **Actions rapides par script** : Modifier, Activer/Désactiver, Public/Privé, Dupliquer, Archiver, Supprimer
+![image](https://hackmd.io/_uploads/S16J84jCZg.png)
+- **Tri configurable** : MAJ, création, nom A→Z / Z→A, téléchargements, vues, note moyenne
+![image](https://hackmd.io/_uploads/HJxcI4j0bl.png)
+
+- **Pagination** : 10 éléments / page avec navigation Précédent / Suivant
+![image](https://hackmd.io/_uploads/Skxo8NoC-e.png)
+
+### 3. Page détail (`/scripts/:scriptId`)
+les titres de chaque script sont cliqaubles et renvoient à une page - détail.
+- Page détail connectée à Supabase
+- Boutons **Retour** et **Télécharger**
+- **Export JSON** complet du script
+- **Export PDF** type "document" :
+  - Page de garde
+  - Sections structurées
+  - Bloc de code
+  - Intégration des screenshots en image (et non en lien)
+  - Footer + numérotation des pages
+  - Pagination correcte (plusieurs itérations de correction)
+![image](https://hackmd.io/_uploads/Hk_R8Ej0bx.png)
+![image](https://hackmd.io/_uploads/BJ_JwNjRWx.png)
+![image](https://hackmd.io/_uploads/rypeDEi0Zl.png)
+le PDF : 
+![image](https://hackmd.io/_uploads/H1_MPNsCbg.png)
+![image](https://hackmd.io/_uploads/SJJSDVj0Wl.png)
+![image](https://hackmd.io/_uploads/SJ9SwEsC-l.png)
+le JSON :
+![image](https://hackmd.io/_uploads/HJxT_vNiAZg.png)
+
+### 4. Page d'édition (`/scripts/:scriptId/edit`)
+- Création d'une vraie **page d'édition** à `/scripts/:scriptId/edit`
+- Bouton Retour : retour vers la page détail du script.
+![image](https://hackmd.io/_uploads/Bk2qv4o0Wg.png)
+![image](https://hackmd.io/_uploads/BJFiw4s0bl.png)
+![image](https://hackmd.io/_uploads/SyBhwVoCZl.png)
+![image](https://hackmd.io/_uploads/BkZpw4sAWx.png)
+![image](https://hackmd.io/_uploads/SkhpDNjR-e.png)
+
+### 5. Import / Export avancé
+Cette partie permet d'automatiser la création des scripts sans passer par le formulaire.
+- **Modèle JSON** téléchargeable (pré-rempli)
+![image](https://hackmd.io/_uploads/r1sZdEiRZg.png)
+- **Import JSON** en drag & drop :
+  - Validation des données
+  - Prévisualisation avant import
+  - Barre de progression
+  - Rapport d'erreurs ligne par ligne (doublons ignorés)
+![image](https://hackmd.io/_uploads/SJ97_VsR-x.png)
+![image](https://hackmd.io/_uploads/HkUNu4jCZe.png)
+![image](https://hackmd.io/_uploads/S1NruNoAWl.png)
+![image](https://hackmd.io/_uploads/HyQUuNsAWe.png)
+
+- **Export PDF** : en-tête brandé + tableau autotable + pagination
+- **Export CSV** : toutes les colonnes essentielles
+![image](https://hackmd.io/_uploads/H1mv_VjR-e.png)
+![image](https://hackmd.io/_uploads/HJ0Du4o0We.png)
+![image](https://hackmd.io/_uploads/rknuOEj0be.png)
+
+### 6. Catégories (amélioration)
+
+- Ajout d'un **compteur de scripts par catégorie** (icône + nombre)
+- Affiché en vue grille et vue tableau
+![image](https://hackmd.io/_uploads/Sygh_EiAZl.png)
+- Il affiche les scripts de cette catégorie.
+
+![image](https://hackmd.io/_uploads/H1BCdEsAbe.png)
+![image](https://hackmd.io/_uploads/HkoytEsA-g.png)
+
+---
+
+## Problèmes rencontrés & résolutions
+
+| Problème | Cause | Résolution |
+|---|---|---|
+| Conflit npm / vite peer deps à l'install | Conflit de dépendances | Monaco Editor était déjà installé — aucune action requise |
+| "Je ne vois pas mes modifications" | L'app utilisait toujours le modal legacy | Redirection vers la nouvelle page `/scripts/new` |
+| `404 Bucket not found` | Bucket absent ou mauvais projet Supabase | Confirmation du nom de bucket + vérification du projet |
+| Images non visibles + PDF avec liens cassés | Bucket configuré en privé | Passage aux signed URLs pour les assets privés |
+| `policy already exists` (SQL) | Script rejoué sans nettoyage préalable | `DROP POLICY IF EXISTS` avant chaque `CREATE POLICY` |
+| Débordements / chevauchements dans le PDF | Mauvaise gestion des sections jsPDF | Plusieurs itérations de correction (pagination, footer, positionnement) |
+
+---
+
+## Sécurité & qualité
+
+- Toutes les opérations passent par le client **Supabase avec RLS activé**
+- L'`author_id` est enregistré automatiquement à la création (`auth.uid()`)
+- Gestion des loaders et états vides sur toutes les vues
+- Design **100 % responsive** (mobile + desktop)
+
+---
+
+## Routes créées / modifiées
+
+| Route | Type | Description |
+|---|---|---|
+| `/scripts` | Page | Liste + dashboard (refonte complète) |
+| `/scripts/new` | Page | Formulaire de création (nouvelle page) |
+| `/scripts/:scriptId` | Page | Détail premium |
+| `/scripts/:scriptId/edit` | Page | Édition (nouvelle page) |
+
+---

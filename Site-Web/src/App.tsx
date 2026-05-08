@@ -11,6 +11,7 @@ import CategoryPage from "./pages/CategoryPage";
 import CategoriesPage from "./pages/CategoriesPage";
 import NewCategoryPage from "./pages/NewCategoryPage";
 import NewScriptPage from "./pages/NewScriptPage";
+import EditScriptPage from "./pages/EditScriptPage";
 import ScriptDetailPage from "./pages/ScriptDetailPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProviderPage from "./pages/ProviderPage";
@@ -64,6 +65,7 @@ const App = () => (
             <Route path="/dashboard" element={<Navigate to="/" replace />} />
             <Route path="/scripts" element={<ProtectedRoute><ScriptsPage /></ProtectedRoute>} />
             <Route path="/scripts/new" element={<ProtectedRoute permission={{ resource: 'scripts', action: 'create' }}><NewScriptPage /></ProtectedRoute>} />
+            <Route path="/scripts/:scriptId/edit" element={<ProtectedRoute permission={{ resource: 'scripts', action: 'update' }}><EditScriptPage /></ProtectedRoute>} />
             <Route path="/categories" element={<ProtectedRoute><CategoriesPage /></ProtectedRoute>} />
             <Route path="/categories/new" element={<ProtectedRoute permission={{ resource: 'resources', action: 'create' }}><NewCategoryPage /></ProtectedRoute>} />
             <Route path="/category/:categoryId" element={<ProtectedRoute><CategoryPage /></ProtectedRoute>} />

@@ -1,10 +1,11 @@
-import { useState, FormEvent, useRef, useCallback, useMemo, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import Editor, { type OnMount } from '@monaco-editor/react';
 import type * as Monaco from 'monaco-editor';
 import { toast } from 'sonner';
 import {
+  ArrowLeft,
   ChevronRight,
   FileCode2,
   Save,
@@ -36,104 +37,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { SCRIPT_SCREENSHOTS_BUCKET } from '@/lib/scriptScreenshots';
+import { SCRIPT_TYPES, LANGUAGE_OPTIONS, DB_SCRIPT_TYPES } from '@/pages/NewScriptPage'; // reuse constants
+import { SCRIPT_SCREENSHOTS_BUCKET, isHttpUrl, signScreenshotPaths } from '@/lib/scriptScreenshots';
 
-interface CategoryLite {
-  id: string;
-  name: string;
-}
-
-export const DB_SCRIPT_TYPES = new Set([
-  'powershell', 'bash', 'python', 'azure_cli', 'aws_cli',
-  'terraform', 'bicep', 'arm', 'cloudformation', 'ansible',
-  'kubernetes', 'docker', 'sql', 'javascript', 'typescript',
-  'go', 'ruby', 'perl', 'yaml', 'json', 'other',
-]);
-
-export const SCRIPT_TYPES = [
-  { value: 'powershell', label: 'PowerShell', monaco: 'powershell' },
-  { value: 'bash', label: 'Bash / Shell', monaco: 'shell' },
-  { value: 'python', label: 'Python', monaco: 'python' },
-  { value: 'javascript', label: 'JavaScript', monaco: 'javascript' },
-  { value: 'typescript', label: 'TypeScript', monaco: 'typescript' },
-  { value: 'go', label: 'Go', monaco: 'go' },
-  { value: 'rust', label: 'Rust', monaco: 'rust' },
-  { value: 'java', label: 'Java', monaco: 'java' },
-  { value: 'kotlin', label: 'Kotlin', monaco: 'kotlin' },
-  { value: 'scala', label: 'Scala', monaco: 'scala' },
-  { value: 'csharp', label: 'C#', monaco: 'csharp' },
-  { value: 'fsharp', label: 'F#', monaco: 'fsharp' },
-  { value: 'vbnet', label: 'VB.NET', monaco: 'vb' },
-  { value: 'php', label: 'PHP', monaco: 'php' },
-  { value: 'ruby', label: 'Ruby', monaco: 'ruby' },
-  { value: 'perl', label: 'Perl', monaco: 'perl' },
-  { value: 'r', label: 'R', monaco: 'r' },
-  { value: 'matlab', label: 'MATLAB / Octave', monaco: 'plaintext' },
-  { value: 'julia', label: 'Julia', monaco: 'julia' },
-  { value: 'lua', label: 'Lua', monaco: 'lua' },
-  { value: 'dart', label: 'Dart', monaco: 'dart' },
-  { value: 'swift', label: 'Swift', monaco: 'swift' },
-  { value: 'objective_c', label: 'Objective-C', monaco: 'objective-c' },
-  { value: 'c', label: 'C', monaco: 'c' },
-  { value: 'cpp', label: 'C++', monaco: 'cpp' },
-  { value: 'zig', label: 'Zig', monaco: 'plaintext' },
-  { value: 'nim', label: 'Nim', monaco: 'plaintext' },
-  { value: 'haskell', label: 'Haskell', monaco: 'haskell' },
-  { value: 'elixir', label: 'Elixir', monaco: 'elixir' },
-  { value: 'erlang', label: 'Erlang', monaco: 'erlang' },
-  { value: 'clojure', label: 'Clojure', monaco: 'clojure' },
-  { value: 'groovy', label: 'Groovy', monaco: 'groovy' },
-  { value: 'assembly', label: 'Assembly', monaco: 'plaintext' },
-  { value: 'fortran', label: 'Fortran', monaco: 'plaintext' },
-  { value: 'cobol', label: 'COBOL', monaco: 'plaintext' },
-  { value: 'pascal', label: 'Pascal', monaco: 'pascal' },
-  { value: 'ada', label: 'Ada', monaco: 'ada' },
-  { value: 'sql', label: 'SQL', monaco: 'sql' },
-  { value: 'plsql', label: 'PL/SQL', monaco: 'sql' },
-  { value: 'tsql', label: 'T-SQL', monaco: 'sql' },
-  { value: 'graphql', label: 'GraphQL', monaco: 'graphql' },
-  { value: 'yaml', label: 'YAML', monaco: 'yaml' },
-  { value: 'json', label: 'JSON', monaco: 'json' },
-  { value: 'xml', label: 'XML', monaco: 'xml' },
-  { value: 'toml', label: 'TOML', monaco: 'ini' },
-  { value: 'ini', label: 'INI', monaco: 'ini' },
-  { value: 'hcl', label: 'HCL', monaco: 'hcl' },
-  { value: 'terraform', label: 'Terraform', monaco: 'hcl' },
-  { value: 'bicep', label: 'Bicep', monaco: 'bicep' },
-  { value: 'arm', label: 'ARM Template', monaco: 'json' },
-  { value: 'cloudformation', label: 'CloudFormation', monaco: 'yaml' },
-  { value: 'azure_cli', label: 'Azure CLI', monaco: 'shell' },
-  { value: 'aws_cli', label: 'AWS CLI', monaco: 'shell' },
-  { value: 'gcloud', label: 'Google Cloud CLI', monaco: 'shell' },
-  { value: 'ansible', label: 'Ansible', monaco: 'yaml' },
-  { value: 'kubernetes', label: 'Kubernetes', monaco: 'yaml' },
-  { value: 'helm', label: 'Helm', monaco: 'yaml' },
-  { value: 'docker', label: 'Dockerfile', monaco: 'dockerfile' },
-  { value: 'makefile', label: 'Makefile', monaco: 'makefile' },
-  { value: 'cmake', label: 'CMake', monaco: 'cmake' },
-  { value: 'gradle', label: 'Gradle', monaco: 'groovy' },
-  { value: 'jenkinsfile', label: 'Jenkinsfile', monaco: 'groovy' },
-  { value: 'github_actions', label: 'GitHub Actions', monaco: 'yaml' },
-  { value: 'gitlab_ci', label: 'GitLab CI', monaco: 'yaml' },
-  { value: 'azure_devops', label: 'Azure DevOps Pipeline', monaco: 'yaml' },
-  { value: 'other', label: 'Autre', monaco: 'plaintext' },
-] as const;
-
-export const LANGUAGE_OPTIONS = [
-  'PowerShell', 'Bash', 'Zsh', 'Fish', 'Python', 'JavaScript', 'TypeScript', 'Go', 'Rust',
-  'Java', 'Kotlin', 'Scala', 'C#', 'F#', 'VB.NET', 'C', 'C++', 'Objective-C', 'Swift',
-  'Dart', 'Ruby', 'Perl', 'PHP', 'R', 'MATLAB', 'Julia', 'Lua', 'Haskell', 'Elixir',
-  'Erlang', 'Clojure', 'Groovy', 'Assembly', 'Fortran', 'COBOL', 'Pascal', 'Ada',
-  'SQL', 'PL/SQL', 'T-SQL', 'GraphQL', 'YAML', 'JSON', 'XML', 'TOML', 'INI', 'HCL',
-  'Terraform', 'Bicep', 'ARM', 'CloudFormation', 'Ansible', 'Dockerfile', 'Makefile',
-  'CMake', 'Nix', 'Puppet', 'Chef', 'Helm', 'Kubernetes YAML', 'Jenkinsfile',
-  'GitHub Actions YAML', 'GitLab CI YAML', 'Azure DevOps YAML', 'GDScript', 'Solidity',
-  'Move', 'Vyper', 'Prolog', 'Scheme', 'Lisp', 'Delphi', 'ABAP', 'SAS', 'Stata',
-  'Scratch', 'LabVIEW', 'Apex', 'Visual Basic', 'OCaml', 'Nim', 'Zig',
-] as const;
+interface CategoryLite { id: string; name: string }
 
 const VISIBILITIES = [
   { value: 'private', label: 'Privé' },
@@ -171,7 +91,9 @@ interface UploadedImage {
   url: string;
   name: string;
   size: number;
-  file: File;
+  file?: File;
+  isStored?: boolean; // existing URL from DB
+  storagePath?: string; // path in storage (preferred)
 }
 
 function ImagePreview({ src, alt }: { src: string; alt: string }) {
@@ -195,13 +117,19 @@ function ImagePreview({ src, alt }: { src: string; alt: string }) {
   );
 }
 
-export default function NewScriptPage() {
-  const navigate = useNavigate();
+export default function EditScriptPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const { scriptId } = useParams<{ scriptId: string }>();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof Monaco | null>(null);
   const completionDisposableRef = useRef<Monaco.IDisposable | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<CategoryLite[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [editorTheme, setEditorTheme] = useState<'vs-dark' | 'vs'>('vs-dark');
 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -225,25 +153,10 @@ export default function NewScriptPage() {
   const [otherInfo, setOtherInfo] = useState('');
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [dragOver, setDragOver] = useState(false);
-  const [editorTheme, setEditorTheme] = useState<'vs-dark' | 'vs'>('vs-dark');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [categories, setCategories] = useState<CategoryLite[]>([]);
-  const [loadingCategories, setLoadingCategories] = useState(true);
-
-  useEffect(() => {
-    const loadCategories = async () => {
-      setLoadingCategories(true);
-      const { data, error } = await supabase.from('categories').select('id, name').order('name');
-      if (error) {
-        toast.error(`Erreur chargement catégories: ${error.message}`);
-      } else {
-        setCategories((data ?? []) as CategoryLite[]);
-      }
-      setLoadingCategories(false);
-    };
-    loadCategories();
-  }, []);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [successOpen, setSuccessOpen] = useState(false);
 
   useEffect(() => {
     const updateTheme = () => {
@@ -256,78 +169,62 @@ export default function NewScriptPage() {
     return () => observer.disconnect();
   }, []);
 
-  const scriptTypeMeta = useMemo(
-    () => SCRIPT_TYPES.find((l) => l.value === scriptType),
-    [scriptType],
-  );
-
-  const jsonModel = useMemo(() => {
-    return {
-      schema_version: '1.0.0',
-      script: {
-        id: `script_${crypto.randomUUID().slice(0, 8)}`,
-        metadata: {
-          name: name || 'Nom du script',
-          description: description || 'Description du script',
-          category_id: categoryId || null,
-          tags,
-          criticality,
-          status,
-          visibility,
-          version,
-          license: license || null,
-        },
-        technical: {
-            script_type: scriptType || 'other',
-          monaco_language: scriptTypeMeta?.monaco || 'powershell',
-          runtime: languageRuntime || null,
-          compatibility: compatibility || null,
-          dependencies: dependencies || null,
-        },
-        source: {
-          filename: name ? `${name.toLowerCase().replace(/\s+/g, '-')}.txt` : 'untitled-script.txt',
-          content: content || '# Ajoutez votre code source ici',
-        },
-        documentation: {
-          features: features || null,
-          prerequisites: prerequisites || null,
-          usage_example: usageExample || null,
-          details: documentation || null,
-          notes: otherInfo || null,
-        },
-        assets: {
-          screenshots: images.map((img) => ({
-            name: img.name,
-            size: img.size,
-            preview_url: img.url,
-          })),
-        },
-      },
-      imported_at: new Date().toISOString(),
+  useEffect(() => {
+    const loadCategories = async () => {
+      setLoadingCategories(true);
+      const { data, error } = await supabase.from('categories').select('id, name').order('name');
+      if (error) toast.error(`Erreur chargement catégories: ${error.message}`);
+      setCategories((data ?? []) as CategoryLite[]);
+      setLoadingCategories(false);
     };
-  }, [
-    name,
-    description,
-    categoryId,
-    tags,
-    criticality,
-    status,
-    visibility,
-    version,
-    license,
-    scriptType,
-    scriptTypeMeta,
-    languageRuntime,
-    compatibility,
-    dependencies,
-    content,
-    features,
-    prerequisites,
-    usageExample,
-    documentation,
-    otherInfo,
-    images,
-  ]);
+    loadCategories();
+  }, []);
+
+  useEffect(() => {
+    const loadScript = async () => {
+      if (!scriptId) return;
+      setLoading(true);
+      const { data, error } = await supabase.from('scripts').select('*').eq('id', scriptId).maybeSingle();
+      if (error || !data) {
+        toast.error('Script introuvable');
+        setLoading(false);
+        navigate('/scripts');
+        return;
+      }
+      setName(data.name ?? '');
+      setDescription(data.description ?? '');
+      setScriptType(data.script_type ?? 'other');
+      setContent(data.content ?? '');
+      setCriticality(data.criticality ?? 'medium');
+      setVersion(data.version ?? '1.0.0');
+      setStatus(data.status ?? 'draft');
+      setVisibility(data.visibility ?? 'private');
+      setCategoryId(data.category_id ?? '');
+      setLicense(data.license ?? 'MIT');
+      setLanguageRuntime(data.language ?? '');
+      setCompatibility(data.compatibility ?? '');
+      setDependencies(data.dependencies ?? '');
+      setDocumentation(data.documentation ?? '');
+      setFeatures(data.features ?? '');
+      setPrerequisites(data.prerequisites ?? '');
+      setUsageExample(data.usage_example ?? '');
+      setTags(Array.isArray(data.tags) ? data.tags : []);
+      const rawShots = (Array.isArray(data.screenshots) ? data.screenshots : []) as string[];
+      const signed = await signScreenshotPaths(rawShots, 60 * 30); // 30 min
+      setImages(rawShots.map((p, idx) => ({
+        id: crypto.randomUUID(),
+        url: signed[idx] ?? '',
+        name: (p.split('/').pop() || 'screenshot'),
+        size: 0,
+        isStored: true,
+        storagePath: isHttpUrl(p) ? undefined : p,
+      })));
+      setLoading(false);
+    };
+    loadScript();
+  }, [scriptId, navigate]);
+
+  const scriptTypeMeta = useMemo(() => SCRIPT_TYPES.find((l: any) => l.value === scriptType), [scriptType]);
 
   const addTag = (val: string) => {
     const t = val.trim().toLowerCase();
@@ -351,6 +248,7 @@ export default function NewScriptPage() {
         name: f.name,
         size: f.size,
         file: f,
+        isStored: false,
       });
     });
     setImages((prev) => [...prev, ...newImgs]);
@@ -359,88 +257,66 @@ export default function NewScriptPage() {
   const removeImage = (id: string) => {
     setImages((prev) => {
       const target = prev.find((i) => i.id === id);
-      if (target) URL.revokeObjectURL(target.url);
+      if (target?.file) URL.revokeObjectURL(target.url);
       return prev.filter((i) => i.id !== id);
     });
   };
 
-  const uploadScreenshots = async (scriptId: string) => {
-    if (!images.length) return [] as string[];
+  const uploadNewScreenshots = async (id: string) => {
+    const existingPathsOrUrls = images
+      .filter((i) => i.isStored)
+      .map((i) => i.storagePath ?? i.url)
+      .filter(Boolean);
+    const toUpload = images.filter((i) => !i.isStored && i.file);
     const uploadedPaths: string[] = [];
-    for (const img of images) {
+    for (const img of toUpload) {
+      const file = img.file!;
       const ext = img.name.split('.').pop() || 'png';
-      const path = `${user?.id ?? 'anon'}/${scriptId}/${img.id}.${ext}`;
-      const { error } = await supabase.storage.from(SCRIPT_SCREENSHOTS_BUCKET).upload(path, img.file, {
-        upsert: true,
-        cacheControl: '3600',
-      });
+      const path = `${user?.id ?? 'anon'}/${id}/${img.id}.${ext}`;
+      const { error } = await supabase.storage.from(SCRIPT_SCREENSHOTS_BUCKET).upload(path, file, { upsert: true, cacheControl: '3600' });
       if (error) throw new Error(error.message);
       uploadedPaths.push(path);
     }
-    return uploadedPaths;
+    return [...existingPathsOrUrls, ...uploadedPaths];
   };
 
   const registerLanguageCompletion = useCallback((monaco: typeof Monaco, languageId: string) => {
     completionDisposableRef.current?.dispose();
     completionDisposableRef.current = monaco.languages.registerCompletionItemProvider(languageId, {
-      provideCompletionItems: () => {
-        const suggestions: Monaco.languages.CompletionItem[] = [
+      provideCompletionItems: () => ({
+        suggestions: [
           {
             label: 'TODO',
             kind: monaco.languages.CompletionItemKind.Snippet,
             insertText: '# TODO: ${1:detail}',
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
           },
-          {
-            label: 'if',
-            kind: monaco.languages.CompletionItemKind.Snippet,
-            insertText: 'if ${1:condition}; then\n\t${2:# code}\nfi',
-            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          },
-        ];
-        return { suggestions };
-      },
+        ],
+      }),
     });
   }, []);
 
   const handleEditorMount: OnMount = (editor, monaco) => {
     editorRef.current = editor;
     monacoRef.current = monaco;
-    const languageId = scriptTypeMeta?.monaco || 'plaintext';
-    registerLanguageCompletion(monaco, languageId);
+    registerLanguageCompletion(monaco, scriptTypeMeta?.monaco || 'plaintext');
   };
 
   useEffect(() => {
     if (!monacoRef.current) return;
-    const languageId = scriptTypeMeta?.monaco || 'plaintext';
-    registerLanguageCompletion(monacoRef.current, languageId);
+    registerLanguageCompletion(monacoRef.current, scriptTypeMeta?.monaco || 'plaintext');
   }, [scriptTypeMeta, registerLanguageCompletion]);
 
-  const runFormat = () => {
-    const action = editorRef.current?.getAction('editor.action.formatDocument');
-    if (!action) return;
-    action.run();
-  };
+  const runFormat = () => editorRef.current?.getAction('editor.action.formatDocument')?.run();
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const performSave = async () => {
+    if (!scriptId) return;
     const result = scriptSchema.safeParse({
-      name,
-      description,
-      scriptType,
-      content,
-      criticality,
-      version,
-      status,
-      categoryId,
-      visibility,
-      tags,
+      name, description, scriptType, content, criticality, version, status, categoryId, visibility, tags,
     });
     if (!result.success) {
       const errs: Record<string, string> = {};
-      result.error.issues.forEach((i) => {
-        errs[i.path[0] as string] = i.message;
-      });
+      result.error.issues.forEach((i) => { errs[i.path[0] as string] = i.message; });
       setErrors(errs);
       toast.error('Veuillez corriger les erreurs du formulaire');
       return;
@@ -448,53 +324,58 @@ export default function NewScriptPage() {
     setErrors({});
     setSubmitting(true);
     const scriptTypeForDb = DB_SCRIPT_TYPES.has(scriptType) ? scriptType : 'other';
-    const newId = crypto.randomUUID();
-    let screenshotPaths: string[] = [];
+    let screenshotPathsOrUrls: string[] = [];
     try {
-      screenshotPaths = await uploadScreenshots(newId);
+      screenshotPathsOrUrls = await uploadNewScreenshots(scriptId);
     } catch (err: any) {
       toast.error(`Upload screenshots: ${err?.message ?? 'erreur'}`);
       setSubmitting(false);
       return;
     }
-    const { error } = await supabase.from('scripts').insert({
-      id: newId,
+    const { error } = await supabase.from('scripts').update({
       name: name.trim(),
       description: description.trim(),
-      script_type: scriptTypeForDb as
-        | 'powershell' | 'bash' | 'python' | 'azure_cli' | 'aws_cli'
-        | 'terraform' | 'bicep' | 'arm' | 'cloudformation' | 'ansible'
-        | 'kubernetes' | 'docker' | 'sql' | 'javascript' | 'typescript'
-        | 'go' | 'ruby' | 'perl' | 'yaml' | 'json' | 'other',
+      script_type: scriptTypeForDb,
       content,
       features: features || null,
       prerequisites: prerequisites || null,
       usage_example: usageExample || null,
-      screenshots: screenshotPaths,
+      screenshots: screenshotPathsOrUrls,
       criticality,
       version: version.trim(),
       status,
       tags,
       category_id: categoryId || null,
-      author_id: user?.id ?? null,
       license: license || null,
       language: languageRuntime || null,
       compatibility: compatibility || null,
       dependencies: dependencies || null,
       documentation: documentation || null,
       visibility,
-    });
+    }).eq('id', scriptId);
     if (error) {
-      toast.error(`Erreur création script: ${error.message}`);
+      toast.error(`Erreur mise à jour: ${error.message}`);
       setSubmitting(false);
       return;
     }
-    const stored = JSON.parse(localStorage.getItem('custom_scripts') || '[]');
-    stored.push(jsonModel);
-    localStorage.setItem('custom_scripts', JSON.stringify(stored));
-    toast.success('Script créé en base avec succès');
-    navigate('/scripts');
+    setSubmitting(false);
+    setConfirmOpen(false);
+    setSuccessOpen(true);
+    toast.success('Script mis à jour');
   };
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setConfirmOpen(true);
+  };
+
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <div className="max-w-5xl mx-auto py-16 text-center text-muted-foreground">Chargement…</div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -504,7 +385,7 @@ export default function NewScriptPage() {
           <ChevronRight className="h-3 w-3" />
           <Link to="/scripts" className="hover:text-foreground transition-colors">Scripts</Link>
           <ChevronRight className="h-3 w-3" />
-          <span className="text-foreground font-medium">Nouveau script</span>
+          <span className="text-foreground font-medium">Modifier</span>
         </nav>
 
         <div className="flex items-start gap-4">
@@ -512,10 +393,8 @@ export default function NewScriptPage() {
             <FileCode2 className="h-6 w-6 text-primary" />
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold tracking-tight">Nouveau script</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Formulaire professionnel structuré + éditeur IDE + modèle JSON complet.
-            </p>
+            <h1 className="text-2xl font-bold tracking-tight">Modifier le script</h1>
+            <p className="text-sm text-muted-foreground mt-1">Formulaire refondu (sections + éditeur IDE + assets).</p>
           </div>
         </div>
 
@@ -533,19 +412,12 @@ export default function NewScriptPage() {
                   <AccordionContent className="space-y-4 pt-2">
                     <div id="field-name" className="space-y-2">
                       <Label>Nom du script *</Label>
-                      <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={100} placeholder="Ex: Audit complet Azure tenant" />
+                      <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
                       {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
                     </div>
                     <div id="field-description" className="space-y-2">
                       <Label>Description *</Label>
-                      <Textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        rows={5}
-                        maxLength={2000}
-                        placeholder="Objectif, contexte, valeur métier..."
-                      />
-                      <p className="text-[11px] text-muted-foreground text-right">{description.length}/2000</p>
+                      <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={5} maxLength={2000} />
                       {errors.description && <p className="text-xs text-destructive">{errors.description}</p>}
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -553,12 +425,10 @@ export default function NewScriptPage() {
                         <Label>Catégorie *</Label>
                         <Select value={categoryId} onValueChange={setCategoryId}>
                           <SelectTrigger>
-                            <SelectValue placeholder={loadingCategories ? 'Chargement des catégories...' : 'Sélectionner...'} />
+                            <SelectValue placeholder={loadingCategories ? 'Chargement des catégories…' : 'Sélectionner…'} />
                           </SelectTrigger>
                           <SelectContent>
-                            {categories.map((c) => (
-                              <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                            ))}
+                            {categories.map((c) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                           </SelectContent>
                         </Select>
                         {errors.categoryId && <p className="text-xs text-destructive">{errors.categoryId}</p>}
@@ -566,11 +436,9 @@ export default function NewScriptPage() {
                       <div id="field-scriptType" className="space-y-2">
                         <Label>Type de script *</Label>
                         <Select value={scriptType} onValueChange={setScriptType}>
-                          <SelectTrigger><SelectValue placeholder="Sélectionner..." /></SelectTrigger>
+                          <SelectTrigger><SelectValue placeholder="Sélectionner…" /></SelectTrigger>
                           <SelectContent>
-                            {SCRIPT_TYPES.map((item) => (
-                              <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>
-                            ))}
+                            {SCRIPT_TYPES.map((item: any) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
                           </SelectContent>
                         </Select>
                         {errors.scriptType && <p className="text-xs text-destructive">{errors.scriptType}</p>}
@@ -595,20 +463,16 @@ export default function NewScriptPage() {
                       </div>
                       <div className="space-y-2">
                         <Label>Statut</Label>
-                        <Select value={status} onValueChange={(v) => setStatus(v as 'draft' | 'active' | 'inactive')}>
+                        <Select value={status} onValueChange={(v) => setStatus(v as any)}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            {STATUSES.map((v) => <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>)}
-                          </SelectContent>
+                          <SelectContent>{STATUSES.map((v) => <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>)}</SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
                         <Label>Visibilité</Label>
-                        <Select value={visibility} onValueChange={(v) => setVisibility(v as 'private' | 'public')}>
+                        <Select value={visibility} onValueChange={(v) => setVisibility(v as any)}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            {VISIBILITIES.map((v) => <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>)}
-                          </SelectContent>
+                          <SelectContent>{VISIBILITIES.map((v) => <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>)}</SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
@@ -641,16 +505,10 @@ export default function NewScriptPage() {
                           value={tagInput}
                           onChange={(e) => setTagInput(e.target.value)}
                           onKeyDown={(e) => {
-                            if (e.key === 'Enter' || e.key === ',') {
-                              e.preventDefault();
-                              addTag(tagInput);
-                            }
+                            if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); addTag(tagInput); }
                           }}
-                          placeholder="azure, security, backup..."
                         />
-                        <Button type="button" size="icon" variant="outline" onClick={() => addTag(tagInput)} aria-label="Ajouter le tag">
-                          <Plus className="h-4 w-4" />
-                        </Button>
+                        <Button type="button" size="icon" variant="outline" onClick={() => addTag(tagInput)}><Plus className="h-4 w-4" /></Button>
                       </div>
                       {tags.length > 0 && (
                         <div className="flex flex-wrap gap-1.5 pt-1">
@@ -681,9 +539,7 @@ export default function NewScriptPage() {
                         <Label>Code source *</Label>
                         <div className="flex flex-wrap items-center gap-2">
                           {scriptTypeMeta && <Badge variant="outline">{scriptTypeMeta.label}</Badge>}
-                          <Button type="button" size="sm" variant="outline" onClick={runFormat}>
-                            <Wand2 className="h-4 w-4" /> Formater
-                          </Button>
+                          <Button type="button" size="sm" variant="outline" onClick={runFormat}><Wand2 className="h-4 w-4" /> Formater</Button>
                         </div>
                       </div>
                       <div className="rounded-xl border border-border/60 overflow-hidden">
@@ -691,12 +547,8 @@ export default function NewScriptPage() {
                           <span className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
                           <span className="h-2.5 w-2.5 rounded-full bg-warning/60" />
                           <span className="h-2.5 w-2.5 rounded-full bg-success/60" />
-                          <span className="ml-2 text-xs font-mono text-muted-foreground">
-                            {name ? `${name.toLowerCase().replace(/\s+/g, '-')}.script` : 'untitled.script'}
-                          </span>
-                          <span className="ml-auto text-[11px] text-muted-foreground flex items-center gap-1">
-                            <Search className="h-3 w-3" /> Ctrl+F
-                          </span>
+                          <span className="ml-2 text-xs font-mono text-muted-foreground">{name ? `${name.toLowerCase().replace(/\s+/g, '-')}.script` : 'untitled.script'}</span>
+                          <span className="ml-auto text-[11px] text-muted-foreground flex items-center gap-1"><Search className="h-3 w-3" /> Ctrl+F</span>
                         </div>
                         <Editor
                           value={content}
@@ -711,20 +563,14 @@ export default function NewScriptPage() {
                             fontSize: 14,
                             fontLigatures: true,
                             lineNumbers: 'on',
-                            roundedSelection: false,
                             scrollBeyondLastLine: false,
-                            readOnly: false,
                             tabSize: 2,
-                            insertSpaces: true,
                             wordWrap: 'on',
                             quickSuggestions: true,
                             suggestOnTriggerCharacters: true,
                             folding: true,
                             formatOnPaste: true,
                             formatOnType: true,
-                            bracketPairColorization: { enabled: true },
-                            guides: { bracketPairs: true },
-                            find: { addExtraSpaceOnTop: false, autoFindInSelection: 'multiline' },
                           }}
                         />
                       </div>
@@ -747,20 +593,18 @@ export default function NewScriptPage() {
                         <Select value={languageRuntime} onValueChange={setLanguageRuntime}>
                           <SelectTrigger><SelectValue placeholder="Sélectionner un langage..." /></SelectTrigger>
                           <SelectContent>
-                            {LANGUAGE_OPTIONS.map((lang) => (
-                              <SelectItem key={lang} value={lang}>{lang}</SelectItem>
-                            ))}
+                            {LANGUAGE_OPTIONS.map((lang: any) => <SelectItem key={lang} value={lang}>{lang}</SelectItem>)}
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
                         <Label>Compatibilité</Label>
-                        <Input value={compatibility} onChange={(e) => setCompatibility(e.target.value)} placeholder="Linux, Windows, Azure Cloud Shell..." />
+                        <Input value={compatibility} onChange={(e) => setCompatibility(e.target.value)} />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <Label>Dépendances</Label>
-                      <Input value={dependencies} onChange={(e) => setDependencies(e.target.value)} placeholder="Az.Accounts >= 2.0, boto3, jq..." />
+                      <Input value={dependencies} onChange={(e) => setDependencies(e.target.value)} />
                     </div>
                     <div className="space-y-2">
                       <Label>Fonctionnalités</Label>
@@ -789,20 +633,16 @@ export default function NewScriptPage() {
                   <AccordionTrigger>
                     <div className="flex items-center gap-2">
                       <Settings2 className="h-4 w-4 text-primary" />
-                      <span>Section 5 - Assets & modèle JSON d'import</span>
+                      <span>Section 5 - Assets & JSON</span>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="space-y-4 pt-2">
                     <div className="space-y-2">
-                      <Label>Captures d'écran</Label>
+                      <Label>Captures d'écran (stockage)</Label>
                       <div
                         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                         onDragLeave={() => setDragOver(false)}
-                        onDrop={(e) => {
-                          e.preventDefault();
-                          setDragOver(false);
-                          handleFiles(e.dataTransfer.files);
-                        }}
+                        onDrop={(e) => { e.preventDefault(); setDragOver(false); handleFiles(e.dataTransfer.files); }}
                         className={cn(
                           'rounded-lg border-2 border-dashed p-6 text-center transition-colors cursor-pointer',
                           dragOver ? 'border-primary bg-primary/5' : 'border-border/60 hover:border-primary/50 hover:bg-muted/20',
@@ -813,17 +653,9 @@ export default function NewScriptPage() {
                       >
                         <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                         <p className="text-sm font-medium">Glissez vos images ici, ou cliquez pour parcourir</p>
-                        <p className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP - max 5MB</p>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          className="hidden"
-                          onChange={(e) => handleFiles(e.target.files)}
-                        />
+                        <p className="text-xs text-muted-foreground mt-1">Enregistrées dans Supabase Storage au moment de la sauvegarde</p>
+                        <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => handleFiles(e.target.files)} />
                       </div>
-
                       {images.length > 0 && (
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2">
                           {images.map((img) => (
@@ -845,23 +677,17 @@ export default function NewScriptPage() {
                         </div>
                       )}
                     </div>
-
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <Label>Modèle JSON complet (prêt pour import automatique)</Label>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={async () => {
-                            await navigator.clipboard.writeText(JSON.stringify(jsonModel, null, 2));
-                            toast.success('JSON copié');
-                          }}
-                        >
+                        <Label>JSON export (copier)</Label>
+                        <Button type="button" variant="outline" size="sm" onClick={async () => {
+                          await navigator.clipboard.writeText(JSON.stringify({ id: scriptId, name }, null, 2));
+                          toast.success('JSON copié');
+                        }}>
                           <Copy className="h-4 w-4" /> Copier JSON
                         </Button>
                       </div>
-                      <Textarea value={JSON.stringify(jsonModel, null, 2)} readOnly rows={14} className="font-mono text-xs" />
+                      <Textarea value={JSON.stringify({ id: scriptId, name }, null, 2)} readOnly rows={6} className="font-mono text-xs" />
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -871,22 +697,61 @@ export default function NewScriptPage() {
 
           <aside className="space-y-4">
             <Card className="p-4 sticky top-6 space-y-3">
-              <h3 className="text-sm font-semibold">Checklist formulaire pro</h3>
-              <p className="text-xs text-muted-foreground">Sections: Identité, Gouvernance, Code, Documentation, JSON.</p>
-              <p className="text-xs text-muted-foreground">Éditeur: coloration, autocomplétion, formatage, recherche, pliage, lignes.</p>
-              <p className="text-xs text-muted-foreground">Thème auto: clair/sombre synchronisé UI.</p>
-            </Card>
-            <div className="flex flex-col gap-2">
+              <h3 className="text-sm font-semibold">Actions</h3>
               <Button type="submit" disabled={submitting} className="w-full">
-                <Save className="h-4 w-4" /> {submitting ? 'Enregistrement...' : 'Enregistrer le script'}
+                <Save className="h-4 w-4" /> {submitting ? 'Enregistrement…' : 'Enregistrer'}
               </Button>
-              <Button type="button" variant="outline" className="w-full" onClick={() => navigate('/scripts')}>
+              <Button type="button" variant="outline" className="w-full" onClick={() => navigate(`/script/${scriptId}`)}>
+                <ArrowLeft className="h-4 w-4" /> Retour
+              </Button>
+              <Button type="button" variant="ghost" className="w-full" onClick={() => navigate(`/script/${scriptId}`)}>
                 <X className="h-4 w-4" /> Annuler
               </Button>
-            </div>
+            </Card>
           </aside>
         </form>
       </div>
+
+      <AlertDialog open={confirmOpen} onOpenChange={(open) => !submitting && setConfirmOpen(open)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmer la mise à jour du script ?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Les modifications seront enregistrées définitivement dans la base.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={submitting}>Annuler</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                void performSave();
+              }}
+              disabled={submitting}
+            >
+              {submitting ? 'Enregistrement…' : 'Valider'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={successOpen} onOpenChange={setSuccessOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Script mis à jour avec succès</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tu peux revenir à la fiche du script ou rester sur la page d’édition.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Rester ici</AlertDialogCancel>
+            <AlertDialogAction onClick={() => navigate('/scripts')}>
+              Retour aux scripts
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }
+

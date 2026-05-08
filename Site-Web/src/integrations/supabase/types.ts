@@ -208,6 +208,110 @@ export type Database = {
           },
         ]
       }
+      scripts: {
+        Row: {
+          author_id: string | null
+          average_rating: number
+          category_id: string | null
+          compatibility: string | null
+          content: string
+          created_at: string
+          criticality: Database["public"]["Enums"]["script_criticality"]
+          dependencies: string | null
+          description: string | null
+          documentation: string | null
+          downloads_count: number
+          favorites_count: number
+          features: string | null
+          id: string
+          is_validated: boolean
+          language: string | null
+          license: string | null
+          name: string
+          prerequisites: string | null
+          screenshots: string[]
+          script_type: Database["public"]["Enums"]["script_type"]
+          status: Database["public"]["Enums"]["script_status"]
+          tags: string[]
+          updated_at: string
+          usage_example: string | null
+          version: string
+          version_history: Json
+          views_count: number
+          visibility: Database["public"]["Enums"]["script_visibility"]
+        }
+        Insert: {
+          author_id?: string | null
+          average_rating?: number
+          category_id?: string | null
+          compatibility?: string | null
+          content?: string
+          created_at?: string
+          criticality?: Database["public"]["Enums"]["script_criticality"]
+          dependencies?: string | null
+          description?: string | null
+          documentation?: string | null
+          downloads_count?: number
+          favorites_count?: number
+          features?: string | null
+          id?: string
+          is_validated?: boolean
+          language?: string | null
+          license?: string | null
+          name: string
+          prerequisites?: string | null
+          screenshots?: string[]
+          script_type?: Database["public"]["Enums"]["script_type"]
+          status?: Database["public"]["Enums"]["script_status"]
+          tags?: string[]
+          updated_at?: string
+          usage_example?: string | null
+          version?: string
+          version_history?: Json
+          views_count?: number
+          visibility?: Database["public"]["Enums"]["script_visibility"]
+        }
+        Update: {
+          author_id?: string | null
+          average_rating?: number
+          category_id?: string | null
+          compatibility?: string | null
+          content?: string
+          created_at?: string
+          criticality?: Database["public"]["Enums"]["script_criticality"]
+          dependencies?: string | null
+          description?: string | null
+          documentation?: string | null
+          downloads_count?: number
+          favorites_count?: number
+          features?: string | null
+          id?: string
+          is_validated?: boolean
+          language?: string | null
+          license?: string | null
+          name?: string
+          prerequisites?: string | null
+          screenshots?: string[]
+          script_type?: Database["public"]["Enums"]["script_type"]
+          status?: Database["public"]["Enums"]["script_status"]
+          tags?: string[]
+          updated_at?: string
+          usage_example?: string | null
+          version?: string
+          version_history?: Json
+          views_count?: number
+          visibility?: Database["public"]["Enums"]["script_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scripts_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -261,6 +365,31 @@ export type Database = {
     Enums: {
       app_role: "global_admin" | "admin" | "editor" | "viewer"
       category_status: "active" | "inactive" | "archived"
+      script_criticality: "low" | "medium" | "high" | "critical"
+      script_status: "draft" | "active" | "inactive" | "archived" | "deprecated"
+      script_type:
+        | "powershell"
+        | "bash"
+        | "python"
+        | "azure_cli"
+        | "aws_cli"
+        | "terraform"
+        | "bicep"
+        | "arm"
+        | "cloudformation"
+        | "ansible"
+        | "kubernetes"
+        | "docker"
+        | "sql"
+        | "javascript"
+        | "typescript"
+        | "go"
+        | "ruby"
+        | "perl"
+        | "yaml"
+        | "json"
+        | "other"
+      script_visibility: "public" | "private"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -390,6 +519,32 @@ export const Constants = {
     Enums: {
       app_role: ["global_admin", "admin", "editor", "viewer"],
       category_status: ["active", "inactive", "archived"],
+      script_criticality: ["low", "medium", "high", "critical"],
+      script_status: ["draft", "active", "inactive", "archived", "deprecated"],
+      script_type: [
+        "powershell",
+        "bash",
+        "python",
+        "azure_cli",
+        "aws_cli",
+        "terraform",
+        "bicep",
+        "arm",
+        "cloudformation",
+        "ansible",
+        "kubernetes",
+        "docker",
+        "sql",
+        "javascript",
+        "typescript",
+        "go",
+        "ruby",
+        "perl",
+        "yaml",
+        "json",
+        "other",
+      ],
+      script_visibility: ["public", "private"],
     },
   },
 } as const
