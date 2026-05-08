@@ -39,7 +39,7 @@
     - [Tâche 6 — Configuration de la page Logs & Audits (06/05/2026)](#tâche-6--configuration-de-la-page-logs--audits-06052026)
     - [Tâche 7 — Refonte de la page profil (07/05/2026)](#tâche-7--refonte-de-la-page-profil-07052026)
     - [Tâche 8 — Création & configuration de la page catégorie (07/05/2026)](#tâche-8--création--configuration-de-la-page-catégorie-07052026)
-    - [Tâche 9 — Création & configuration de la page Scripts + améliorations Catégories (08/05/2026)](#tâche-8--création--configuration-de-la-page-catégorie-08052026)
+    - [Tâche 9 — Création & configuration de la page Scripts + améliorations Catégories (08/05/2026)](#tâche-9--création--configuration-de-la-page-scripts--améliorations-catégories-08052026)
     - [UML et documentation de conception](#uml-et-documentation-de-conception)
 
 
