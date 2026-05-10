@@ -1,72 +1,460 @@
-# PLG Projet Pédagogique 2026 — Groupe 24
+# PLG Projet Pédagogique 2026 - Groupe 24
 
-> **Application web dashboard** pour centraliser, documenter et consulter des scripts cloud Azure & AWS, avec pages métier, fiches détaillées et composants UI réutilisables.
+## Membres
+
+| Membre                   | Rôle                  | Classe    |
+| ------------------------ | --------------------- | --------- |
+| Amir Minihadji AMINA     | Dev + Admin        | E5 - CCSN |
+| LO Pape                  | Chef de projet + dev backend + Admin   | E4 - CCSN |
+| Neylie NDJUMKENG-NGUEMO  | Architecte logiciel | E4 - CCSN |
+| Steve John BIAMOU HOUMGA | Expert cybersécurité  | E4 - CCSN |
+| Gauyet NGUEFACK-TCHAMI   | Experte cybersécurité  | E4 - CCSN |
+| Mhand BOUFALA            | Superviseur           |         |
+
+## Informations du projet
+
+| Élément | Détails |
+|---|---|
+| Titre du projet | Cloud Script Manager |
+| Domaine | Cloud Computing – Architecture Azure – Sécurité – DevOps |
+| Entreprise | DSPI-TECH |
+| Technologies principales | Microsoft Azure, React.js, Docker, Azure Firewall, Linux, Supabase, … |
+| Année académique | 2025 – 2026 |
+| Niveau | E4 – E5 |
+| Lieu | Paris – France |
+| Groupe | 24 |
+| Nombre de personnes | 5 |
+| Date début | Janvier 2026 |
+| Date fin | Septembre 2026 |
+
+## Introduction
+
+Le **Cloud Computing** et l’automatisation des infrastructures sont devenus des piliers essentiels des systèmes d’information modernes.  
+Les entreprises utilisent aujourd’hui de nombreuses technologies telles que :
+
+- Microsoft Azure
+- AWS (Amazon Web Services)
+- Google Cloud Platform (GCP)
+- Linux & Windows Server
+- Docker & Kubernetes
+- DevOps & CI/CD
+- Virtualisation & Infrastructure as Code (IaC)
+- Cybersécurité & supervision
+- Automatisation des tâches IT
+
+Dans ce contexte, les administrateurs systèmes, ingénieurs cloud, équipes DevOps et experts cybersécurité utilisent quotidiennement des scripts, des templates, des procédures automatisées et des outils d’infrastructure afin de :
+
+- Réduire les erreurs humaines
+- Standardiser les configurations
+- Automatiser les tâches répétitives
+- Déployer rapidement des infrastructures
+- Renforcer la sécurité des systèmes
+- Optimiser la supervision et la maintenance
+- Améliorer la productivité des équipes IT
+
+Les scripts et outils d’automatisation jouent aujourd’hui un rôle central dans la gestion des infrastructures modernes, qu’elles soient **on-premise**, **cloud** ou **hybrides**.
+
+
+## Contexte et problématique
+
+Malgré leur importance, les scripts, procédures et outils d’automatisation présentent encore plusieurs limites dans les environnements IT modernes.
+
+| Problème | Description |
+|---|---|
+| Dispersion | Scripts, templates et procédures dispersés entre GitHub, forums, blogs et outils internes |
+| Fiabilité | Scripts parfois non testés, obsolètes ou incompatibles |
+| Documentation | Documentation souvent incomplète ou inexistante |
+| Sécurité | Risques liés à l’exécution de scripts non vérifiés |
+| Standardisation | Difficulté à uniformiser les pratiques au sein des équipes |
+| Temps | Temps important perdu à rechercher, tester et corriger les scripts |
+| Collaboration | Difficulté de partage et de centralisation entre équipes |
+| Maintenance | Complexité de mise à jour des scripts et automatisations |
+| Compatibilité | Multiplication des environnements et technologies différentes |
+
+
+## Problématique principale
+
+L’absence d’une plateforme centralisée, collaborative et sécurisée complique la gestion, le partage et l’automatisation des infrastructures IT modernes.
+
+Les entreprises ont besoin d’une solution capable de :
+
+- Centraliser les scripts et ressources IT
+- Faciliter la collaboration entre équipes
+- Sécuriser l’utilisation des automatisations
+- Standardiser les procédures techniques
+- Simplifier la recherche et la gestion des ressources
+- Supporter des environnements multi-cloud et hybrides
+- Améliorer la productivité des administrateurs et ingénieurs
+
+## Thèmes abordés
+
+- Linux
+- Windows Server
+- Active Directory
+- PowerShell
+- Bash
+- Microsoft Azure
+- AWS (Amazon Web Services)
+- Google Cloud Platform (GCP)
+- Microsoft 365
+- Docker
+- Kubernetes
+- VMware
+- Hyper-V
+- Terraform
+- Ansible
+- DevOps
+- CI/CD
+- Réseau
+- Sécurité informatique
+- Monitoring & Supervision
+- Backup & Restore
+- Virtualisation
+- Cloud Computing
+- Infrastructure as Code (IaC)
+- Python Automation
+- Exchange Server
+- SQL Server
+- PostgreSQL
+- MySQL
+- GitHub Actions
+- GitLab CI/CD
+- Jenkins
+- Microsoft Intune
+- SCCM / MECM
+- Azure DevOps
+- Entra ID (Azure AD)
+- Linux Administration
+- Windows Administration
+- Firewall & VPN
+- Docker Compose
+- Nginx
+- Apache
+- Scripts d’automatisation
+- Audit & Compliance
+- Monitoring Cloud
+- FinOps / Cloud Cost Management
+- Cybersecurity
+- SIEM & Logs
+- API & REST
+- Storage & NAS
+- DNS / DHCP
+- VPN
+- Active Directory Security
+- Office 365 Automation
+- Infrastructure Cloud Hybride
+- Kubernetes Security
+- Automation IT
+- Scripting avancé
+- Helpdesk & Support IT
+- Observabilité
+- Backup Cloud
+- Disaster Recovery (PRA/PCA)
+- AI & Automation
+- Azure OpenAI
+- VMware ESXi
+- Proxmox
+- Linux Security
+- Windows Security
+- Endpoint Management
+- Cloud Security
+- Server Management
+- Multi-Cloud
+- SysAdmin Tools
+- DevSecOps
+- MLOps
+- OpenShift
+- Rancher
+- GitOps
+- Reverse Proxy
+- SSL/TLS & Certificats
+- Microsoft Defender
+- CrowdStrike
+- Sentinel
+- Elastic Stack (ELK)
+- Zabbix
+- Grafana
+- Prometheus
+- Datadog
+- PRTG Monitoring
+- Cisco
+- Fortinet
+- Palo Alto
+- pfSense
+- MikroTik
+
+## Objectifs du projet
+
+### Objectif principal
+
+Concevoir et déployer une plateforme centralisée permettant de regrouper, documenter, partager, sécuriser et exploiter des scripts, outils et ressources IT via une application web moderne et sécurisée.
+
+La plateforme couvrira plusieurs domaines technologiques :
+
+- Cloud Computing
+- Administration système
+- DevOps
+- Cybersécurité
+- Réseau
+- Virtualisation
+- Automatisation IT
+- Infrastructure as Code (IaC)
+- Monitoring & Supervision
+- Multi-Cloud
 
 ---
 
-## Équipe
+### Objectifs spécifiques
 
-| Membre | 
-|--------|
-| Amir Minihadji AMINA |
-| LO Pape | 
-| Neylie NDJUMKENG-NGUEMO |
-| **Mhand BOUFALA** - (**Superviseur**) |
+| Objectif | Description |
+|---|---|
+| Centralisation | Dashboard unique regroupant scripts, procédures, documentations et outils IT |
+| Fiabilité & sécurité | Ressources validées, testées et sécurisées avant publication |
+| Collaboration | Faciliter le partage de connaissances entre équipes IT |
+| Administration simplifiée | Interface intuitive pour rechercher, gérer et utiliser les ressources |
+| Architecture professionnelle | Déploiement cloud moderne avec bonnes pratiques DevOps et sécurité |
+| Haute disponibilité | Solution scalable, résiliente et hautement disponible |
+| Multi-technologies | Support de plusieurs environnements cloud, systèmes et outils |
+| Standardisation | Uniformisation des pratiques et automatisations IT |
+| Documentation | Centralisation des guides techniques et tutoriels |
 
 ---
 
-## Table des matières
+## Avantages du projet
 
-- [Objectif du projet](#objectif-du-projet)
-- [Périmètre fonctionnel](#périmètre-fonctionnel)
+- La plateforme centralise différents scripts, outils, templates et documentations IT dans un seul environnement.
+- Elle réduit le temps de recherche et améliore la productivité des équipes techniques.
+- Les ressources sont validées, documentées et sécurisées avant utilisation.
+- L’automatisation des tâches permet de réduire les erreurs humaines.
+- L’application web offre une interface moderne, intuitive et responsive.
+- L’architecture conteneurisée améliore la scalabilité et la portabilité.
+- La solution facilite l’intégration des pratiques DevOps et DevSecOps.
+- La standardisation des procédures améliore la qualité et la maintenance des infrastructures.
+- La plateforme peut évoluer vers des fonctionnalités avancées :
+  - CI/CD
+  - GitOps
+  - Intelligence artificielle
+  - Automatisation avancée
+  - Multi-cloud
+  - Observabilité
+
+
+## Valeur économique
+
+### 1. Réduction des coûts opérationnels
+
+#### a. Automatisation des tâches IT
+Réduction du temps passé par les administrateurs à rechercher, tester et maintenir les scripts et procédures techniques.
+
+#### b. Réduction des erreurs humaines
+Moins d’incidents techniques et diminution des coûts liés aux corrections et interruptions de service.
+
+#### c. Optimisation des ressources
+Meilleure gestion des infrastructures cloud, systèmes et services grâce à une plateforme centralisée.
+
+#### d. Gain de productivité
+Amélioration de la collaboration entre équipes techniques et accélération des déploiements.
+
+
+### 2. ROI (Retour sur investissement)
+
+- Mise en place d’une plateforme centralisée permettant une réduction des coûts à long terme.
+- Investissement initial :
+  - Infrastructure cloud
+  - Développement
+  - Sécurité
+  - Hébergement
+  - Supervision
+- ROI estimé :
+  - récupération des coûts entre 12 et 18 mois
+  - grâce aux gains de productivité et à l’automatisation.
+
+
+## Valeur côté marché
+
+### 1. Différenciation du produit
+
+#### a. Plateforme centralisée IT
+Solution regroupant scripts, automatisations, documentations et outils techniques dans un seul espace.
+
+#### b. Sécurité intégrée
+Respect des bonnes pratiques de cybersécurité et de contrôle d’accès.
+
+#### c. Architecture scalable
+Plateforme évolutive compatible avec des environnements hybrides et multi-cloud.
+
+#### d. Support multi-domaines
+Prise en charge de plusieurs technologies :
+- Cloud
+- DevOps
+- Réseau
+- Cybersécurité
+- Virtualisation
+- Administration système
+
+### 2. Opportunités commerciales
+
+#### Marché cible
+
+- PME
+- Grandes entreprises
+- ESN / sociétés de services
+- Administrateurs systèmes
+- Équipes DevOps
+- Équipes cybersécurité
+- Ingénieurs cloud
+- Centres de formation IT
+
+
+## Périmètre du projet
+
+### Inclus dans le projet
+
+- Centralisation des scripts et ressources IT
+- Développement d’un dashboard web
+- Gestion des utilisateurs et des rôles
+- Recherche et filtrage des ressources
+- Documentation technique et tutoriels
+- Sécurisation réseau et applicative
+- Déploiement cloud conteneurisé
+- Supervision et journalisation
+- Gestion des catégories et technologies
+- Mise en place des bonnes pratiques DevOps
+
+
+## Hors périmètre
+
+- Développement mobile natif
+- Marketplace publique ouverte
+- Exécution automatique sans validation humaine
+- Hébergement de contenus non vérifiés
+- Gestion avancée de SOC/SIEM temps réel
+- Administration complète d’infrastructures clients
+
+
+## Parties prenantes
+
+| Rôle | Description |
+|---|---|
+| Équipe projet | Développement, cloud, cybersécurité, architecture et DevOps |
+| Administrateurs systèmes | Utilisateurs finaux de la plateforme |
+| Équipes DevOps | Utilisation des automatisations et pipelines |
+| Responsable sécurité | Validation des politiques de sécurité |
+| Développeurs Frontend | Développement de l’interface utilisateur |
+| Développeurs Backend | Développement des APIs et services |
+| Architecte cloud | Conception de l’infrastructure et de l’architecture |
+| Chef de projet | Coordination, suivi et planification |
+| Support IT | Maintenance et assistance |
+| Enseignant / Jury | Encadrement et évaluation académique |
+
+
+## Exigences fonctionnelles
+
+| ID | Exigence |
+|---|---|
+| EF1 | Authentification sécurisée des utilisateurs |
+| EF2 | Gestion des rôles et permissions |
+| EF3 | Consultation, téléchargement et copie des scripts |
+| EF4 | Ajout, modification et suppression des ressources |
+| EF5 | Recherche par catégorie, technologie et mot-clé |
+| EF6 | Affichage de documentations et tutoriels |
+| EF7 | Journalisation des actions utilisateurs |
+| EF8 | Gestion des catégories et tags |
+| EF9 | Support multi-technologies |
+| EF10 | Tableau de bord d’administration |
+| EF11 | Historique des modifications |
+| EF12 | Gestion des favoris et ressources populaires |
+
+
+
+## Exigences non fonctionnelles
+
+| Critère | Exigence |
+|---|---|
+| Sécurité | HTTPS, RBAC, protection des accès, journalisation et contrôle des permissions |
+| Performance | Temps de réponse rapide pour les opérations courantes |
+| Disponibilité | Haute disponibilité et redondance des services |
+| Scalabilité | Mise à l’échelle automatique selon la charge |
+| Maintenabilité | Architecture modulaire et facilement maintenable |
+| Portabilité | Déploiement conteneurisé compatible multi-environnements |
+| Compatibilité | Support des environnements cloud, hybrides et on-premise |
+| Observabilité | Supervision, monitoring et centralisation des logs |
+| Résilience | Sauvegarde et reprise après incident |
+| Extensibilité | Possibilité d’ajouter de nouvelles technologies et fonctionnalités |
+
+
+## Coût total estimatif du projet
+
+| Phase / Poste | Description | Coût mensuel (€) | Durée estimée | Coût total estimatif (€) |
+|---|---|---|---|---|
+| Prototype / Test | Déploiement initial pour validation et tests | 200 – 400 | 3 mois | 600 – 1200 |
+| Production | Mise en production avec faible charge | 500 – 1200 | 6 mois | 3000 – 7200 |
+| Maintenance et support | Mises à jour, sauvegardes, sécurité | 150 – 300 | 12 mois | 1800 – 3600 |
+| Formation et documentation | Guides utilisateurs, tutoriels, sessions de formation | 50 – 150 | 1 mois | 50 – 150 |
+
+### Coût total estimatif du projet
+**5 450 – 12 150 €**
+
+
+## Rendu N° 04
+
+- [Rendu N°04 - Résumé](#rendu-n04--résumé)
+- [Organisation du projet](#organisation-du-projet)
 - [Stack technique](#stack-technique)
 - [Architecture du dépôt](#architecture-du-dépôt)
 - [Architecture applicative](#architecture-applicative)
 - [Routing](#routing)
 - [Gestion des données et de l'état](#gestion-des-données-et-de-létat)
 - [Installation et lancement](#installation-et-lancement)
-- [Scripts disponibles](#scripts-disponibles)
-- [Tests](#tests)
-- [Qualité et conventions](#qualité-et-conventions)
+- [Commandes npm](#commandes-npm)
 - [Journal des tâches](#journal-des-tâches)
-  - [Tâche 1 — Mise en place du frontend (01/04/2026)](#tâche-1--mise-en-place-du-frontend-01042026)
-  - [Phase 5 — Développement MVP](#phase-5--développement-mvp)
-    - [Tâche 1 — Refonte des pages Dashboard / Catégories / Ressources (21/04/2026)](#tâche-1--refonte-des-pages-dashboard--catégories--ressources-21042026)
-    - [Tâche 2 — Formulaires de création Catégories & Scripts (22/04/2026)](#tâche-2--formulaires-de-création-catégories--scripts-22042026)
-    - [Tâche 3 — Choix de la plateforme Supabase (01/05/2026)](#tâche-3--choix-de-la-plateforme-supabase-01052026)
-    - [Tâche 4 — Système d'authentification & gestion des administrateurs (03/05/2026)](#tâche-4--système-dauthentification--gestion-des-administrateurs-03052026)
-    - [Tâche 5 — Améliorations du dashboard : page utilisateur (06/05/2026)](#tâche-5--améliorations-du-dashboard--page-utilisateur-06052026)
-    - [Tâche 6 — Configuration de la page Logs & Audits (06/05/2026)](#tâche-6--configuration-de-la-page-logs--audits-06052026)
-    - [Tâche 7 — Refonte de la page profil (07/05/2026)](#tâche-7--refonte-de-la-page-profil-07052026)
-    - [Tâche 8 — Création & configuration de la page catégorie (07/05/2026)](#tâche-8--création--configuration-de-la-page-catégorie-07052026)
-    - [Tâche 9 — Création & configuration de la page Scripts + améliorations Catégories (08/05/2026)](#tâche-9--création--configuration-de-la-page-scripts--améliorations-catégories-08052026)
-    - [UML et documentation de conception](#uml-et-documentation-de-conception)
+  - [Tâche 1 - Mise en place du frontend (01/04/2026)](#tâche-1--mise-en-place-du-frontend-01042026)
+  - [Phase 5 - Développement MVP](#phase-5--développement-mvp)
+    - [Tâche 2 - Refonte des pages Dashboard / Catégories / Ressources (21/04/2026)](#tâche-2--refonte-des-pages-dashboard--catégories--ressources-21042026)
+    - [Tâche 3 - Formulaires de création Catégories & Scripts (22/04/2026)](#tâche-3--formulaires-de-création-catégories--scripts-22042026)
+    - [Tâche 4 - Choix de la plateforme Supabase (01/05/2026)](#tâche-4--choix-de-la-plateforme-supabase-01052026)
+    - [Tâche 5 - Système d'authentification & gestion des administrateurs (03/05/2026)](#tâche-5--système-dauthentification--gestion-des-administrateurs-03052026)
+    - [Tâche 6 - Améliorations du dashboard : page utilisateur (06/05/2026)](#tâche-6--améliorations-du-dashboard--page-utilisateur-06052026)
+    - [Tâche 7 - Configuration de la page Logs & Audits (06/05/2026)](#tâche-7--configuration-de-la-page-logs--audits-06052026)
+    - [Tâche 8 - Refonte de la page profil (07/05/2026)](#tâche-8--refonte-de-la-page-profil-07052026)
+    - [Tâche 9 - Création & configuration de la page Catégories (07/05/2026)](#tâche-9--création--configuration-de-la-page-catégories-07052026)
+    - [Tâche 10 - Création & configuration de la page Scripts + améliorations Catégories (08/05/2026)](#tâche-10--création--configuration-de-la-page-scripts--améliorations-catégories-08052026)
+  - [UML et documentation de conception](#uml-et-documentation-de-conception)
+- [Prochaines étapes](#prochaines-étapes)
 
 
----
+## Rendu N°04 - Résumé
 
-## Objectif du projet
+Dans ce rendu, l'équipe a travaillé sur les pages de gestion des catégories de scripts, la page profil, ainsi que sur le système d'authentification et la mise en place de la sécurité. La configuration de la base de données dans Supabase a également été finalisée.
 
-Le projet vise à fournir un point d'entrée unique pour :
+Une attention particulière a été portée à la protection des routes, à la gestion des rôles utilisateurs, ainsi qu'à la sécurisation des accès et des données sensibles.
 
-- organiser des scripts techniques par catégories et providers cloud ;
-- standardiser la consultation de la documentation d'exécution ;
-- simplifier la navigation entre usages courants (favoris, téléchargements, historique, partages) ;
-- préparer une évolution vers des données dynamiques et des workflows métier.
+**Précision concernant le rendu N°03 :** lors du rendu précédent, nous avions évoqué un changement de base de données. Initialement orientés vers CosmosDB, nous avons décidé de migrer vers PostgreSQL via Supabase pour des raisons techniques et économiques : meilleure flexibilité, intégration plus simple avec le frontend React, et contrôle accru des données via Row Level Security.
 
----
+**Nouveaux membres :** deux développeurs ont rejoint l'équipe depuis le rendu précédent. La liste complète figure dans le tableau d'équipe ci-dessus.
 
-## Périmètre fonctionnel
+**Avancement global : 68 %**
 
-Fonctionnalités côté frontend :
 
-- Dashboard principal
-- Navigation par catégories et par provider
-- Liste de scripts et pages de détail
-- Pages utilisateur (profil, réglages, login)
-- Pages utilitaires (contact, ressources, favoris, téléchargements, historique, partages)
 
----
+## Organisation du projet
+
+### Outils de gestion
+
+- **Microsoft Planner** : gestion des tâches et suivi de l'avancement
+- **HackMD** : plateforme de documentation collaborative, choisie pour la mise à jour en temps réel des fichiers partagés
+
+### Convention de nommage des fichiers
+
+Les fichiers sont nommés selon le format : `PLG - N° du document + intitulé`. Le projet compte à ce jour **17 fichiers**, chacun traitant un sujet spécifique.
+
+![image](https://hackmd.io/_uploads/BytSW060-e.png)
+![image](https://hackmd.io/_uploads/Hketb0aRbl.png)
+![image](https://hackmd.io/_uploads/rkNJGApCWg.png)
+![image](https://hackmd.io/_uploads/HkDeMC6CZg.png)
+![image](https://hackmd.io/_uploads/rJuNzRaA-l.png)
+![image](https://hackmd.io/_uploads/Sk9B4RpCZl.png)
+
 
 ## Stack technique
 
@@ -99,14 +487,13 @@ Fonctionnalités côté frontend :
 - Testing Library (`react`, `jest-dom`)
 - Environnement `jsdom`
 
----
 
 ## Architecture du dépôt
 
 ```text
 .
 ├── README.md
-├── Site-Web/                      # Application frontend (Vite + React + TS)
+├── Site-Web/                      
 │   ├── package.json
 │   ├── vite.config.ts
 │   ├── vitest.config.ts
@@ -120,8 +507,7 @@ Fonctionnalités côté frontend :
 │       ├── hooks/
 │       ├── data/
 │       └── test/
-└── UML/                           # Diagrammes de conception (PlantUML)
-```
+└── UML/                           
 
 ---
 
@@ -139,12 +525,12 @@ src/
 ├── components/
 │   ├── dashboard/      # ScriptCard, CategoryCard, StatCard
 │   ├── layout/         # DashboardLayout, Sidebar, Header
-│   ├── scripts/        # ScriptDetail (vue détail GitHub-like)
-│   └── ui/             # shadcn primitives
+│   ├── scripts/        # ScriptDetail (vue détail)
+│   └── ui/             # Primitives shadcn
 ├── contexts/
 │   └── AuthContext.tsx  # Auth, rôles, permissions globaux
-├── data/scripts.ts      # Modèle Script + helpers (catalogue)
-├── hooks/useUserData.ts # Favoris / téléchargements / partages / historique
+├── data/scripts.ts      # Modèle Script + helpers
+├── hooks/useUserData.ts # Favoris, téléchargements, partages, historique
 ├── lib/passwordPolicy.ts
 └── pages/
     ├── Index.tsx
@@ -167,8 +553,8 @@ src/
         ├── UsersPage.tsx
         └── AuditLogsPage.tsx
 ```
+![image](https://hackmd.io/_uploads/ryPvSkR0Wl.png)
 
----
 
 ## Routing
 
@@ -193,9 +579,9 @@ Routes déclarées dans `Site-Web/src/App.tsx` :
 | `/profile` | Profil utilisateur |
 | `/contact` | Contact |
 | `/login` | Connexion |
-| `/signup` | Inscription (1er admin global) |
-| `/forgot-password` | Réinitialisation mot de passe |
-| `/reset-password` | Nouveau mot de passe (via lien) |
+| `/signup` | Inscription (1er administrateur global) |
+| `/forgot-password` | Réinitialisation du mot de passe |
+| `/reset-password` | Nouveau mot de passe via lien sécurisé |
 | `/set-password` | Première connexion obligatoire |
 | `/admin/users` | Gestion des utilisateurs (global_admin) |
 | `/admin/audit-logs` | Logs & audits (global_admin) |
@@ -203,25 +589,70 @@ Routes déclarées dans `Site-Web/src/App.tsx` :
 | `/suspended` | Compte suspendu |
 | `*` | Page 404 NotFound |
 
+![image](https://hackmd.io/_uploads/SkKcB1CCZl.png)
+
 ### Protection des routes
 
-`<ProtectedRoute>` dans `src/components/auth/ProtectedRoute.tsx` :
+Composant `<ProtectedRoute>` dans `src/components/auth/ProtectedRoute.tsx` :
 
-- Redirige vers `/login` si non connecté
-- Redirige vers `/suspended` si compte suspendu
-- Force `/set-password` à la première connexion
-- Vérifie le `role` ou la `permission` requise → `/forbidden` sinon
+- Redirige vers `/login` si l'utilisateur n'est pas connecté
+- Redirige vers `/suspended` si le compte est suspendu
+- Force la redirection vers `/set-password` à la première connexion
+- Vérifie le `role` ou la `permission` requise, redirige vers `/forbidden` sinon
+![image](https://hackmd.io/_uploads/ByU3B1CCbe.png)
 
----
+```tsx
+import { ReactNode } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth, AppRole } from '@/contexts/AuthContext';
+import { Loader2 } from 'lucide-react';
+
+interface ProtectedRouteProps {
+  children: ReactNode;
+  role?: AppRole;
+  permission?: { resource: string; action: 'create' | 'read' | 'update' | 'delete' };
+}
+
+export function ProtectedRoute({ children, role, permission }: ProtectedRouteProps) {
+  const { user, profile, loading, hasRole, hasPermission } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
+
+  if (profile?.is_suspended) return <Navigate to="/suspended" replace />;
+  if (profile?.must_change_password && location.pathname !== '/set-password') {
+    return <Navigate to="/set-password" replace />;
+  }
+
+  if (role && !hasRole(role) && !hasRole('global_admin')) {
+    return <Navigate to="/forbidden" replace />;
+  }
+  if (permission && !hasPermission(permission.resource, permission.action)) {
+    return <Navigate to="/forbidden" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+```
+
 
 ## Gestion des données et de l'état
 
 - Les données de scripts sont définies dans `Site-Web/src/data/scripts.ts`.
 - Le hook `useUserData.ts` gère l'état utilisateur local (profil, favoris, téléchargements, partages, historique) via `localStorage`.
 - `AuthContext.tsx` expose `user`, `session`, `profile`, `roles`, `permissions`, `hasRole()`, `hasPermission()`, `signIn`, `signOut`.
-- Une couche TanStack Query est présente pour les futures intégrations API.
+- Une couche TanStack Query est en place pour les futures intégrations API.
+![image](https://hackmd.io/_uploads/SklDLkAC-x.png)
 
----
 
 ## Installation et lancement
 
@@ -230,7 +661,7 @@ Routes déclarées dans `Site-Web/src/App.tsx` :
 - Node.js 18+ (Node 20 LTS recommandé)
 - npm
 
-> Le frontend est dans `Site-Web/`. Les commandes doivent être exécutées dans ce dossier.
+Le frontend est dans `Site-Web/`. Toutes les commandes doivent être exécutées depuis ce dossier.
 
 ### Cloner et installer
 
@@ -246,12 +677,11 @@ npm install
 npm run dev
 ```
 
-Par défaut, Vite est configuré sur le port `8080` (voir `Site-Web/vite.config.ts`).  
-Ouvrir [http://localhost:8080](http://localhost:8080).
+Par défaut, Vite est configuré sur le port `8080` (voir `Site-Web/vite.config.ts`).
+Accéder à l'application via [http://localhost:8080](http://localhost:8080).
 
----
 
-## Scripts disponibles
+## Commandes npm
 
 Depuis `Site-Web/` :
 
@@ -265,141 +695,121 @@ Depuis `Site-Web/` :
 | `npm run test` | Exécution des tests Vitest |
 | `npm run test:watch` | Tests en mode watch |
 
----
 
-## Tests
-
-- Configuration dans `Site-Web/vitest.config.ts`
-- Setup global dans `Site-Web/src/test/setup.ts` (dont mock `matchMedia`)
-- Test d'exemple présent dans `Site-Web/src/test/example.test.ts`
-
-```bash
-cd Site-Web
-npm run test
-```
-
----
-
-## Qualité et conventions
-
-- **Linting** : `Site-Web/eslint.config.js`
-- **Styling** : `Site-Web/tailwind.config.ts` + `postcss.config.js`
-- **Alias TypeScript** : `@/*` vers `src/*` (voir `tsconfig.app.json`)
-
-Bonnes pratiques recommandées :
-- Lancer `npm run lint` avant chaque commit
-- Ajouter des tests pour toute logique métier critique
-- Faire des commits atomiques avec messages explicites
-
----
 
 ## Journal des tâches
 
----
+Dans ce **rendu N°04**, l'équipe s'est concentrée sur le développement frontend et backend, après avoir finalisé les phases d'architecture, de prototypage et de modélisation UML lors des rendus précédents.
 
-### Tâche 1 — Mise en place du frontend (01/04/2026)
+
+
+### Tâche 1 - Mise en place du frontend (01/04/2026)
 
 Mise en place initiale du projet frontend avec Vite + React + TypeScript. Configuration du routing, des composants de layout, du dashboard de base et de la structure de données des scripts.
 
-**État à cette étape :** frontend seul, pas de backend branché.
-
----
-
-### Phase 5 — Développement MVP
-
-Plateforme web centralisée pour la gestion, la documentation et l'exploitation de scripts cloud (Azure & AWS) à destination des équipes administrateurs.
+**Etat à cette étape :** frontend seul, aucun backend branché.
 
 ![image](https://hackmd.io/_uploads/r1Cz5s4aWe.png)
 
----
 
-### Tâche 1 — Refonte des pages Dashboard / Catégories / Ressources (21/04/2026)
+
+### Phase 5 - Développement MVP
+
+Objectif : plateforme web centralisée pour la gestion, la documentation et l'exploitation de scripts cloud (Azure & AWS) à destination des équipes d'administration.
+
+
+### Tâche 2 - Refonte des pages Dashboard / Catégories / Ressources (21/04/2026)
 
 Refonte complète du style visuel des trois pages clés de la plateforme, dans la lignée des standards GitHub, Linear et Vercel.
 
-#### Dashboard — `/` (`src/pages/Index.tsx`)
+#### Dashboard - `/` (`src/pages/Index.tsx`)
 
-- **Hero header** avec badge de statut animé (Opérationnel), version build et CTA primaires
-- **4 KPI cards** : Scripts disponibles, Azure, AWS, Validés — avec icônes colorées et indicateur d'évolution
-- **Charts row** : barchart "Scripts par catégorie" + donut "Par provider" (Recharts) avec tooltips thémés
-- **Activity feed** chronologique + **grille d'accès rapides**
-- **System status** footer (API / Catalogue / Recherche / CDN) avec indicateurs animés
+- Hero header avec badge de statut animé (Opérationnel), version build et boutons d'action principaux
+- 4 KPI cards : Scripts disponibles, Azure, AWS, Validés — avec icônes colorées et indicateur d'évolution
+- Charts row : barchart "Scripts par catégorie" + donut "Par provider" (Recharts) avec tooltips thémés
+- Activity feed chronologique + grille d'accès rapides
+- System status footer (API / Catalogue / Recherche / CDN) avec indicateurs animés
 
 ![image](https://hackmd.io/_uploads/B1Qlcs4aWe.png)
 ![image](https://hackmd.io/_uploads/H1LWciVTWx.png)
 
 #### Catégories — `/categories` (`src/pages/CategoriesPage.tsx`)
 
-- Header avec **breadcrumb**, description et **mini-stats** (nombre de catégories / scripts)
-- Cards catégorie : icône colorée par accent, **slug en monospace**, compteur de scripts, **% du catalogue** et **barre de progression** dynamique
-- Bandeau d'astuce de recherche + footer "Demander une nouvelle catégorie"
+- Header avec breadcrumb, description et mini-stats (nombre de catégories / scripts)
+- Cards catégorie : icône colorée par accent, slug en monospace, compteur de scripts, pourcentage du catalogue et barre de progression dynamique
+- Bandeau d'aide à la recherche + footer "Demander une nouvelle catégorie"
 
 ![image](https://hackmd.io/_uploads/HkHV9sNpZl.png)
 
-#### Ressources — `/resources` (`src/pages/ResourcesPage.tsx`)
+#### Ressources - `/resources` (`src/pages/ResourcesPage.tsx`)
 
-- Header avec icône `Library`, breadcrumb et stats (ressources totales / catégories)
-- **Barre de recherche** live + **filtres par catégorie** sous forme de chips
-- Cards avec : icône thématisée, **badge de type** (Doc / CLI / Repo / Vidéo / Guide), nom de domaine en monospace, lien externe
-- Sections regroupées dynamiquement avec compteur, état vide explicite
+- Header avec icône `Library`, breadcrumb et statistiques (ressources totales / catégories)
+- Barre de recherche live + filtres par catégorie sous forme de chips
+- Cards avec icône thématisée, badge de type (Doc / CLI / Repo / Vidéo / Guide), nom de domaine en monospace, lien externe
+- Sections regroupées dynamiquement avec compteur et état vide explicite
 
 ![image](https://hackmd.io/_uploads/HJRHqsN6Wg.png)
 
 #### Améliorations transverses
 
-- 100 % **design tokens HSL** — aucun hex codé en dur dans les composants
+- 100 % design tokens HSL, aucun code hexadécimal codé en dur dans les composants
 - Hover states unifiés (border primary + ombre primary/5 + transitions)
 - Typographie tabulaire (`tabular-nums`) pour tous les chiffres
-- Spacing dense type GitHub (gap-3/4, padding compact)
+- Espacement dense type GitHub (gap-3/4, padding compact)
 - Composants accessibles : focus rings, contrastes respectés en thème sombre
 
----
 
-### Tâche 2 — Formulaires de création Catégories & Scripts (22/04/2026)
+### Tâche 3 - Formulaires de création Catégories & Scripts (22/04/2026)
 
-Introduction de deux formulaires professionnels de création.
+Dans cette partie, nous avons créer les deux formulaires qui sont : catégorie et script.
 
-#### Nouvelle catégorie — `/categories/new` (`src/pages/NewCategoryPage.tsx`)
+#### Nouvelle catégorie - `/categories/new` (`src/pages/NewCategoryPage.tsx`)
 
-Formulaire en 2 colonnes (formulaire + **aperçu en direct sticky**).
+Formulaire en 2 colonnes : formulaire principal + aperçu en direct (sticky).
 
-**Champs :**
-- **Nom** (obligatoire, 2-60 car., compteur live)
-- **Description** (optionnelle, 280 car. max)
-- **Couleur** : color picker natif + champ HEX synchronisé + 8 presets cliquables
-- **Icône** : grille de 12 icônes Lucide sélectionnables
-- **Statut** : `Actif` / `Inactif` avec pastille colorée
+| Champ | Règle |
+|-------|-------|
+| Nom | Obligatoire, 2–60 caractères, compteur live |
+| Description | Optionnelle, 280 caractères max |
+| Couleur | Color picker natif + champ HEX synchronisé + 8 presets |
+| Icône | Grille de 12 icônes Lucide sélectionnables |
+| Statut | `Actif` / `Inactif` avec pastille colorée |
 
 ![image](https://hackmd.io/_uploads/Skxcqj46-x.png)
 ![image](https://hackmd.io/_uploads/SJ5jqj4pWx.png)
 
-#### Nouveau script — `/scripts/new` (`src/pages/NewScriptPage.tsx`)
+#### Nouveau script - `/scripts/new` (`src/pages/NewScriptPage.tsx`)
 
 **Identité :**
-- **Nom** (obligatoire, 3-100 car.)
-- **Description** : textarea avec **mini-toolbar WYSIWYG** (Gras / Italique / Liste / Lien — markdown) + compteur 2000 car.
-- **Catégorie** : Select dynamique chargé depuis `categories`
-- **Type** : Bash, PowerShell, Python, Azure CLI, AWS CLI, Bicep, ARM, Terraform, CloudFormation, JS, TS
+
+- Nom (obligatoire, 3–100 caractères)
+- Description : textarea avec mini-toolbar WYSIWYG (Gras / Italique / Liste / Lien - markdown) + compteur 2000 caractères
+- Catégorie : Select dynamique chargé depuis `categories`
+- Type : Bash, PowerShell, Python, Azure CLI, AWS CLI, Bicep, ARM, Terraform, CloudFormation, JS, TS
 
 **Code source :**
-- Éditeur stylisé avec **chrome de fenêtre type IDE** (3 dots colorées + nom de fichier dynamique avec extension auto-détectée)
+
+- Editeur stylisé avec chrome de fenêtre type IDE (3 dots colorées + nom de fichier dynamique avec extension auto-détectée)
 - Police monospace, fond foncé, badge du langage sélectionné
 
 **Documentation détaillée :**
+
 - Fonctionnalités, Prérequis, Exemple (mono), Autres informations
-- **Upload d'images** : zone **drag & drop** + parcourir, prévisualisation grille, validation type/taille (5 MB max)
+- Upload d'images : zone drag & drop + parcourir, prévisualisation grille, validation type/taille (5 MB max)
 
 **Sidebar métadonnées (sticky) :**
-- **Criticité** : 4 boutons radio colorés (Faible / Moyenne / Élevée / Critique)
-- **Version** : champ avec regex (`v1.0.0`)
-- **Statut** : Select avec pastille
-- **Tags** : système de **chips** avec autocomplete (max 15, Entrée ou virgule pour ajouter)
+
+- Criticité : 4 boutons radio colorés (Faible / Moyenne / Elevée / Critique)
+- Version : champ avec regex (`v1.0.0`)
+- Statut : Select avec pastille
+- Tags : système de chips avec autocomplete (max 15, Entrée ou virgule pour ajouter)
 
 **Validation & Accessibilité :**
-- Schéma **Zod** complet avec règles métier
+
+- Schéma Zod complet avec règles métier
 - Scroll automatique vers le premier champ en erreur
-- `aria-invalid`, `aria-pressed`, `aria-label` sur les contrôles non-textuels
-- Persistance en `localStorage` (`custom_scripts`)
+- Attributs `aria-invalid`, `aria-pressed`, `aria-label` sur les contrôles non-textuels
+- Persistance du brouillon en `localStorage` (`custom_scripts`)
 
 ![image](https://hackmd.io/_uploads/HyGpciVTZg.png)
 ![image](https://hackmd.io/_uploads/S1BCcoNTZe.png)
@@ -407,50 +817,51 @@ Formulaire en 2 colonnes (formulaire + **aperçu en direct sticky**).
 ![image](https://hackmd.io/_uploads/SyV-isV6bx.png)
 ![image](https://hackmd.io/_uploads/SJeMisEp-x.png)
 
----
 
-### Tâche 3 — Choix de la plateforme Supabase (01/05/2026)
+### Tâche 4 - Choix de la plateforme Supabase (01/05/2026)
 
-#### Qu'est-ce que Supabase ?
+Dans cette partie, nous détaillons pourquoi le choix de supabase pour la partie Backend (**PostgreSQL**).
 
-Supabase est une **alternative open-source à Firebase** basée sur **PostgreSQL**. Il fournit un **backend complet "as-a-service" (BaaS)** comprenant base de données, authentification, API automatique, temps réel, stockage de fichiers et Edge Functions.
+#### Présentation de Supabase
+
+Supabase est une alternative open-source à Firebase basée sur PostgreSQL. Il fournit un backend complet "as-a-service" (BaaS) comprenant base de données, authentification, API automatique, temps réel, stockage de fichiers et Edge Functions.
 
 #### Architecture de Supabase
 
 | Brique | Description |
 |--------|-------------|
-| **PostgreSQL** | Base de données relationnelle, JSON natif, indexation avancée |
-| **Auth** | JWT sécurisé, OAuth (Google, GitHub…), gestion des utilisateurs |
-| **Realtime** | WebSockets, synchronisation instantanée |
-| **Storage** | Gestion de fichiers (images, documents…) |
-| **Edge Functions** | Backend serverless, exécution proche de l'utilisateur |
+| PostgreSQL | Base de données relationnelle, JSON natif, indexation avancée |
+| Auth | JWT sécurisé, OAuth (Google, GitHub…), gestion des utilisateurs |
+| Realtime | WebSockets, synchronisation instantanée |
+| Storage | Gestion de fichiers (images, documents…) |
+| Edge Functions | Backend serverless, exécution proche de l'utilisateur |
 
 #### Pourquoi Supabase ?
 
-- **Open Source** : code transparent, auto-hébergeable, pas de vendor lock-in
-- **PostgreSQL** : SQL standard, requêtes puissantes (JOIN, agrégations), transactions fiables
-- **API automatique** : REST + GraphQL générés automatiquement, sans backend à développer
-- **Auth intégrée** : email/mot de passe, magic link, OAuth, gestion des sessions
-- **Row Level Security (RLS)** : contrôle d'accès directement en base, par utilisateur
-- **Realtime** : WebSockets intégrés, idéal pour dashboards live et notifications
-- **Edge Functions** : logique métier serverless en TypeScript
+- Open Source : code transparent, auto-hébergeable, sans vendor lock-in
+- PostgreSQL : SQL standard, requêtes puissantes (JOIN, agrégations), transactions fiables
+- API automatique : REST + GraphQL générés automatiquement, sans backend à développer
+- Auth intégrée : email/mot de passe, magic link, OAuth, gestion des sessions JWT
+- Row Level Security (RLS) : contrôle d'accès directement en base, par utilisateur
+- Realtime : WebSockets intégrés, idéal pour les dashboards live et les notifications
+- Edge Functions : logique métier serverless en TypeScript
 
 #### Supabase vs Firebase
 
 | Critère | Supabase | Firebase |
 |---------|----------|----------|
 | Base de données | PostgreSQL (SQL) | NoSQL (Firestore) |
-| Open Source | ✅ | ❌ |
+| Open Source | Oui | Non |
 | Requêtes complexes | Très puissantes | Limitées |
-| Vendor lock-in | Faible | Élevé |
-| Auth | ✅ | ✅ |
-| Realtime | ✅ | ✅ |
+| Vendor lock-in | Faible | Elevé |
+| Auth | Oui | Oui |
+| Realtime | Oui | Oui |
 
 #### Limites de Supabase
 
-- Moins mature que Firebase (écosystème plus petit)
-- Nécessite SQL — moins accessible pour les débutants
-- Realtime moins avancé que Firestore, mais suffisant dans 90 % des cas
+- Ecosystème moins mature que Firebase
+- Nécessite des connaissances SQL
+- Realtime moins avancé que Firestore, mais suffisant pour les besoins du projet
 
 #### Principales commandes Supabase CLI
 
@@ -480,7 +891,7 @@ supabase link --project-ref <project-ref>
 supabase start          # Lance PostgreSQL, API, Auth, Realtime, Studio
 supabase stop
 supabase db reset       # Supprime toutes les données locales
-supabase db pull        # Pull schéma depuis le cloud
+supabase db pull        # Récupère le schéma depuis le cloud
 ```
 
 **Migrations**
@@ -531,14 +942,12 @@ supabase status
 
 #### Installation de la CLI Supabase en local
 
-**Prérequis** : Node.js (LTS) + Docker installé et configuré.
+Prérequis : Node.js (LTS) + Docker installé et configuré.
 
 ![image](https://hackmd.io/_uploads/rkGQQY_Abl.png)
 
 ```bash
-# Télécharger
 curl -L https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz -o supabase.tar.gz
-# Extraire et installer
 sudo mv supabase /usr/local/bin/
 ```
 
@@ -565,27 +974,31 @@ supabase start
 
 #### Types de clés API Supabase
 
-| Type de clé | Usage | Sécurité |
-|-------------|-------|----------|
-| **Publishable Key** | Frontend (React, Next.js…) | Publique, sans danger |
-| **Secret Key** | Backend uniquement (Edge Functions, serveur) | Ultra sensible — ne jamais exposer |
-| **AWS Access Key ID** | Identification IAM AWS | Sensible |
-| **AWS Secret Access Key** | Auth AWS API | Ultra sensible |
+| Type de clé | Usage | Niveau de sécurité |
+|-------------|-------|-------------------|
+| Publishable Key | Frontend (React, Next.js…) | Publique, sans danger |
+| Secret Key | Backend uniquement (Edge Functions, serveur) | Ultra sensible — ne jamais exposer |
+| AWS Access Key ID | Identification IAM AWS | Sensible |
+| AWS Secret Access Key | Authentification AWS API | Ultra sensible |
 
->  La `service_role_key` (Secret Key) ne doit **jamais** être dans le frontend, ni committée sur GitHub.
+> La `service_role_key` ne doit jamais figurer dans le code frontend ni être committée sur GitHub.
 
----
 
-### Tâche 4 — Système d'authentification & gestion des administrateurs (03/05/2026)
 
-#### Base de données — Schéma RBAC
+### Tâche 5 - Système d'authentification & gestion des administrateurs (03/05/2026)
+
+Dans cette partie, nous navons travaillé sur la mise en place de la page connexion et inscription en définissant les rôles et permissions.
+
+#### Base de données - Schéma RBAC
+
+Dans cette partie nous avons créer les tables et fiare la migration dans la base de données et définir la sécurité.
 
 Migration créant 5 tables avec RLS strict :
 
 | Table | Rôle |
 |-------|------|
 | `profiles` | Données utilisateur (nom, email, actif, suspendu, must_change_password, last_login) |
-| `user_roles` | Association user ↔ rôle (`global_admin`, `admin`, `editor`, `viewer`) |
+| `user_roles` | Association utilisateur ↔ rôle (`global_admin`, `admin`, `editor`, `viewer`) |
 | `permissions` | Catalogue de permissions (resource × action : create/read/update/delete) |
 | `role_permissions` | Matrice rôle ↔ permissions (seed initial inclus) |
 | `audit_logs` | Journal horodaté des actions (login, invite, suspend, delete, update_roles…) |
@@ -593,10 +1006,11 @@ Migration créant 5 tables avec RLS strict :
 ![image](https://hackmd.io/_uploads/r1JuU9uCZe.png)
 
 **Fonctions sécurisées (`SECURITY DEFINER`) :**
+
 - `has_role(user_id, role)` — évite la récursion RLS
 - `has_permission(user_id, resource, action)` — résolution via les rôles
-- `is_active_user(user_id)` — vérifie actif et non suspendu
-- `handle_new_user()` — trigger `auth.users` : crée le profil et attribue le rôle initial. Le **1er utilisateur** devient automatiquement `global_admin`, les suivants reçoivent `viewer`
+- `is_active_user(user_id)` — vérifie que l'utilisateur est actif et non suspendu
+- `handle_new_user()` — trigger `auth.users` : crée le profil et attribue le rôle initial. Le 1er utilisateur devient automatiquement `global_admin`, les suivants reçoivent `viewer`
 - `log_audit_event(action, resource, resource_id, details)` — helper de journalisation
 
 ![image](https://hackmd.io/_uploads/B1ZqL9dCWx.png)
@@ -608,8 +1022,8 @@ Migration créant 5 tables avec RLS strict :
 | Rôle | Description |
 |------|-------------|
 | `global_admin` | Accès total (FULL ACCESS) |
-| `admin` | Tout sauf `users.delete` |
-| `editor` | Lecture/édition scripts, ressources, profil |
+| `admin` | Accès complet sauf la page gestion des utilisateur et la page Logs & audits |
+| `editor` | Lecture et édition des scripts, ressources et profil |
 | `viewer` | Lecture seule |
 
 ![image](https://hackmd.io/_uploads/BJPALqdAZx.png)
@@ -630,10 +1044,7 @@ Migration créant 5 tables avec RLS strict :
 
 ![image](https://hackmd.io/_uploads/rynXPcORZg.png)
 
-#### Script SQL complet — Système RBAC
-
-<details>
-<summary>Voir le script SQL complet</summary>
+#### Script PostgreSQL complet - Système RBAC
 
 ```sql
 -- =========================================================
@@ -841,8 +1252,6 @@ INSERT INTO public.role_permissions (role, permission_id) SELECT 'viewer'::publi
   WHERE action = 'read' AND resource IN ('scripts','resources','site','profile');
 ```
 
-</details>
-
 #### Pages d'authentification
 
 | Route | Description |
@@ -851,56 +1260,55 @@ INSERT INTO public.role_permissions (role, permission_id) SELECT 'viewer'::publi
 | `/signup` | Création du 1er administrateur global |
 | `/forgot-password` | Demande d'email de réinitialisation |
 | `/reset-password` | Nouveau mot de passe via lien sécurisé |
-| `/set-password` | Première connexion : mot de passe obligatoire |
+| `/set-password` | Première connexion : changement de mot de passe obligatoire |
 | `/forbidden` | Accès refusé |
 | `/suspended` | Compte suspendu |
 
 **Politique de mot de passe** (définie dans `src/lib/passwordPolicy.ts`) :
-- ≥ 16 caractères
-- Majuscule + minuscule + chiffre + caractère spécial
-- Indicateur de force (4 niveaux) + checklist live
 
-**Pages d'authentification**
+- 16 caractères minimum
+- Majuscule + minuscule + chiffre + caractère spécial requis
+- Indicateur de force (4 niveaux) + checklist live
 
 ![image](https://hackmd.io/_uploads/S1MLCc_Abg.png)
 ![image](https://hackmd.io/_uploads/r1-jCcdA-g.png)
 ![image](https://hackmd.io/_uploads/B163AqdRWx.png)
 ![image](https://hackmd.io/_uploads/ByaaC9d0-l.png)
 
-#### Page administrateur global — `/admin/users`
+#### Page administrateur global - `/admin/users`
 
 - Liste tabulaire (nom, email, rôles, statut, dernière connexion)
-- Recherche live nom/email
-- **Invitation** d'un administrateur (nom + email + rôles multi-sélection) → email automatique
+- Recherche live par nom/email
+- Invitation d'un administrateur (nom + email + rôles multi-sélection) avec envoi automatique d'email
 - Modification des rôles (multi-checkbox dans dialog)
-- Suspension / réactivation
+- Suspension / réactivation de compte
 - Forcer la réinitialisation du mot de passe
-- Suppression définitive (avec confirmation, blocage auto-suppression)
+- Suppression définitive (avec confirmation, blocage de l'auto-suppression)
 
-#### Logs & Audit — `/admin/audit-logs`
+#### Logs & Audit - `/admin/audit-logs`
 
 - Tableau horodaté des 500 dernières actions
 - Recherche multi-critère + filtre par ressource
 - Icône et couleur par type d'action
-- Détails JSON par action
+- Affichage des détails JSON par action
 
 #### Edge Functions Supabase
 
 | Fonction | Rôle |
 |----------|------|
-| `admin-invite-user` | Crée le compte via `auth.admin.inviteUserByEmail`, attribue les rôles, marque `must_change_password=true`, log audit |
-| `admin-delete-user` | Supprime un utilisateur via `auth.admin.deleteUser`, log audit. Auto-suppression bloquée |
+| `admin-invite-user` | Crée le compte via `auth.admin.inviteUserByEmail`, attribue les rôles, marque `must_change_password=true`, enregistre un log d'audit |
+| `admin-delete-user` | Supprime un utilisateur via `auth.admin.deleteUser`, enregistre un log d'audit. L'auto-suppression est bloquée |
 
 ![image](https://hackmd.io/_uploads/rynMd5_0bx.png)
 
 #### Sécurité
 
 - Hashage des mots de passe géré par Supabase Auth (bcrypt)
-- Tokens d'invitation et de reset **expirables**, à usage unique
+- Tokens d'invitation et de reset expirables, à usage unique
 - RLS strict sur toutes les tables, fonctions `SECURITY DEFINER` pour éviter la récursion
-- Vérification des permissions **côté serveur** via RLS et Edge Functions
+- Vérification des permissions côté serveur via RLS et Edge Functions
 - `service_role_key` jamais exposée au frontend
-- Audit logs pour login, logout, invite, suspend, reactivate, delete, update_roles, password reset
+- Audit logs pour : login, logout, invite, suspend, reactivate, delete, update_roles, password reset
 - Auto-suppression et auto-suspension bloquées
 
 #### Templates d'email personnalisés
@@ -914,18 +1322,18 @@ INSERT INTO public.role_permissions (role, permission_id) SELECT 'viewer'::publi
 ![image](https://hackmd.io/_uploads/rkepLs_Abx.png)
 ![image](https://hackmd.io/_uploads/SJDNDs_0Zl.png)
 
-#### Premier démarrage — Création du compte admin global
+#### Premier démarrage - Création du compte administrateur global
 
-1. Aller sur `/signup`
+1. Accéder à `/signup`
 
 ![image](https://hackmd.io/_uploads/Hkt01jdCZx.png)
 ![image](https://hackmd.io/_uploads/ByYJxjORbx.png)
 
-2. Créer un compte → devient automatiquement **Administrateur Global**
+2. Créer un compte — ce premier compte devient automatiquement Administrateur Global
 
 ![image](https://hackmd.io/_uploads/SJ0tljuAWe.png)
 
-3. Confirmer par email
+3. Confirmer l'inscription par email
 
 ![image](https://hackmd.io/_uploads/S1gebsu0Wx.png)
 
@@ -938,7 +1346,7 @@ INSERT INTO public.role_permissions (role, permission_id) SELECT 'viewer'::publi
 ![image](https://hackmd.io/_uploads/r1Xc-juCbx.png)
 ![image](https://hackmd.io/_uploads/BJP6Zj_CZg.png)
 
-#### Tests — Invitation d'un utilisateur
+#### Tests - Invitation d'un utilisateur
 
 ![image](https://hackmd.io/_uploads/HyyOdj_CWl.png)
 ![image](https://hackmd.io/_uploads/S1iytj_0-g.png)
@@ -962,33 +1370,32 @@ INSERT INTO public.role_permissions (role, permission_id) SELECT 'viewer'::publi
 ![image](https://hackmd.io/_uploads/rk92M2dCZl.png)
 ![image](https://hackmd.io/_uploads/r1J0fhdRbe.png)
 
----
 
-### Tâche 5 — Améliorations du dashboard : page utilisateur (06/05/2026)
+### Tâche 6 - Améliorations du dashboard : page utilisateur (06/05/2026)
 
 #### Bloc Informations Temps Réel
 
 Ajout d'un bloc informatif affiché à côté du dashboard principal :
 
-- **Date actuelle**
-- **Heure en temps réel** (heures / minutes / secondes, mise à jour chaque seconde)
-- **Localisation utilisateur** (langue du système, fuseau horaire)
+- Date actuelle
+- Heure en temps réel (heures / minutes / secondes, mise à jour chaque seconde)
+- Localisation utilisateur (langue du système, fuseau horaire)
 
 ![image](https://hackmd.io/_uploads/HkFl_3uR-e.png)
 
 #### Gestion des Notifications
 
-- Icône de notification dynamique avec badge si nouvelles notifications
-- Renvoie vers la page Logs & Audits
+- Icône de notification dynamique avec badge en cas de nouvelles notifications
+- Redirige vers la page Logs & Audits
 
 ![image](https://hackmd.io/_uploads/SJlQ_hO0bg.png)
 ![image](https://hackmd.io/_uploads/B1YHdn_CZx.png)
 
 #### Détails Utilisateur
 
-Ajout d'une action **"Voir"** dans le tableau :
+Ajout d'une action "Voir" dans le tableau utilisateur :
 
-- Ouverture d'une **modale**
+- Ouverture d'une modale dédiée
 - Affichage des informations détaillées : nom, email, rôle(s), statut, métadonnées
 
 ![image](https://hackmd.io/_uploads/HyvwO3OR-g.png)
@@ -996,35 +1403,39 @@ Ajout d'une action **"Voir"** dans le tableau :
 
 #### Pagination du Tableau
 
-- **5 lignes par page**
+- 5 lignes par page
 - Navigation entre les pages
 
 ![image](https://hackmd.io/_uploads/H1txYnO0-l.png)
 
----
 
-### Tâche 6 — Configuration de la page Logs & Audits (06/05/2026)
+
+### Tâche 7 - Configuration de la page Logs & Audits (06/05/2026)
+
+Dans cette partie, nous avons travaillé sur la page Logs et audits.
+
+Pour l’instant, les logs sont limités aux opérations de connexion et d’inscription. Cette fonctionnalité sera étendue lors des prochaines étapes du projet.
 
 #### KPIs
 
-Cartes KPI en haut de page :
+Cartes statistiques en haut de page :
 
 - Nombre total de logs
 - Activités récentes
-- Actions critiques (suppression, modification)
+- Actions critiques (suppressions, modifications)
 
 ![image](https://hackmd.io/_uploads/HJ9mSaO0-g.png)
 
 #### Tableau des Logs
 
-- Actions disponibles par ligne (voir, supprimer, détail)
-- Données enrichies (utilisateur, action, ressource, date)
+- Actions disponibles par ligne : voir, supprimer, afficher le détail
+- Données enrichies : utilisateur, action, ressource, date
 
 ![image](https://hackmd.io/_uploads/SyGLB6dRZl.png)
 
 #### Pagination
 
-- **10 lignes par page**
+- 10 lignes par page
 - Navigation fluide
 
 ![image](https://hackmd.io/_uploads/ByIwH6dAZl.png)
@@ -1032,17 +1443,14 @@ Cartes KPI en haut de page :
 #### Sélection multiple & suppression en masse
 
 - Case à cocher par ligne
-- "Tout sélectionner / Tout désélectionner"
-- Suppression en masse
+- Tout sélectionner / Tout désélectionner
+- Suppression en masse avec confirmation
 
 ![image](https://hackmd.io/_uploads/HkzKS6dAWx.png)
 
 #### Export des Logs
 
-Bouton **"Télécharger"** avec sélection du format :
-
-- **CSV**
-- **PDF** (header, métadonnées, tableau structuré, mise en forme rapport)
+Bouton "Télécharger" proposant deux formats : CSV ou PDF (en-tête, métadonnées, tableau structuré).
 
 ```bash
 npm install jspdf jspdf-autotable
@@ -1054,40 +1462,26 @@ npm install jspdf jspdf-autotable
 ![image](https://hackmd.io/_uploads/Sy-GI6_0Wl.png)
 ![image](https://hackmd.io/_uploads/r17FIaOCWe.png)
 
----
 
-## UML et documentation de conception
+### Tâche 8 - Refonte de la page profil (07/05/2026)
 
-Le dossier `UML/` contient des diagrammes PlantUML :
+Dans cette partie, nous avons travaillé sur la page de profil afin d’élargir ses champs et de la connecter à notre base de données.
 
-- Diagrammes de contexte / cas d'utilisation
-- Diagrammes d'activité
-- Diagrammes de séquence
-- Scénarios scripts (connexion, consultation, téléchargement, contact support…)
+#### Objectif
 
-Ces documents servent de référence de conception et de support.
+Refonte totale de `src/pages/ProfilePage.tsx` afin de remplacer l'ancienne interface statique par une page de profil professionnelle, dynamique et entièrement connectée à Supabase.
 
----
-
-## Tâche 7 — Refonte de la page profil (07/05/2026)
-
-## Objectif
-
-Refonte totale de `src/pages/ProfilePage.tsx` afin de remplacer l'ancienne interface statique par une page de profil **professionnelle, dynamique et entièrement connectée à Supabase**.
-
-Les objectifs principaux sont :
+Objectifs principaux :
 
 - Afficher et éditer les informations personnelles d'un utilisateur en temps réel
 - Synchroniser toutes les données avec la table `profiles` de Supabase
 - Permettre l'upload et la prévisualisation d'un avatar via Supabase Storage
-- Garantir qu'un utilisateur ne peut modifier **que son propre profil** (Row Level Security)
+- Garantir qu'un utilisateur ne peut modifier que son propre profil (Row Level Security)
 - Offrir une expérience utilisateur fluide avec validation, retours visuels et gestion d'erreurs
 
----
+#### Schema de la base de données
 
-## Schéma de la base de données
-
-La table `profiles` a été étendue avec de nouveaux champs. Voici la définition SQL complète après migration :
+La table `profiles` a été étendue avec de nouveaux champs :
 
 ```sql
 create table public.profiles (
@@ -1100,8 +1494,6 @@ create table public.profiles (
   last_login       timestamp with time zone          null,
   created_at       timestamp with time zone not null default now(),
   updated_at       timestamp with time zone not null default now(),
-
-  -- Nouveaux champs ajoutés lors de cette refonte
   first_name       text                              null,
   profession       text                              null,
   bio              text                              null,
@@ -1111,109 +1503,76 @@ create table public.profiles (
   city             text                              null,
   country          text                              null,
   status           text                     not null default 'active'::text,
-
   constraint profiles_pkey primary key (id),
   constraint profiles_id_fkey foreign key (id)
     references auth.users (id) on delete cascade
 ) tablespace pg_default;
 
--- Trigger de mise à jour automatique du champ updated_at
 create trigger profiles_set_updated_at
   before update on profiles
   for each row
   execute function update_updated_at_column();
 ```
 
----
+#### Nouveaux champs
 
-## Nouveaux champs
-
-| Champ        | Type   | Nullable | Description                                              |
-|--------------|--------|----------|----------------------------------------------------------|
-| `first_name` | `text` | Oui      | Prénom de l'utilisateur                                  |
-| `profession` | `text` | Oui      | Intitulé du poste / métier                               |
-| `bio`        | `text` | Oui      | Courte biographie (limitée en longueur côté client)      |
-| `phone`      | `text` | Oui      | Numéro de téléphone (validé côté client)                 |
-| `avatar_url` | `text` | Oui      | URL publique de l'image uploadée dans Supabase Storage   |
-| `address`    | `text` | Oui      | Adresse postale                                          |
-| `city`       | `text` | Oui      | Ville                                                    |
-| `country`    | `text` | Oui      | Pays                                                     |
-| `status`     | `text` | Non      | Statut de présence : `active`, `away`, `busy`, `offline` |
-
+| Champ | Type | Nullable | Description |
+|-------|------|----------|-------------|
+| `first_name` | `text` | Oui | Prénom de l'utilisateur |
+| `profession` | `text` | Oui | Intitulé du poste / métier |
+| `bio` | `text` | Oui | Courte biographie (limitée en longueur côté client) |
+| `phone` | `text` | Oui | Numéro de téléphone (validé côté client) |
+| `avatar_url` | `text` | Oui | URL publique de l'image uploadée dans Supabase Storage |
+| `address` | `text` | Oui | Adresse postale |
+| `city` | `text` | Oui | Ville |
+| `country` | `text` | Oui | Pays |
+| `status` | `text` | Non | Statut de présence : `active`, `away`, `busy`, `offline` |
 
 ![image](https://hackmd.io/_uploads/HJ2xARKCbg.png)
 ![image](https://hackmd.io/_uploads/SykXARKRZx.png)
 ![image](https://hackmd.io/_uploads/rkuYCCtAWg.png)
 
-## Fonctionnalités implémentées
+#### Fonctionnalités implémentées
 
-### Chargement & sauvegarde
+**Chargement & sauvegarde**
 
-- Récupération du profil au montant du composant via `supabase.from('profiles').select()`
+- Récupération du profil au montage du composant via `supabase.from('profiles').select()`
 - Sauvegarde directe dans Supabase via `.update()` sur le profil de l'utilisateur connecté
 - Mise à jour optimiste de l'interface avant confirmation serveur
 
-### Validation côté utilisateur
+**Validation côté client**
 
-| Champ    | Règle de validation                          |
-|----------|----------------------------------------------|
-| `name`   | Obligatoire, non vide                        |
-| `phone`  | Format numérique, optionnel                  |
-| `bio`    | Longueur maximale contrôlée (ex : 500 chars) |
+| Champ | Règle de validation |
+|-------|---------------------|
+| `name` | Obligatoire, non vide |
+| `phone` | Format numérique, optionnel |
+| `bio` | Longueur maximale : 500 caractères |
 
-### Retours utilisateur
+**Statuts de présence**
 
-- **Toasts** de succès et d'erreur pour chaque action (sauvegarde, upload, erreur réseau)
-- Indicateurs visuels distincts pour les états `loading`, `saving` et `uploading`
-- Prévisualisation instantanée des modifications avant sauvegarde
+| Valeur | Affichage | Couleur |
+|--------|-----------|---------|
+| `active` | Actif | Vert |
+| `away` | Absent | Jaune |
+| `busy` | Occupé | Rouge |
+| `offline` | Hors ligne | Gris |
 
-### statuts
+#### Architecture & UI
 
+**Sections de la page :**
 
+- Carte identité (panneau gauche) : photo de profil avec bouton d'upload intégré, nom complet, prénom, profession, badge de statut interactif, badges de rôles
+- Formulaire principal (panneau droit) : informations personnelles, coordonnées, biographie avec compteur de caractères
 
-| Valeur     | Affichage   | Couleur   |
-|------------|-------------|-----------|
-| `active`   | Actif    | Vert      |
-| `away`     | Absent   | Jaune     |
-| `busy`     | Occupé   | Rouge     |
-| `offline`  | Hors ligne | Gris    |
+#### Upload d'avatar
 
----
+L'upload est géré via Supabase Storage :
 
-## Architecture & UI
-
-### Sections de la page
-
-**Carte identité (panneau gauche)**
-- Photo de profil avec bouton d'upload intégré
-- Nom complet + prénom
-- Profession
-- Badge de statut interactif
-- Badges de rôles
-
-**Formulaire principal (panneau droit)**
-- Section *Informations personnelles* : prénom, nom, profession, téléphone
-- Section *Coordonnées* : adresse, ville, pays
-- Section *Biographie* : textarea avec compteur de caractères
-- Boutons Annuler / Sauvegarder
-
----
-
-## Upload d'avatar
-
-L'upload est géré via **Supabase Storage** :
-
-- **Bucket** : `avatars` (accès public activé)
-- **Chemin de stockage** : `{user.id}/{nom_du_fichier}`
-- **Formats acceptés** : `image/png`, `image/jpeg`, `image/webp`
-- **Flux** :
-  1. L'utilisateur sélectionne une image via l'input file
-  2. L'image est uploadée dans le bucket `avatars` sous le dossier `{user.id}/`
-  3. L'URL publique générée est sauvegardée dans `profiles.avatar_url`
-  4. La prévisualisation est mise à jour instantanément dans l'interface
+- Bucket : `avatars` (accès public activé) et sera corrigé prochainement.
+- Chemin de stockage : `{user.id}/{nom_du_fichier}`
+- Formats acceptés : `image/png`, `image/jpeg`, `image/webp`
 
 ```typescript
-// Exemple d'upload
 const { data, error } = await supabase.storage
   .from('avatars')
   .upload(`${user.id}/${file.name}`, file, { upsert: true });
@@ -1225,122 +1584,63 @@ const { publicUrl } = supabase.storage
 await supabase.from('profiles').update({ avatar_url: publicUrl });
 ```
 
----
+#### Gestion des états
 
-## Gestion des états
+| Etat | Description | UI associée |
+|------|-------------|-------------|
+| `loading` | Chargement initial du profil depuis Supabase | Skeleton / spinner global |
+| `saving` | Sauvegarde du formulaire en cours | Bouton désactivé + spinner |
+| `uploading` | Upload de l'avatar en cours | Overlay sur l'avatar |
 
-Le composant gère trois états de chargement distincts :
+#### Sécurité & RLS
 
-| État        | Description                                      | UI associée                  |
-|-------------|--------------------------------------------------|------------------------------|
-| `loading`   | Chargement initial du profil depuis Supabase     | Skeleton / spinner global    |
-| `saving`    | Sauvegarde du formulaire en cours                | Bouton désactivé + spinner   |
-| `uploading` | Upload de l'avatar en cours                      | Overlay sur l'avatar         |
-
----
-
-## Sécurité & RLS
-
-La page respecte la politique **Row Level Security (RLS)** de Supabase :
-
-- Chaque utilisateur authentifié ne peut **lire et modifier que son propre profil**
+- Chaque utilisateur authentifié ne peut lire et modifier que son propre profil
 - Les requêtes `.update()` sont filtrées automatiquement par `auth.uid() = id`
 - Aucune donnée sensible (mot de passe, tokens) n'est exposée côté client
 
 ```sql
--- Exemple de politique RLS attendue sur la table profiles
 create policy "Users can update their own profile"
   on profiles for update
   using (auth.uid() = id);
 ```
 
----
+#### Alertes de sécurité identifiées (à corriger avant mise en production)
 
-## Tâche à venir (correction)
-### Alertes de sécurité 
-
-Les avertissements suivants ont été identifiés dans le dashboard Supabase et **doivent être traités en priorité** avant la mise en production.
-
-> **Priorité haute** — Ces vulnérabilités peuvent permettre des escalades de privilèges ou des fuites de données.
-
----
-
-### 1. Les utilisateurs authentifiés peuvent insérer des entrées arbitraires dans le journal d'audit
-
-**Risque** : Un utilisateur connecté peut écrire dans la table d'audit, corrompant ainsi les logs de traçabilité.  
-**Correctif** : Restreindre les politiques INSERT sur la table d'audit aux seuls rôles système (`service_role`). Supprimer toute politique RLS qui accorde un accès en écriture aux utilisateurs authentifiés sur cette table.
-
----
-
-### 2. Tout utilisateur authentifié peut s'octroyer des rôles d'administrateur
-
-**Risque** : Élévation de privilèges  un utilisateur standard peut se promouvoir administrateur.  
-**Correctif** : Retirer les politiques RLS permettant aux utilisateurs de modifier leur propre colonne de rôle. Les changements de rôles doivent être effectués exclusivement via des fonctions `SECURITY DEFINER` appelées depuis le backend ou via le dashboard Supabase.
-
----
-
-### 3. Le public peut exécuter une fonction `SECURITY DEFINER`
-
-**Risque** : Des fonctions exécutées avec des privilèges élevés sont accessibles sans authentification.  
-**Correctif** : Révoquer l'accès `EXECUTE` au rôle `anon` sur les fonctions concernées. Restreindre à `authenticated` ou `service_role` selon le besoin.
-
-```sql
-revoke execute on function nom_de_la_fonction from anon;
-```
-
----
-
-### 4. Protection par mot de passe désactivée suite à une fuite
-
-**Risque** : Des mots de passe compromis peuvent toujours être utilisés pour se connecter.  
-**Correctif** : Activer la vérification de mots de passe compromis dans les paramètres d'authentification Supabase (*Auth → Settings → Password Protection*). Forcer la réinitialisation des mots de passe concernés.
-
----
-
-### 5. Les utilisateurs connectés peuvent exécuter une fonction `SECURITY DEFINER`
-
-**Risque** : Des fonctions privilégiées sont exposées à tous les utilisateurs authentifiés, même non-admins.  
-**Correctif** : Auditer toutes les fonctions `SECURITY DEFINER` et restreindre leur accès au minimum nécessaire. Utiliser des vérifications internes (`auth.uid()`, `auth.role()`) pour limiter les actions autorisées.
-
----
-
-### 6. Le bucket public `avatars` ne supprime pas les liens des fichiers images
-
-**Risque** : Même après suppression d'un fichier du bucket, son URL publique reste accessible (le CDN Supabase met en cache les fichiers publics).  
-**Correctif** :
-- Passer le bucket `avatars` en **mode privé** et générer des **signed URLs** à durée limitée pour afficher les avatars
-- Ou implémenter une stratégie de nommage unique (ex : UUID) pour chaque upload afin que les anciennes URLs deviennent caduques naturellement
+| N° | Risque | Correctif |
+|----|--------|-----------|
+| 1 | Les utilisateurs authentifiés peuvent insérer des entrées arbitraires dans le journal d'audit | Restreindre les politiques INSERT sur la table d'audit aux seuls rôles système (`service_role`) |
+| 2 | Tout utilisateur authentifié peut s'octroyer des rôles d'administrateur | Les changements de rôles doivent être effectués exclusivement via des fonctions `SECURITY DEFINER` côté backend |
+| 3 | Le public peut exécuter une fonction `SECURITY DEFINER` | Révoquer l'accès `EXECUTE` au rôle `anon` : `revoke execute on function nom_de_la_fonction from anon;` |
+| 4 | Protection par mot de passe désactivée suite à une fuite | Activer la vérification de mots de passe compromis dans Auth > Settings > Password Protection |
+| 5 | Les utilisateurs connectés peuvent exécuter une fonction `SECURITY DEFINER` | Auditer toutes les fonctions `SECURITY DEFINER` et restreindre leur accès au minimum nécessaire |
+| 6 | Le bucket public `avatars` ne supprime pas les liens des fichiers images | Passer le bucket en mode privé et générer des signed URLs à durée limitée |
 
 ```typescript
-// Alternative : génération d'une signed URL (bucket privé)
+// Génération d'une signed URL (bucket privé)
 const { data } = await supabase.storage
   .from('avatars')
   .createSignedUrl(`${user.id}/${fileName}`, 3600); // expire dans 1h
 ```
 
----
-
-## Fichiers concernés
+#### Fichiers concernés
 
 | Fichier | Modification |
-|--------|-------------|
+|---------|-------------|
 | `src/pages/ProfilePage.tsx` | Refonte complète |
 | `supabase/migrations/XXXXXX_add_profile_fields.sql` | Ajout des nouveaux champs |
 | `supabase/storage/avatars` | Création du bucket |
 
----
 
-## Tâche 8 — Création & configuration de la page catégorie (07/05/2026)
+### Tâche 9 - Création & configuration de la page Catégories (07/05/2026)
 
-## Objectif
+Dans cette partie, nous avons travaillé sur la page des catégories, en la connectant à notre base de données, en créant les tables nécessaires et en mettant en place certaines fonctionnalités.
 
-Dans cette partie, nous allons créer et configurer la page catégorie.
 
----
+#### Objectif
 
-## Base de données : création de la table
+Création et configuration complète de la page de gestion des catégories, connectée à Supabase avec CRUD complet.
 
-### Table `public.categories`
+#### Base de données - création de la  table `public.categories`
 
 ```sql
 create type category_status as enum ('active', 'inactive', 'archived');
@@ -1358,22 +1658,21 @@ create table public.categories (
   created_by  uuid                              null references auth.users(id),
   created_at  timestamp with time zone not null default now(),
   updated_at  timestamp with time zone not null default now(),
-
   constraint categories_pkey primary key (id)
 ) tablespace pg_default;
 
--- Trigger de mise à jour automatique du champ updated_at
 create trigger categories_set_updated_at
   before update on categories
   for each row
   execute function update_updated_at_column();
 ```
+
 ![image](https://hackmd.io/_uploads/ryebsxq0We.png)
 
-### Détail des colonnes
+**Détail des colonnes**
 
 | Colonne | Type | Nullable | Description |
-|---|---|---|---|
+|---------|------|----------|-------------|
 | `id` | `uuid` | Non | Identifiant unique auto-généré |
 | `name` | `text` | Non | Nom affiché de la catégorie |
 | `description` | `text` | Oui | Description courte |
@@ -1385,28 +1684,20 @@ create trigger categories_set_updated_at
 | `position` | `integer` | Non | Ordre d'affichage |
 | `created_by` | `uuid` | Oui | Référence à l'utilisateur créateur |
 
----
+#### Sécurité & RLS
 
-## Sécurité & RLS
-
-Les politiques Row Level Security garantissent un accès différencié selon le rôle de l'utilisateur.
-
-| Action            | Tous auth. | Editor | Admin / Global |
-|------------------|------------|--------|-----------------|
-| SELECT (lecture) | oui        | oui    | oui             |
-| INSERT           | non        | oui    | oui             |
-| UPDATE           | non        | oui    | oui             |
-| DELETE           | non        | non    | oui             
-
-**Code SQL**
+| Action | Tous auth. | Editor | Admin / Global |
+|--------|------------|--------|----------------|
+| SELECT | Oui | Oui | Oui |
+| INSERT | Non | Oui | Oui |
+| UPDATE | Non | Oui | Oui |
+| DELETE | Non | Non | Oui |
 
 ```sql
--- Lecture : tout utilisateur authentifié
 create policy "categories_select"
   on categories for select
   using (auth.role() = 'authenticated');
 
--- Écriture : editor, admin, global_admin
 create policy "categories_insert"
   on categories for insert
   with check (
@@ -1417,7 +1708,6 @@ create policy "categories_insert"
     )
   );
 
--- Suppression : admin et global_admin uniquement
 create policy "categories_delete"
   on categories for delete
   using (
@@ -1429,221 +1719,145 @@ create policy "categories_delete"
   );
 ```
 
----
+#### Page catégorie
 
-## Interface utilisateur
+**Fichier :** `src/pages/CategoriesPage.tsx`
 
-### Composant principal
-
-**Fichier** : `src/pages/CategoriesPage.tsx`
-
-La page est organisée en plusieurs zones distinctes :
-
-| Section                                                      |
-|--------------------------------------------------------------|
-| En-tête : Titre + boutons Import / Export / Modèle / +      |
-| 6 Cartes statistiques                                        |
-| Barre : Recherche | Filtre statut | Bascule vue             |
-| Actions de sélection en masse (si éléments sélectionnés)     |
-| Vue Grille OU Vue Tableau paginée                           |
+| Section |
+|---------|
+| En-tête : Titre + boutons Import / Export / Modèle / + |
+| 6 cartes statistiques |
+| Barre : Recherche, Filtre statut, Bascule de vue |
+| Actions de sélection en masse (si éléments sélectionnés) |
+| Vue Grille ou Vue Tableau paginée |
 
 ![image](https://hackmd.io/_uploads/B19ZqgqA-x.png)
 
-### États gérés
+**Etats gérés**
 
-| État | Description | UI |
-|---|---|---|
+| Etat | Description | UI |
+|------|-------------|-----|
 | `loading` | Chargement initial depuis Supabase | Skeletons animés |
 | `empty` | Aucune catégorie trouvée | Illustration + message d'action |
 | `saving` | Sauvegarde en cours | Bouton désactivé + spinner |
 | `importing` | Import JSON en cours | Barre de progression 0→100% |
 | `exporting` | Génération PDF/CSV | Barre de progression |
 
----
-
-## Statistiques & Dashboard
-
-Six cartes statistiques en haut de page offrent une vue instantanée du catalogue :
+#### Statistiques
 
 | Carte | Métrique | Couleur |
-|---|---|---|
-| **Total** | Nombre total de catégories | Neutre |
-| **Actives** | `status = 'active'` | Vert |
-| **Inactives** | `status = 'inactive'` | Jaune |
-| **Archivées** | `status = 'archived'` | Gris |
-| **Visibles** | `is_visible = true` | Bleu |
-| **Masquées** | `is_visible = false` | Violet |
+|-------|----------|---------|
+| Total | Nombre total de catégories | Neutre |
+| Actives | `status = 'active'` | Vert |
+| Inactives | `status = 'inactive'` | Jaune |
+| Archivées | `status = 'archived'` | Gris |
+| Visibles | `is_visible = true` | Bleu |
+| Masquées | `is_visible = false` | Violet |
 
+#### Gestion des vues
 
----
+- Recherche instantanée sur `name` et `description`
+- Filtre par statut : Tous / Actives / Inactives / Archivées
+- Les deux filtres sont combinables et réactifs sans rechargement de page
 
-## Gestion des vues
-
-### Recherche & Filtrage
-
-- **Recherche instantanée** : filtrage en temps réel sur le `name` et la `description`
-- **Filtre par statut** : menu déroulant `Tous | Actives | Inactives | Archivées`
-- Les deux filtres sont combinables et réactifs sans rechargement
 ![image](https://hackmd.io/_uploads/ryVr9lqCZe.png)
 
-### Vue Grille
+**Vue Grille**
 
-Cartes colorées premium affichant pour chaque catégorie :
-- Icône Lucide dans un rond de couleur
-- Nom et description
-- Badge de statut (`active` / `inactive` / `archived`)
-- Badge de visibilité
-- Menu d'actions (⋯) en overlay au hover
+Cartes colorées affichant : icône Lucide, nom et description, badge de statut, badge de visibilité, menu d'actions au hover.
 
 ![image](https://hackmd.io/_uploads/S1TLcx9Cbx.png)
 
-### Vue Tableau
+**Vue Tableau**
 
-Tableau dense avec une ligne par catégorie, incluant toutes les colonnes clés et un menu d'actions en ligne. Adapté aux administrateurs gérant de grands volumes.
+Tableau dense avec toutes les colonnes clés et un menu d'actions en ligne, adapté à la gestion de grands volumes.
+
 ![image](https://hackmd.io/_uploads/rk7O5lcCbe.png)
 
----
+#### Modal Création & Edition
 
-## Modal Création / Édition
-
-Le formulaire est organisé en **2 sections distinctes** :
-
-### Section 1 — Informations générales
+**Section 1 - Informations générales**
 
 | Champ | Type | Règle |
-|---|---|---|
+|-------|------|-------|
 | `name` | Texte | Obligatoire |
 | `description` | Textarea | Optionnel |
 | `type` | Texte | Optionnel (cloud, devops…) |
 | `status` | Select enum | `active` par défaut |
 | `is_visible` | Toggle | `true` par défaut |
 
-### Section 2 — Personnalisation visuelle
+**Section 2 - Personnalisation visuelle**
 
-- **Color picker** : palette de couleurs prédéfinies + sélecteur natif HTML pour valeur personnalisée
-- **Sélecteur d'icônes** : grille d'icônes Lucide filtrables par nom, prévisualisation en temps réel
-
-La prévisualisation de la carte finale est mise à jour **instantanément** à chaque modification de couleur ou d'icône.
+- Color picker : palette de couleurs prédéfinies + sélecteur natif HTML
+- Sélecteur d'icônes : grille d'icônes Lucide filtrables par nom, prévisualisation en temps réel
 
 ![image](https://hackmd.io/_uploads/B16c5g5A-e.png)
 
----
-
-## Actions disponibles
-
-Chaque catégorie expose les actions suivantes (menu contextuel en grille, boutons en tableau) :
+#### Actions disponibles
 
 | Action | Description | Confirmation requise |
-|---|---|---|
-| **Éditer** | Ouvre la modal pré-remplie | Non |
-| **Activer** | Passe le statut à `active` | Non |
-| **Désactiver** | Passe le statut à `inactive` | Non |
-| **Afficher / Masquer** | Bascule `is_visible` | Non |
-| **Dupliquer** | Crée une copie avec `(copie)` dans le nom | Non |
-| **Archiver** | Passe le statut à `archived` | Non |
-| **Supprimer** | Suppression définitive en base | Oui |
+|--------|-------------|---------------------|
+| Editer | Ouvre la modal pré-remplie | Non |
+| Activer | Passe le statut à `active` | Non |
+| Désactiver | Passe le statut à `inactive` | Non |
+| Afficher / Masquer | Bascule `is_visible` | Non |
+| Dupliquer | Crée une copie avec `(copie)` dans le nom | Non |
+| Archiver | Passe le statut à `archived` | Non |
+| Supprimer | Suppression définitive en base | Oui |
 
-Chaque action déclenche un **toast** de succès ou d'erreur.
 ![image](https://hackmd.io/_uploads/Hy3uogc0Ze.png)
 
----
-
-## Sélection en masse
-
-Une barre d'actions collectives apparaît dès qu'au moins une catégorie est sélectionnée.
+#### Sélection en masse
 
 | Contrôle | Comportement |
-|---|---|
+|----------|-------------|
 | Case à cocher par ligne | Sélection individuelle |
-| **Tout sélectionner** | Coche toutes les catégories de la page courante |
-| **Désélectionner** | Décoche tous les éléments |
-| **Archiver** | Archive en masse les éléments sélectionnés |
-| **Supprimer** | Suppression en masse avec modal de confirmation |
+| Tout sélectionner | Coche toutes les catégories de la page courante |
+| Désélectionner | Décoche tous les éléments |
+| Archiver | Archive en masse les éléments sélectionnés |
+| Supprimer | Suppression en masse avec modal de confirmation |
 
 ![image](https://hackmd.io/_uploads/By76ogcRZe.png)
 
+#### Pagination
 
----
-
-## Pagination
-
-Le tableau est paginé par **10 éléments par page**.
-
-```
-  Affichage 1–10 sur 47 catégories
-  [← Précédent]   Page 1 / 5   [Suivant →]
-```
-
-| Élément | Détail |
-|---|---|
-| Taille de page | 10 éléments |
-| Navigation | Boutons Précédent / Suivant |
-| Indicateur | `Page X / Y` |
-| Compteur | `Affichage N–M sur Total` |
-
-La pagination est réinitialisée à la page 1 lors de toute modification de recherche ou de filtre.
+- 10 éléments par page
+- Navigation Précédent / Suivant
+- Indicateur `Page X / Y` et compteur `Affichage N–M sur Total`
+- Réinitialisée à la page 1 lors de toute modification de filtre ou de recherche
 
 ![image](https://hackmd.io/_uploads/Bkvk2xcRbe.png)
 
----
+#### Import JSON
 
-## Import JSON
-
-Bouton **Importer JSON** en haut de page ouvrant une modal dédiée.
-
-### Flux d'import
+**Flux d'import :**
 
 ```
 1. Ouverture de la modal d'import
-        ↓
-2. Dépôt du fichier (drag & drop) ou sélection via explorateur
-        ↓
+2. Dépôt du fichier (drag & drop) ou sélection via l'explorateur
 3. Validation JSON (structure, champs requis, types)
-        ↓
-4. Barre de progression 0% → 100% + statut en temps réel
-        ↓
+4. Barre de progression 0% → 100%
 5. Insertion en base des catégories valides
-        ↓
 6. Modal de résumé final
 ```
 
-### Gestion des cas particuliers
+**Gestion des cas particuliers**
 
 | Cas | Comportement |
-|---|---|
+|-----|-------------|
 | JSON invalide | Erreur affichée, import bloqué |
 | Champ manquant | Ligne signalée avec message précis |
 | Doublon détecté | Ligne ignorée, comptabilisée dans "ignorées" |
 | Erreur Supabase | Ligne comptabilisée dans "erreurs" |
 
+#### Modèle JSON
 
-## Modèle JSON
-
-Bouton **Modèle JSON** en haut de page pour faciliter la préparation d'imports.
-
-### Flux
-
-```
-1. Clic sur Modèle JSON
-        ↓
-2. Modal de confirmation
-        ↓
-3. Barre de progression du téléchargement
-        ↓
-4. Modal de confirmation de fin (fichier téléchargé)
-```
-
-Le fichier téléchargé contient **2 à 3 exemples** de catégories avec tous les champs attendus et leurs valeurs types, prêt à être complété et réimporté.
+Le bouton "Modèle JSON" génère et télécharge un fichier pré-rempli contenant 2 à 3 exemples de catégories, prêt à être complété et réimporté.
 
 ![image](https://hackmd.io/_uploads/B14u3l90We.png)
 ![image](https://hackmd.io/_uploads/HJQKnx5Cbg.png)
 ![image](https://hackmd.io/_uploads/S1r53g5AWg.png)
-le fichier du modèle Json.
 ![image](https://hackmd.io/_uploads/rJPa3g9RZe.png)
-
-### Importer un modèle Json 
-
-On peut importer un modèle Json afin d'automatiser la création des catégories.
 ![image](https://hackmd.io/_uploads/rJNSaxcRbg.png)
 ![image](https://hackmd.io/_uploads/BkHLTecRZl.png)
 ![image](https://hackmd.io/_uploads/ry4w6gqRWx.png)
@@ -1653,96 +1867,65 @@ On peut importer un modèle Json afin d'automatiser la création des catégories
 ![image](https://hackmd.io/_uploads/HyZs6xcRWl.png)
 ![image](https://hackmd.io/_uploads/B1N36xqA-g.png)
 
+#### Export
 
----
-
-## Export
-
-Bouton **Télécharger** en haut de page proposant deux formats (PDF - CSV).
-
-### Flux d'export
+**Flux d'export :**
 
 ```
 1. Clic sur Télécharger
-        ↓
 2. Modal de confirmation (format PDF ou CSV)
-        ↓
 3. Barre de progression pendant la génération
-        ↓
 4. Téléchargement automatique du fichier
 ```
+
 ![image](https://hackmd.io/_uploads/SkaZClqAbg.png)
 ![image](https://hackmd.io/_uploads/Bylm0lq0Ze.png)
 ![image](https://hackmd.io/_uploads/H19E0gqRbe.png)
 
-### Export PDF
+**Export PDF :** mise en page professionnelle avec en-tête et pied de page, tableau avec colonnes Nom / Type / Statut / Visible / Couleur, pagination automatique, date d'export incluse.
 
-- Mise en page professionnelle avec entête et pied de page
-- Tableau de toutes les catégories avec colonnes : Nom, Type, Statut, Visible, Couleur
-- Pagination automatique des pages
-- Date d'export incluse dans le pied de page
 ![image](https://hackmd.io/_uploads/Sk_DCx90-l.png)
 
-### Export CSV
+**Export CSV :** fichier plat compatible Excel / Google Sheets, encodage UTF-8 avec BOM, en-têtes de colonnes en première ligne.
 
-- Fichier plat compatible Excel / Google Sheets
-- Encodage UTF-8 avec BOM pour les caractères spéciaux
-- En-têtes de colonnes en première ligne
 ![image](https://hackmd.io/_uploads/BkY6CeqC-x.png)
 
----
+#### Migration Supabase
 
-
-## Migration Supabase
-
-Une nouvelle migration de la base de donnée a été lancée.
 ![image](https://hackmd.io/_uploads/SJu7yb90Wx.png)
 
-
-```
-migrations/
-└── XXXXXX_categories_and_profiles_update.sql
-```
-
-### Contenu de la migration
-
 | Bloc | Description |
-|---|---|
-| **Colonnes `profiles`** | Ajout de `first_name`, `profession`, `bio`, `phone`, `avatar_url`, `address`, `city`, `country`, `status` |
-| **Bucket `avatars`** | Création du bucket Supabase Storage avec lecture publique et écriture réservée au propriétaire |
-| **Enum `category_status`** | Création du type `active \| inactive \| archived` |
-| **Table `categories`** | Création avec toutes les colonnes et contraintes |
-| **Policies RLS** | SELECT / INSERT / UPDATE / DELETE selon les rôles |
-| **Trigger `updated_at`** | Application sur `profiles` et `categories` |
+|------|-------------|
+| Colonnes `profiles` | Ajout de `first_name`, `profession`, `bio`, `phone`, `avatar_url`, `address`, `city`, `country`, `status` |
+| Bucket `avatars` | Création du bucket Supabase Storage avec lecture publique et écriture réservée au propriétaire |
+| Enum `category_status` | Création du type `active`, `inactive`, `archived` |
+| Table `categories` | Création avec toutes les colonnes et contraintes |
+| Policies RLS | SELECT / INSERT / UPDATE / DELETE selon les rôles |
+| Trigger `updated_at` | Application sur `profiles` et `categories` |
 
----
-
-## Fichiers concernés
+#### Fichiers concernés
 
 | Fichier | Modification |
-|---|---|
+|---------|-------------|
 | `src/pages/CategoriesPage.tsx` | Création complète du module |
 | `src/components/CategoryModal.tsx` | Modal création / édition |
 | `src/components/CategoryCard.tsx` | Carte vue grille |
 | `supabase/migrations/XXXXXX_categories.sql` | Migration complète |
 | `supabase/storage/avatars` | Bucket avatars (partagé avec ProfilePage) |
 
----
 
-## Tâche 9 — Création & configuration de la page Scripts + améliorations Catégories (08/05/2026)
+### Tâche 10 - Création & configuration de la page Scripts + améliorations Catégories (08/05/2026)
 
-## Objectif 
+Dans cette partie, nous avons travaillé sur la page des scripts, en optimisant le formulaire, en créant la table associée, en la connectant à notre base de données et en intégrant certaines fonctionnalités.
 
-Créer, configurer et transformer la page de scripts en un **centre de gestion professionnel** connecté à Supabase, avec CRUD complet.
+#### Objectif
 
----
+Transformer la page de scripts en un centre de gestion professionnel connecté à Supabase, avec CRUD complet, dashboard analytique et UX premium.
 
-## Base de données : création de la table `scripts`
-
-### Table `scripts` :
+#### Base de données création de la table `scripts`
 
 | Colonne | Type | Description |
-|---|---|---|
+|---------|------|-------------|
 | `name` | text | Nom du script |
 | `description` | text | Description |
 | `script_type` | enum | powershell, bash, python, azure_cli, aws_cli, terraform, bicep, arm, cloudformation, ansible, kubernetes, docker, sql, javascript, typescript, go, ruby, perl, yaml, json, other |
@@ -1777,163 +1960,161 @@ Créer, configurer et transformer la page de scripts en un **centre de gestion p
 ![image](https://hackmd.io/_uploads/B1MDENjRbe.png)
 ![image](https://hackmd.io/_uploads/ryTd44sAbx.png)
 
-### Sécurité - RLS (Row Level Security)
+**Sécurité - RLS**
 
 | Opération | Accès autorisé |
-|---|---|
-| **Lecture** | Scripts publics, scripts dont on est l'auteur, rôles editor / admin / global_admin |
-| **Écriture** | Rôles editor / admin / global_admin — ou propriétaire (update uniquement) |
-| **Suppression** | Rôles admin / global_admin uniquement |
+|-----------|---------------|
+| Lecture | Scripts publics, scripts dont on est l'auteur, rôles editor / admin / global_admin |
+| Ecriture | Rôles editor / admin / global_admin — ou propriétaire (update uniquement) |
+| Suppression | Rôles admin / global_admin uniquement |
 
 ![image](https://hackmd.io/_uploads/HkL9VNiRbx.png)
 
 > Trigger `updated_at` automatique configuré sur la table.
 
----
+#### Réalisations
 
-## Réalisations de la session
+**1. Formulaire de création (`/scripts/new`)**
 
-### 1. Formulaire de création (`/scripts/new`)
-
-- Mise ne place du formulaire avec tous les champs.
-- Intégration de **Monaco Editor** pour l'édition du code source
+- Mise en place du formulaire avec tous les champs requis
+- Intégration de Monaco Editor pour l'édition du code source (expérience type IDE)
 - Connexion Supabase : création effective d'un script en base
 - Chargement dynamique des catégories depuis la table `categories`
-- Liste Type / Langage fortement élargie avec fallback `other`
-- Formulaire en colonnes
-- Validation client + Update supabase.
+- Liste Type / Langage élargie avec fallback `other`
+- Formulaire en colonnes avec validation client et mise à jour Supabase
+
 ![image](https://hackmd.io/_uploads/r13Zr4oRbg.png)
 ![image](https://hackmd.io/_uploads/B1-XrNsA-e.png)
 ![image](https://hackmd.io/_uploads/HkK4BVsCbx.png)
 ![image](https://hackmd.io/_uploads/ByarSNsC-g.png)
 ![image](https://hackmd.io/_uploads/SkrwBEiAWl.png)
 
+**2. Page liste (`/scripts`)**
 
-### 2. Page liste (`/scripts`)
-- Dashboard avec **6 cards statistiques animées** :
-  - Total, Actifs, Archivés, Critiques, Publics, Téléchargements
-  - Animations `fade-in`, hover translate + blur glow
+Dashboard avec 6 cards statistiques animées : Total, Actifs, Archivés, Critiques, Publics, Téléchargements.
+
 ![image](https://hackmd.io/_uploads/H1H5BNo0Ze.png)
 
-- **3 modes d'affichage** avec des botuons d'actions :
-  - Grille 
-  - Cards 
-  - Tableau 
+3 modes d'affichage disponibles :
+
 ![image](https://hackmd.io/_uploads/Bk3jrEs0Ze.png)
 ![image](https://hackmd.io/_uploads/B1bTS4o0-l.png)
 ![image](https://hackmd.io/_uploads/rkBCBVo0Wl.png)
 
+Recherche & filtres :
 
-- **Recherche & filtres** :
-  - Recherche dynamique temps réel (nom, description, tags)
-  - Filtres rapides : statut, type, catégorie
-  - Panneau Recherche avancée : criticité, visibilité, auteur, tag, plage de dates
-  - Sauvegarde des filtres dans `localStorage` + bouton de réinitialisation
+- Recherche dynamique en temps réel (nom, description, tags)
+- Filtres rapides : statut, type, catégorie
+- Panneau Recherche avancée : criticité, visibilité, auteur, tag, plage de dates
+- Sauvegarde des filtres dans `localStorage` + bouton de réinitialisation
+
 ![image](https://hackmd.io/_uploads/r1dZIVoR-l.png)
 
-- **Actions globales** : Sélectionner tout / Désélectionner / Archiver / Supprimer (avec confirmation)
+Actions globales et rapides :
+
 ![image](https://hackmd.io/_uploads/HyIBL4i0Zg.png)
-
-- **Actions rapides par script** : Modifier, Activer/Désactiver, Public/Privé, Dupliquer, Archiver, Supprimer
 ![image](https://hackmd.io/_uploads/S16J84jCZg.png)
-- **Tri configurable** : MAJ, création, nom A→Z / Z→A, téléchargements, vues, note moyenne
 ![image](https://hackmd.io/_uploads/HJxcI4j0bl.png)
-
-- **Pagination** : 10 éléments / page avec navigation Précédent / Suivant
 ![image](https://hackmd.io/_uploads/Skxo8NoC-e.png)
 
-### 3. Page détail (`/scripts/:scriptId`)
-les titres de chaque script sont cliqaubles et renvoient à une page - détail.
+**3. Page détail (`/scripts/:scriptId`)**
+
 - Page détail connectée à Supabase
-- Boutons **Retour** et **Télécharger**
-- **Export JSON** complet du script
-- **Export PDF** type "document" :
-  - Page de garde
-  - Sections structurées
-  - Bloc de code
-  - Intégration des screenshots en image (et non en lien)
-  - Footer + numérotation des pages
-  - Pagination correcte (plusieurs itérations de correction)
+- Boutons Retour et Télécharger
+- Export JSON complet du script
+- Export PDF : page de garde, sections structurées, bloc de code, screenshots intégrés en image, footer + numérotation des pages, pagination correcte
+
 ![image](https://hackmd.io/_uploads/Hk_R8Ej0bx.png)
 ![image](https://hackmd.io/_uploads/BJ_JwNjRWx.png)
 ![image](https://hackmd.io/_uploads/rypeDEi0Zl.png)
-le PDF : 
 ![image](https://hackmd.io/_uploads/H1_MPNsCbg.png)
 ![image](https://hackmd.io/_uploads/SJJSDVj0Wl.png)
 ![image](https://hackmd.io/_uploads/SJ9SwEsC-l.png)
-le JSON :
 ![image](https://hackmd.io/_uploads/HJxT_vNiAZg.png)
 
-### 4. Page d'édition (`/scripts/:scriptId/edit`)
-- Création d'une vraie **page d'édition** à `/scripts/:scriptId/edit`
-- Bouton Retour : retour vers la page détail du script.
+**4. Page d'édition (`/scripts/:scriptId/edit`)**
+
+- Création d'une page d'édition dédiée à `/scripts/:scriptId/edit`
+- Bouton Retour : retour vers la page détail du script concerné
+
 ![image](https://hackmd.io/_uploads/Bk2qv4o0Wg.png)
 ![image](https://hackmd.io/_uploads/BJFiw4s0bl.png)
 ![image](https://hackmd.io/_uploads/SyBhwVoCZl.png)
 ![image](https://hackmd.io/_uploads/BkZpw4sAWx.png)
 ![image](https://hackmd.io/_uploads/SkhpDNjR-e.png)
 
-### 5. Import / Export avancé
-Cette partie permet d'automatiser la création des scripts sans passer par le formulaire.
-- **Modèle JSON** téléchargeable (pré-rempli)
+**5. Import / Export avancé**
+
+- Modèle JSON téléchargeable (pré-rempli)
+- Import JSON en drag & drop : validation, prévisualisation, barre de progression, rapport d'erreurs ligne par ligne, doublons ignorés
+- Export PDF : en-tête brandé + tableau autotable + pagination
+- Export CSV : toutes les colonnes essentielles
+
 ![image](https://hackmd.io/_uploads/r1sZdEiRZg.png)
-- **Import JSON** en drag & drop :
-  - Validation des données
-  - Prévisualisation avant import
-  - Barre de progression
-  - Rapport d'erreurs ligne par ligne (doublons ignorés)
 ![image](https://hackmd.io/_uploads/SJ97_VsR-x.png)
 ![image](https://hackmd.io/_uploads/HkUNu4jCZe.png)
 ![image](https://hackmd.io/_uploads/S1NruNoAWl.png)
 ![image](https://hackmd.io/_uploads/HyQUuNsAWe.png)
-
-- **Export PDF** : en-tête brandé + tableau autotable + pagination
-- **Export CSV** : toutes les colonnes essentielles
 ![image](https://hackmd.io/_uploads/H1mv_VjR-e.png)
 ![image](https://hackmd.io/_uploads/HJ0Du4o0We.png)
 ![image](https://hackmd.io/_uploads/rknuOEj0be.png)
 
-### 6. Catégories (amélioration)
+**6. Catégories (amélioration)**
 
-- Ajout d'un **compteur de scripts par catégorie** (icône + nombre)
-- Affiché en vue grille et vue tableau
+- Ajout d'un compteur de scripts par catégorie (icône + nombre) en vue grille et vue tableau
+- Un clic sur la catégorie affiche les scripts associés
+
 ![image](https://hackmd.io/_uploads/Sygh_EiAZl.png)
-- Il affiche les scripts de cette catégorie.
-
 ![image](https://hackmd.io/_uploads/H1BCdEsAbe.png)
 ![image](https://hackmd.io/_uploads/HkoytEsA-g.png)
 
----
-
-## Problèmes rencontrés & résolutions
+#### Problèmes rencontrés & résolutions
 
 | Problème | Cause | Résolution |
-|---|---|---|
+|----------|-------|------------|
 | Conflit npm / vite peer deps à l'install | Conflit de dépendances | Monaco Editor était déjà installé — aucune action requise |
-| "Je ne vois pas mes modifications" | L'app utilisait toujours le modal legacy | Redirection vers la nouvelle page `/scripts/new` |
-| `404 Bucket not found` | Bucket absent ou mauvais projet Supabase | Confirmation du nom de bucket + vérification du projet |
-| Images non visibles + PDF avec liens cassés | Bucket configuré en privé | Passage aux signed URLs pour les assets privés |
+| Modifications non visibles | L'application utilisait toujours le modal legacy | Redirection vers la nouvelle page `/scripts/new` |
+| `404 Bucket not found` | Bucket absent ou mauvais projet Supabase ciblé | Confirmation du nom de bucket + vérification du projet |
+| Images non visibles + PDF avec liens cassés | Bucket configuré en mode privé | Passage aux signed URLs pour les assets privés |
 | `policy already exists` (SQL) | Script rejoué sans nettoyage préalable | `DROP POLICY IF EXISTS` avant chaque `CREATE POLICY` |
 | Débordements / chevauchements dans le PDF | Mauvaise gestion des sections jsPDF | Plusieurs itérations de correction (pagination, footer, positionnement) |
 
----
+#### Sécurité & qualité
 
-## Sécurité & qualité
-
-- Toutes les opérations passent par le client **Supabase avec RLS activé**
+- Toutes les opérations passent par le client Supabase avec RLS activé
 - L'`author_id` est enregistré automatiquement à la création (`auth.uid()`)
-- Gestion des loaders et états vides sur toutes les vues
-- Design **100 % responsive** (mobile + desktop)
+- Gestion des états de chargement et des vues vides sur toutes les pages
+- Design 100 % responsive (mobile + desktop)
 
----
-
-## Routes créées / modifiées
+#### Routes créées & modifiées
 
 | Route | Type | Description |
-|---|---|---|
+|-------|------|-------------|
 | `/scripts` | Page | Liste + dashboard (refonte complète) |
 | `/scripts/new` | Page | Formulaire de création (nouvelle page) |
-| `/scripts/:scriptId` | Page | Détail premium |
-| `/scripts/:scriptId/edit` | Page | Édition (nouvelle page) |
+| `/scripts/:scriptId` | Page | Page de détail |
+| `/scripts/:scriptId/edit` | Page | Page d'édition (nouvelle page) |
 
----
+
+## UML et documentation de conception
+
+Le dossier `UML/` contient des diagrammes PlantUML couvrant :
+
+- Diagrammes de contexte et cas d'utilisation
+- Diagrammes d'activité
+- Diagrammes de séquence
+- Scénarios métier (connexion, consultation, téléchargement, contact support…)
+
+Ces documents constituent la référence de conception du projet et servent de support pédagogique.
+
+
+## Prochaines étapes
+
+Les prochaines phases de développement porteront sur :
+
+- La finalisation des pages restantes : ressources, contact et interface utilisateur finale
+- La poursuite des travaux de sécurité, notamment la correction des alertes identifiées lors du rendu N°04
+- Le démarrage des premiers tests de validation fonctionnelle et de sécurité
+
+L'objectif est de livrer une version complète et testée du projet d'ici fin juin 2026.
+
