@@ -2,13 +2,17 @@
 
 ## Groupe : 24
 
-### Membres
-- Amir Minihadji AMINA  
-- LO Pape  
-- Neylie NDJUMKENG-NGUEMO  
+## Membres
 
-### Superviseur
-- Mhand BOUFALA
+| Membre                   | Rôle                  | Classe    |
+| ------------------------ | --------------------- | --------- |
+| Amir Minihadji AMINA     | Dev + Admin        | E5 - CCSN |
+| LO Pape                  | Chef de projet + dev backend + Admin   | E4 - CCSN |
+| Neylie NDJUMKENG-NGUEMO  | Architecte logiciel | E4 - CCSN |
+| Steve John BIAMOU HOUMGA | Expert cybersécurité  | E4 - CCSN |
+| Gauyet NGUEFACK-TCHAMI   | Experte cybersécurité  | E4 - CCSN |
+| Mhand BOUFALA            | Superviseur           |         |
+
 ---
 
 ![Azure](https://img.shields.io/badge/Cloud-Microsoft%20Azure-0089D6?style=flat&logo=microsoftazure)
