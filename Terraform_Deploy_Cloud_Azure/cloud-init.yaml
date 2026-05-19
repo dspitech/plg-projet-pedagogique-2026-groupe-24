@@ -1,0 +1,141 @@
+#cloud-config
+
+# ==============================================================================================
+# PLG - 2026 / Groupe 24 : ESTIAM - Paris
+# cloud-init.yaml : installations et configurations des logiciels et packages 
+# ===============================================================================================
+
+package_update: true
+package_upgrade: true
+
+packages:
+  - git
+  - curl
+  - wget
+  - unzip
+  - zip
+  - vim
+  - nano
+  - htop
+  - tree
+  - tmux
+  - jq
+  - make
+  - build-essential
+  - software-properties-common
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - net-tools
+  - nmap
+  - dnsutils
+  - iputils-ping
+  - traceroute
+  - netcat
+  - python3
+  - python3-pip
+  - python3-venv
+  - postgresql-client
+  - redis-tools
+  - nginx
+  - ufw
+  - fail2ban
+
+runcmd:
+
+  # --- Docker ---
+  - curl -fsSL https://get.docker.com | sh
+  - usermod -aG docker azure_admin
+  - systemctl enable docker
+  - systemctl start docker
+  - apt-get install -y docker-compose-plugin
+
+  # --- Node.js LTS ---
+  - curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+  - apt-get install -y nodejs
+
+  # --- Packages npm globaux ---
+  - npm install -g pm2 nodemon typescript ts-node prettier eslint
+
+  # --- PM2 : démarrage automatique au reboot ---
+  - pm2 startup systemd -u azure_admin --hp /home/azure_admin
+  - systemctl enable pm2-azure_admin
+
+  # --- Python packages ---
+  - pip3 install --upgrade pip
+  - pip3 install httpie rich requests fastapi uvicorn black flake8
+
+  # --- Azure CLI ---
+  - curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+
+  # --- GitHub CLI ---
+  - curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+  - chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list
+  - apt-get update
+  - apt-get install -y gh
+
+  # --- Supabase CLI ---
+  - curl -L https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz -o /tmp/supabase.tar.gz
+  - tar -xvzf /tmp/supabase.tar.gz -C /tmp
+  - mv /tmp/supabase /usr/local/bin/supabase
+  - chmod +x /usr/local/bin/supabase
+
+  # --- Terraform ---
+  - wget -O /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.8.5/terraform_1.8.5_linux_amd64.zip
+  - unzip /tmp/terraform.zip -d /usr/local/bin/
+  - chmod +x /usr/local/bin/terraform
+
+  # --- Nginx : reverse proxy port 80 → Node.js :3000 ---
+  - |
+    cat > /etc/nginx/sites-available/webapp << 'EOF'
+    server {
+        listen 80;
+        server_name _;
+
+        location /health {
+            return 200 'OK';
+            add_header Content-Type text/plain;
+        }
+
+        location / {
+            proxy_pass http://localhost:3000;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection 'upgrade';
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_cache_bypass $http_upgrade;
+        }
+    }
+    EOF
+  - ln -sf /etc/nginx/sites-available/webapp /etc/nginx/sites-enabled/webapp
+  - rm -f /etc/nginx/sites-enabled/default
+  - systemctl enable nginx
+  - systemctl restart nginx
+
+  # --- ufw ---
+  - ufw default deny incoming
+  - ufw default allow outgoing
+  - ufw allow 22/tcp
+  - ufw allow 80/tcp
+  - ufw allow 443/tcp
+  - ufw allow 3000/tcp
+  - ufw allow 3001/tcp
+  - ufw allow 5432/tcp
+  - ufw allow 8080/tcp
+  - ufw allow 8443/tcp
+  - ufw allow 54321/tcp
+  - ufw --force enable
+
+  # --- fail2ban ---
+  - systemctl enable fail2ban
+  - systemctl start fail2ban
+
+  # --- Dossier de travail ---
+  - mkdir -p /home/azure_admin/projects
+  - chown -R azure_admin:azure_admin /home/azure_admin/projects
+
+final_message: "PLG - 2026 :  VM prête après $UPTIME secondes. Nginx, PM2 et tous les outils sont installés."
