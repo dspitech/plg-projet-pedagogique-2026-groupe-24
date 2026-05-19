@@ -1,4 +1,15 @@
-# 🏗️ AZ-PRO-HUB-SPOKE-NORWAY
+# Projet pédagogique 2026 : Mise en place de l'insfrastructure Azure
+
+## Groupe : 24
+
+### Membres
+- Amir Minihadji AMINA  
+- LO Pape  
+- Neylie NDJUMKENG-NGUEMO  
+
+### Superviseur
+- Mhand BOUFALA
+---
 
 ![Azure](https://img.shields.io/badge/Cloud-Microsoft%20Azure-0089D6?style=flat&logo=microsoftazure)
 ![Terraform](https://img.shields.io/badge/IaC-Terraform-7B42BC?style=flat&logo=terraform)
@@ -10,11 +21,13 @@
 ![VNet Peering](https://img.shields.io/badge/Network-VNet_Peering-0078D4?style=flat)
 ![Cloud Shell](https://img.shields.io/badge/Environnement-Cloud_Shell_PowerShell-5391FE?style=flat&logo=powershell)
 
-> **Projet** : Architecture Script tools avec Load Balancer - Hébergement web avec backend Supabase
+## Objectif
+Dans ce rendu N°5
+> **Projet** : Architecture Script HUB tools avec Load Balancer - Hébergement web avec backend Supabase
 > **Environnement** : Azure Cloud Shell (PowerShell)
 > **Région** : `norwayeast`
 > **Auteur** : PLG - 2026 / Groupe - 24 / ESTIAM Paris
-> **Date** : Décembre 2025
+> **Date** : Main 2026
 
 ---
 
