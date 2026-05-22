@@ -33,7 +33,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 type Status = 'draft' | 'active' | 'inactive' | 'archived' | 'deprecated';
 type Criticality = 'low' | 'medium' | 'high' | 'critical';
@@ -447,9 +447,12 @@ export default function ScriptsPage() {
 
   const remove = async () => {
     if (!toDelete) return;
+    const { moveToTrash } = await import('@/lib/trash');
+    const t = await moveToTrash({ resourceType: 'script', rows: [toDelete] });
+    if (!t.ok) return toast.error(t.error ?? 'Erreur');
     const { error } = await supabase.from('scripts').delete().eq('id', toDelete.id);
     if (error) return toast.error(error.message);
-    toast.success('Script supprimé');
+    toast.success('Script déplacé dans la corbeille');
     setToDelete(null);
     load();
   };
@@ -518,9 +521,13 @@ export default function ScriptsPage() {
 
   const deleteSelected = async () => {
     if (!selectedIds.length) return;
+    const rows = items.filter((s) => selectedIds.includes(s.id));
+    const { moveToTrash } = await import('@/lib/trash');
+    const t = await moveToTrash({ resourceType: 'script', rows });
+    if (!t.ok) return toast.error(t.error ?? 'Erreur');
     const { error } = await supabase.from('scripts').delete().in('id', selectedIds);
     if (error) return toast.error(error.message);
-    toast.success(`${selectedIds.length} supprimé(s)`);
+    toast.success(`${selectedIds.length} déplacé(s) dans la corbeille`);
     setSelectedIds([]); setBulkDeleteOpen(false); load();
   };
 

@@ -1,7 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import {
   ChevronRight,
   FolderPlus,

@@ -1,11 +1,12 @@
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Terminal, Mail, Lock, LogIn, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/lib/toast';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -15,8 +16,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [signupAllowed, setSignupAllowed] = useState(false);
+
+  useEffect(() => {
+    supabase.rpc('global_admin_exists').then(({ data, error }) => {
+      if (!error) setSignupAllowed(data !== true);
+    });
+  }, []);
 
   const from = (location.state as any)?.from?.pathname ?? '/';
+
 
   if (user) {
     navigate(from, { replace: true });
@@ -103,9 +112,15 @@ export default function LoginPage() {
             <p className="text-[11px] text-muted-foreground">
               Accédez à votre compte pour gérer vos scripts.
             </p>
-            <Link to="/signup" className="text-xs text-primary hover:underline mt-2 inline-block">
-              Pas de compte ? S'inscrire →
-            </Link>
+            {signupAllowed ? (
+              <Link to="/signup" className="text-xs text-primary hover:underline mt-2 inline-block">
+                Pas de compte ? S'inscrire →
+              </Link>
+            ) : (
+              <Link to="/no-signup" className="text-xs text-muted-foreground hover:text-foreground mt-2 inline-block">
+                Pas de compte ? Demander un accès →
+              </Link>
+            )}
           </div>
         </div>
       </div>

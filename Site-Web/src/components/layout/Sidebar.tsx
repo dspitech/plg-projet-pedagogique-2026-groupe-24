@@ -6,13 +6,7 @@ import {
   FileCode2,
   BookOpen,
   FolderTree,
-  Cloud,
-  Server,
   Mail,
-  Star,
-  Share2,
-  Download,
-  History,
   User,
   LogOut,
   ChevronLeft,
@@ -20,12 +14,14 @@ import {
   Terminal,
   Users as UsersIcon,
   ScrollText,
+  Archive,
+  Trash2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
-type NavItem = { id: string; name: string; icon: typeof Home; path: string; adminOnly?: boolean };
+type NavItem = { id: string; name: string; icon: typeof Home; path: string };
 
 const sections: { label?: string; items: NavItem[]; adminOnly?: boolean }[] = [
   {
@@ -39,27 +35,13 @@ const sections: { label?: string; items: NavItem[]; adminOnly?: boolean }[] = [
     ],
   },
   {
-    label: 'Fournisseurs Cloud',
-    items: [
-      { id: 'azure', name: 'Azure', icon: Cloud, path: '/provider/azure' },
-      { id: 'aws', name: 'AWS', icon: Server, path: '/provider/aws' },
-    ],
-  },
-  {
-    label: 'Mon espace',
-    items: [
-      { id: 'favorites', name: 'Favoris', icon: Star, path: '/favorites' },
-      { id: 'shares', name: 'Partages', icon: Share2, path: '/shares' },
-      { id: 'downloads', name: 'Téléchargements', icon: Download, path: '/downloads' },
-      { id: 'history', name: 'Historique', icon: History, path: '/history' },
-    ],
-  },
-  {
     label: 'Administration',
     adminOnly: true,
     items: [
-      { id: 'users', name: 'Utilisateurs', icon: UsersIcon, path: '/admin/users', adminOnly: true },
-      { id: 'audit', name: 'Logs & Audit', icon: ScrollText, path: '/admin/audit-logs', adminOnly: true },
+      { id: 'users', name: 'Utilisateurs', icon: UsersIcon, path: '/admin/users' },
+      { id: 'audit', name: 'Logs & Audit', icon: ScrollText, path: '/admin/audit-logs' },
+      { id: 'archives', name: 'Archives', icon: Archive, path: '/admin/archives' },
+      { id: 'trash', name: 'Corbeille', icon: Trash2, path: '/admin/trash' },
     ],
   },
   {

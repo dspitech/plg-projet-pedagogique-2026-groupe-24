@@ -189,3 +189,43 @@
     50% { transform: translateY(-10px); }
   }
 }
+
+/* Sonner — toasts centrés, design unifié */
+[data-sonner-toaster][data-x-position='center'] {
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%);
+  width: min(100%, 28rem);
+}
+
+[data-sonner-toaster] [data-sonner-toast] {
+  width: 100%;
+  margin: 0 auto;
+  animation: toast-enter 0.35s cubic-bezier(0.21, 1.02, 0.73, 1) forwards;
+}
+
+[data-sonner-toaster] [data-sonner-toast][data-removed='true'] {
+  animation: toast-exit 0.25s ease-in forwards;
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}

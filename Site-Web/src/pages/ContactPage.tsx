@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Mail, MessageSquare, MapPin, Phone, Send } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 export default function ContactPage() {
   const [name, setName] = useState('');

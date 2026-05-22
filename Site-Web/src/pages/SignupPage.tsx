@@ -1,12 +1,12 @@
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Terminal, Mail, Lock, User, Loader2, Check, X } from 'lucide-react';
+import { Terminal, Mail, Lock, User, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { validatePasswordStrength } from '@/lib/passwordPolicy';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -15,37 +15,53 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    supabase.rpc('global_admin_exists').then(({ data, error }) => {
+      if (!mounted) return;
+      if (!error && data === true) {
+        navigate('/no-signup', { replace: true });
+        return;
+      }
+      setChecking(false);
+    });
+    return () => { mounted = false; };
+  }, [navigate]);
 
   const strength = validatePasswordStrength(password);
   const matches = password.length > 0 && password === confirm;
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!strength.valid) {
-      toast.error('Mot de passe non conforme à la politique de sécurité');
-      return;
-    }
-    if (!matches) {
-      toast.error('Les mots de passe ne correspondent pas');
-      return;
-    }
+    if (!strength.valid) { toast.error('Mot de passe non conforme à la politique de sécurité'); return; }
+    if (!matches) { toast.error('Les mots de passe ne correspondent pas'); return; }
     setLoading(true);
+    // Double-check just before signup (race-safe)
+    const { data: existsNow } = await supabase.rpc('global_admin_exists');
+    if (existsNow === true) {
+      setLoading(false);
+      navigate('/no-signup', { replace: true });
+      return;
+    }
     const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${window.location.origin}/`,
-        data: { name },
-      },
+      email, password,
+      options: { emailRedirectTo: `${window.location.origin}/`, data: { name } },
     });
     setLoading(false);
-    if (error) {
-      toast.error('Inscription impossible', { description: error.message });
-      return;
-    }
+    if (error) { toast.error('Inscription impossible', { description: error.message }); return; }
     toast.success('Compte créé', { description: 'Vérifiez votre email pour confirmer.' });
     navigate('/login');
   };
+
+  if (checking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-secondary/10 p-4">
@@ -57,7 +73,7 @@ export default function SignupPage() {
             </div>
             <h1 className="text-2xl font-bold">S'inscrire</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Créez votre compte pour commencer à gérer vos scripts.
+              Créez votre compte pour accéder à la plateforme.
             </p>
           </div>
 

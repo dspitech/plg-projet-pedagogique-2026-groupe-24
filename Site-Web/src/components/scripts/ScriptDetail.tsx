@@ -24,7 +24,7 @@ import { Script, Criticality } from '@/data/scripts';
 import { cn } from '@/lib/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { useUserData } from '@/hooks/useUserData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';

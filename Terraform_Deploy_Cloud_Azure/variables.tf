@@ -12,6 +12,7 @@ variable "rg_name" {
   default     = "RG-PLG-ESTIAM-Paris-2026"
 }
 
+
 variable "location" {
   description = "Région Azure cible"
   type        = string

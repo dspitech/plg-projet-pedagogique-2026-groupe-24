@@ -1,7 +1,20 @@
-import { Search, Bell, User, CalendarDays, Clock3, MapPin, Command, LogOut, Settings } from 'lucide-react';
+import {
+  Search,
+  Bell,
+  User,
+  CalendarDays,
+  Clock3,
+  MapPin,
+  Command,
+  LogOut,
+  Settings,
+  Loader2,
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useUserLocation } from '@/hooks/useUserLocation';
+import { getTimezoneShort } from '@/lib/userLocation';
 import { supabase } from '@/integrations/supabase/client';
 import {
   DropdownMenu,
@@ -11,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 const ROLE_LABELS = {
   global_admin: 'Admin Global',
@@ -25,6 +39,17 @@ export function Header() {
   const [now, setNow] = useState(() => new Date());
   const [logsCount, setLogsCount] = useState(0);
   const navigate = useNavigate();
+
+  const profileHint = useMemo(
+    () => ({
+      city: (profile as { city?: string } | null)?.city,
+      country: (profile as { country?: string } | null)?.country,
+      address: (profile as { address?: string } | null)?.address,
+    }),
+    [profile],
+  );
+
+  const { location, loading: locationLoading } = useUserLocation(profileHint);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,37 +90,48 @@ export function Header() {
     return 'Aucun role';
   }, [roles]);
 
-  const dateLabel = new Intl.DateTimeFormat('fr-FR', {
-    weekday: 'short',
-    day: '2-digit',
-    month: 'short',
+  const timeZone = location?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'Local';
+
+  const dateParts = new Intl.DateTimeFormat('fr-FR', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
     year: 'numeric',
-  }).format(now);
+    timeZone,
+  }).formatToParts(now);
+
+  const weekday = dateParts.find((p) => p.type === 'weekday')?.value ?? '';
+  const dayMonthYear =
+    `${dateParts.find((p) => p.type === 'day')?.value ?? ''} ${dateParts.find((p) => p.type === 'month')?.value ?? ''} ${dateParts.find((p) => p.type === 'year')?.value ?? ''}`.trim();
 
   const timeLabel = new Intl.DateTimeFormat('fr-FR', {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
     hour12: false,
+    timeZone,
   }).format(now);
 
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone ?? 'Local';
-  const localeLabel = navigator.language.toUpperCase();
-  const locationLabel = timeZone;
+  const tzShort = getTimezoneShort(now, timeZone);
+
   const displayName = profile?.name || profile?.email || 'Utilisateur';
-  const avatarUrl = (profile as any)?.avatar_url as string | undefined;
+  const avatarUrl = (profile as { avatar_url?: string } | null)?.avatar_url;
   const initials = (displayName?.trim()?.[0] ?? 'U').toUpperCase();
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/auth');
+    navigate('/login');
   };
 
+  const locationPrimary = location?.city ?? location?.line1?.split(',')[0]?.trim() ?? '—';
+  const locationSecondary = [location?.postalCode, location?.country ?? location?.line2]
+    .filter(Boolean)
+    .join(' · ');
+
   return (
-    <header className="sticky top-0 z-30 h-16 bg-background/90 backdrop-blur-xl border-b border-border/70">
-      <div className="flex h-full items-center justify-between px-6">
-        {/* Search */}
-        <form onSubmit={handleSearch} className="flex-1 max-w-2xl">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-background/95 backdrop-blur-xl">
+      <div className="flex min-h-[4.25rem] items-center justify-between gap-4 px-4 py-2.5 lg:px-6">
+        <form onSubmit={handleSearch} className="min-w-0 flex-1 max-w-2xl">
           <div className="group relative">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
             <input
@@ -112,41 +148,80 @@ export function Header() {
           </div>
         </form>
 
-        {/* Actions */}
-        <div className="flex items-center gap-4 ml-6">
-          <div className="hidden xl:flex items-center gap-3 rounded-xl border border-border/70 bg-card/70 px-3.5 py-2 shadow-sm">
-            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-              <CalendarDays className="h-3.5 w-3.5" />
-              <span className="tabular-nums">{dateLabel}</span>
+        <div className="flex shrink-0 items-center gap-3 lg:gap-4">
+          <div
+            className={cn(
+              'hidden lg:flex items-center rounded-2xl border border-border/50',
+              'bg-card/50 shadow-sm ring-1 ring-white/5',
+            )}
+          >
+            <div className="flex items-center gap-3 px-5 py-3.5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20">
+                <CalendarDays className="h-[18px] w-[18px] text-primary" />
+              </span>
+              <div className="flex flex-col justify-center gap-1">
+                <span className="text-sm font-semibold capitalize leading-none text-foreground">{weekday}</span>
+                <span className="text-xs leading-none text-muted-foreground">{dayMonthYear}</span>
+              </div>
             </div>
-            <div className="h-6 w-px bg-border/70" />
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
-              <Clock3 className="h-3.5 w-3.5" />
-              <span className="tabular-nums">{timeLabel}</span>
+
+            <div className="h-11 w-px shrink-0 bg-border/50" />
+
+            <div className="flex items-center gap-3 px-5 py-3.5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20">
+                <Clock3 className="h-[18px] w-[18px] text-primary" />
+              </span>
+              <div className="flex flex-col justify-center gap-1">
+                <span className="font-mono text-base font-semibold tabular-nums leading-none tracking-wide text-foreground">
+                  {timeLabel}
+                </span>
+                <span className="text-xs leading-none text-muted-foreground">{tzShort}</span>
+              </div>
             </div>
-            <div className="h-6 w-px bg-border/70" />
-            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground whitespace-nowrap">
-              <MapPin className="h-3.5 w-3.5" />
-              <span>{localeLabel} - {locationLabel}</span>
+
+            <div className="h-11 w-px shrink-0 bg-border/50" />
+
+            <div className="flex min-w-[9.5rem] max-w-[12rem] items-center gap-3 px-5 py-3.5">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/20">
+                <MapPin className="h-[18px] w-[18px] text-primary" />
+              </span>
+              {locationLoading ? (
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                  <span>Chargement…</span>
+                </div>
+              ) : (
+                <div className="flex min-w-0 flex-col justify-center gap-1">
+                  <span className="truncate text-sm font-semibold leading-none text-foreground" title={locationPrimary}>
+                    {locationPrimary}
+                  </span>
+                  {locationSecondary ? (
+                    <span
+                      className="truncate text-xs leading-none text-muted-foreground"
+                      title={locationSecondary}
+                    >
+                      {locationSecondary}
+                    </span>
+                  ) : null}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Notifications */}
           <button
             onClick={() => navigate('/admin/audit-logs')}
             title="Voir les logs et audits"
-            className="relative flex h-10 min-w-10 items-center justify-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors px-2"
+            className="relative flex h-10 min-w-10 items-center justify-center rounded-lg px-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
             <Bell className="h-5 w-5" />
-            <span className="absolute -right-1 -top-1 inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground tabular-nums">
+            <span className="absolute -right-1 -top-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground tabular-nums">
               {logsCount > 99 ? '99+' : logsCount}
             </span>
           </button>
 
-          {/* User */}
-          <div className="flex items-center gap-3 pl-4 border-l border-border/70">
+          <div className="flex items-center gap-3 border-l border-border/70 pl-3 lg:pl-4">
             <div className="hidden sm:block text-right">
-              <p className="text-sm font-semibold text-foreground truncate max-w-[180px]">{displayName}</p>
+              <p className="max-w-[180px] truncate text-sm font-semibold text-foreground">{displayName}</p>
               <p className="text-xs text-muted-foreground">{roleLabel}</p>
             </div>
             <DropdownMenu>
@@ -154,9 +229,7 @@ export function Header() {
                 <button className="rounded-full ring-offset-background transition hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                   <Avatar className="h-10 w-10 border border-border/70">
                     <AvatarImage src={avatarUrl} alt={displayName} />
-                    <AvatarFallback className="bg-primary/10 text-primary font-semibold">
-                      {initials}
-                    </AvatarFallback>
+                    <AvatarFallback className="bg-primary/10 font-semibold text-primary">{initials}</AvatarFallback>
                   </Avatar>
                 </button>
               </DropdownMenuTrigger>
@@ -170,7 +243,10 @@ export function Header() {
                   Paramètres
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="gap-2 text-destructive focus:text-destructive">
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="gap-2 text-destructive focus:text-destructive"
+                >
                   <LogOut className="h-4 w-4" />
                   Se déconnecter
                 </DropdownMenuItem>

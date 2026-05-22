@@ -14,9 +14,55 @@ export type Database = {
   }
   public: {
     Tables: {
+      archived_logs: {
+        Row: {
+          action: string
+          archived_at: string
+          category: string
+          details: Json | null
+          id: string
+          ip_address: string | null
+          original_created_at: string
+          resource: string
+          resource_id: string | null
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          archived_at?: string
+          category?: string
+          details?: Json | null
+          id: string
+          ip_address?: string | null
+          original_created_at: string
+          resource: string
+          resource_id?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          archived_at?: string
+          category?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          original_created_at?: string
+          resource?: string
+          resource_id?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
+          category: string
           created_at: string
           details: Json | null
           id: string
@@ -29,6 +75,7 @@ export type Database = {
         }
         Insert: {
           action: string
+          category?: string
           created_at?: string
           details?: Json | null
           id?: string
@@ -41,6 +88,7 @@ export type Database = {
         }
         Update: {
           action?: string
+          category?: string
           created_at?: string
           details?: Json | null
           id?: string
@@ -185,6 +233,92 @@ export type Database = {
         }
         Relationships: []
       }
+      resources: {
+        Row: {
+          author_id: string | null
+          category_id: string | null
+          created_at: string
+          criticality: Database["public"]["Enums"]["resource_criticality"]
+          description: string | null
+          downloads_count: number
+          favorites_count: number
+          file_path: string | null
+          file_size: number | null
+          id: string
+          is_featured: boolean
+          language: string | null
+          mime_type: string | null
+          name: string
+          resource_type: Database["public"]["Enums"]["resource_type"]
+          status: Database["public"]["Enums"]["resource_status"]
+          tags: string[]
+          thumbnail_url: string | null
+          updated_at: string
+          url: string | null
+          version: string
+          views_count: number
+          visibility: Database["public"]["Enums"]["resource_visibility"]
+        }
+        Insert: {
+          author_id?: string | null
+          category_id?: string | null
+          created_at?: string
+          criticality?: Database["public"]["Enums"]["resource_criticality"]
+          description?: string | null
+          downloads_count?: number
+          favorites_count?: number
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          is_featured?: boolean
+          language?: string | null
+          mime_type?: string | null
+          name: string
+          resource_type?: Database["public"]["Enums"]["resource_type"]
+          status?: Database["public"]["Enums"]["resource_status"]
+          tags?: string[]
+          thumbnail_url?: string | null
+          updated_at?: string
+          url?: string | null
+          version?: string
+          views_count?: number
+          visibility?: Database["public"]["Enums"]["resource_visibility"]
+        }
+        Update: {
+          author_id?: string | null
+          category_id?: string | null
+          created_at?: string
+          criticality?: Database["public"]["Enums"]["resource_criticality"]
+          description?: string | null
+          downloads_count?: number
+          favorites_count?: number
+          file_path?: string | null
+          file_size?: number | null
+          id?: string
+          is_featured?: boolean
+          language?: string | null
+          mime_type?: string | null
+          name?: string
+          resource_type?: Database["public"]["Enums"]["resource_type"]
+          status?: Database["public"]["Enums"]["resource_status"]
+          tags?: string[]
+          thumbnail_url?: string | null
+          updated_at?: string
+          url?: string | null
+          version?: string
+          views_count?: number
+          visibility?: Database["public"]["Enums"]["resource_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resources_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_permissions: {
         Row: {
           permission_id: string
@@ -312,6 +446,39 @@ export type Database = {
           },
         ]
       }
+      trash_items: {
+        Row: {
+          created_at: string
+          deleted_by: string | null
+          deleted_by_email: string | null
+          id: string
+          payload: Json
+          reason: string | null
+          resource_id: string
+          resource_type: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_by?: string | null
+          deleted_by_email?: string | null
+          id?: string
+          payload: Json
+          reason?: string | null
+          resource_id: string
+          resource_type: string
+        }
+        Update: {
+          created_at?: string
+          deleted_by?: string | null
+          deleted_by_email?: string | null
+          id?: string
+          payload?: Json
+          reason?: string | null
+          resource_id?: string
+          resource_type?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -338,6 +505,9 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      archive_audit_logs_by_ids: { Args: { _ids: string[] }; Returns: number }
+      archive_old_audit_logs: { Args: never; Returns: number }
+      global_admin_exists: { Args: never; Returns: boolean }
       has_permission: {
         Args: { _action: string; _resource: string; _user_id: string }
         Returns: boolean
@@ -350,21 +520,45 @@ export type Database = {
         Returns: boolean
       }
       is_active_user: { Args: { _user_id: string }; Returns: boolean }
-      log_audit_event: {
-        Args: {
-          _action: string
-          _details?: Json
-          _ip_address?: string
-          _resource: string
-          _resource_id?: string
-          _user_agent?: string
-        }
-        Returns: string
-      }
+      log_audit_event:
+        | {
+            Args: {
+              _action: string
+              _details?: Json
+              _ip_address?: string
+              _resource: string
+              _resource_id?: string
+              _user_agent?: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _action: string
+              _category?: string
+              _details?: Json
+              _ip_address?: string
+              _resource: string
+              _resource_id?: string
+              _user_agent?: string
+            }
+            Returns: string
+          }
     }
     Enums: {
       app_role: "global_admin" | "admin" | "editor" | "viewer"
       category_status: "active" | "inactive" | "archived"
+      resource_criticality: "low" | "medium" | "high" | "critical"
+      resource_status: "draft" | "active" | "archived"
+      resource_type:
+        | "link"
+        | "document"
+        | "file"
+        | "video"
+        | "image"
+        | "repository"
+        | "other"
+      resource_visibility: "public" | "private"
       script_criticality: "low" | "medium" | "high" | "critical"
       script_status: "draft" | "active" | "inactive" | "archived" | "deprecated"
       script_type:
@@ -389,6 +583,65 @@ export type Database = {
         | "yaml"
         | "json"
         | "other"
+        | "rust"
+        | "java"
+        | "kotlin"
+        | "scala"
+        | "csharp"
+        | "fsharp"
+        | "vbnet"
+        | "php"
+        | "r"
+        | "julia"
+        | "lua"
+        | "dart"
+        | "swift"
+        | "objective_c"
+        | "c"
+        | "cpp"
+        | "graphql"
+        | "xml"
+        | "hcl"
+        | "gcloud"
+        | "helm"
+        | "makefile"
+        | "cmake"
+        | "gradle"
+        | "jenkinsfile"
+        | "github_actions"
+        | "gitlab_ci"
+        | "azure_devops"
+        | "matlab"
+        | "fortran"
+        | "cobol"
+        | "pascal"
+        | "ada"
+        | "plsql"
+        | "tsql"
+        | "toml"
+        | "ini"
+        | "nix"
+        | "chef"
+        | "puppet"
+        | "zig"
+        | "nim"
+        | "haskell"
+        | "elixir"
+        | "erlang"
+        | "clojure"
+        | "groovy"
+        | "assembly"
+        | "objectivec"
+        | "solidity"
+        | "move"
+        | "vyper"
+        | "prolog"
+        | "scheme"
+        | "lisp"
+        | "abap"
+        | "sas"
+        | "stata"
+        | "ocaml"
       script_visibility: "public" | "private"
     }
     CompositeTypes: {
@@ -519,6 +772,18 @@ export const Constants = {
     Enums: {
       app_role: ["global_admin", "admin", "editor", "viewer"],
       category_status: ["active", "inactive", "archived"],
+      resource_criticality: ["low", "medium", "high", "critical"],
+      resource_status: ["draft", "active", "archived"],
+      resource_type: [
+        "link",
+        "document",
+        "file",
+        "video",
+        "image",
+        "repository",
+        "other",
+      ],
+      resource_visibility: ["public", "private"],
       script_criticality: ["low", "medium", "high", "critical"],
       script_status: ["draft", "active", "inactive", "archived", "deprecated"],
       script_type: [
@@ -543,6 +808,65 @@ export const Constants = {
         "yaml",
         "json",
         "other",
+        "rust",
+        "java",
+        "kotlin",
+        "scala",
+        "csharp",
+        "fsharp",
+        "vbnet",
+        "php",
+        "r",
+        "julia",
+        "lua",
+        "dart",
+        "swift",
+        "objective_c",
+        "c",
+        "cpp",
+        "graphql",
+        "xml",
+        "hcl",
+        "gcloud",
+        "helm",
+        "makefile",
+        "cmake",
+        "gradle",
+        "jenkinsfile",
+        "github_actions",
+        "gitlab_ci",
+        "azure_devops",
+        "matlab",
+        "fortran",
+        "cobol",
+        "pascal",
+        "ada",
+        "plsql",
+        "tsql",
+        "toml",
+        "ini",
+        "nix",
+        "chef",
+        "puppet",
+        "zig",
+        "nim",
+        "haskell",
+        "elixir",
+        "erlang",
+        "clojure",
+        "groovy",
+        "assembly",
+        "objectivec",
+        "solidity",
+        "move",
+        "vyper",
+        "prolog",
+        "scheme",
+        "lisp",
+        "abap",
+        "sas",
+        "stata",
+        "ocaml",
       ],
       script_visibility: ["public", "private"],
     },

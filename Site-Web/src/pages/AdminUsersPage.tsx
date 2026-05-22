@@ -36,7 +36,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth, AppRole, Profile } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 interface AdminRow extends Profile {
   roles: AppRole[];
@@ -77,7 +77,7 @@ const extractFunctionErrorMessage = async (error: unknown): Promise<string | nul
 };
 
 export default function AdminUsersPage() {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, roles: currentRoles, refresh } = useAuth();
   const [users, setUsers] = useState<AdminRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -86,6 +86,14 @@ export default function AdminUsersPage() {
   const [openView, setOpenView] = useState<AdminRow | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [page, setPage] = useState(1);
+
+  // Delegation flow (global_admin self-deletion)
+  const [delegateOpen, setDelegateOpen] = useState(false);
+  const [delegateStep, setDelegateStep] = useState<'choose' | 'select' | 'warn'>('choose');
+  const [delegateTarget, setDelegateTarget] = useState<string>('');
+  const [delegateNewRole, setDelegateNewRole] = useState<AppRole>('viewer');
+  const [delegateLoading, setDelegateLoading] = useState(false);
+  const [delegationDone, setDelegationDone] = useState(false);
 
   // Invite form
   const [iName, setIName] = useState('');
@@ -213,7 +221,17 @@ export default function AdminUsersPage() {
   };
 
   const removeUser = async (u: AdminRow) => {
-    if (u.id === currentUser?.id) {
+    const isSelf = u.id === currentUser?.id;
+    const isSelfGlobalAdmin = isSelf && currentRoles.includes('global_admin');
+    if (isSelfGlobalAdmin) {
+      setDelegateOpen(true);
+      setDelegateStep('choose');
+      setDelegateTarget('');
+      setDelegateNewRole('viewer');
+      setDelegationDone(false);
+      return;
+    }
+    if (isSelf) {
       toast.error('Vous ne pouvez pas vous supprimer vous-même');
       return;
     }
@@ -225,6 +243,70 @@ export default function AdminUsersPage() {
     toast.success('Utilisateur supprimé');
     load();
   };
+
+  const performDelegation = async () => {
+    if (!delegateTarget || !currentUser) return;
+    setDelegateLoading(true);
+    try {
+      // ORDER MATTERS: keep our global_admin role alive while we INSERT new rows,
+      // then remove it last. Inserting after removing causes RLS violation.
+
+      // 1) Grant global_admin to target (we are still global_admin → RLS ok)
+      const { error: insErr } = await supabase
+        .from('user_roles')
+        .insert({ user_id: delegateTarget, role: 'global_admin' });
+      if (insErr && !/duplicate/i.test(insErr.message)) throw insErr;
+
+      // 2) Insert our new self role (self insert is also allowed by the new policy)
+      const { error: selfRoleErr } = await supabase
+        .from('user_roles')
+        .insert({ user_id: currentUser.id, role: delegateNewRole });
+      if (selfRoleErr && !/duplicate/i.test(selfRoleErr.message)) throw selfRoleErr;
+
+      // 3) NOW remove our own global_admin role
+      const { error: delErr } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', currentUser.id)
+        .eq('role', 'global_admin');
+      if (delErr) throw delErr;
+
+      await supabase.rpc('log_audit_event', {
+        _action: 'delegate_global_admin',
+        _resource: 'users',
+        _resource_id: delegateTarget,
+        _details: { from: currentUser.id, new_self_role: delegateNewRole },
+        _category: 'users',
+      });
+
+      toast.success(`Rôle d'admin global délégué. Votre nouveau rôle: ${delegateNewRole}`);
+      setDelegationDone(true);
+      await refresh();
+      await load();
+    } catch (err: any) {
+      toast.error('Délégation échouée', { description: err?.message });
+    } finally {
+      setDelegateLoading(false);
+    }
+  };
+
+  const finalizeSelfDelete = async () => {
+    if (!currentUser) return;
+    setDelegateLoading(true);
+    const { data, error } = await supabase.functions.invoke('admin-delete-user', {
+      body: { user_id: currentUser.id },
+    });
+    setDelegateLoading(false);
+    if (error || data?.error) {
+      toast.error('Suppression impossible', { description: error?.message ?? data?.error });
+      return;
+    }
+    toast.success('Compte supprimé');
+    setDelegateOpen(false);
+    await supabase.auth.signOut();
+    window.location.href = '/login';
+  };
+
 
   return (
     <DashboardLayout>
@@ -577,6 +659,153 @@ export default function AdminUsersPage() {
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setOpenView(null)}>Fermer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {/* Delegation dialog (global_admin self-delete) */}
+      <Dialog open={delegateOpen} onOpenChange={(o) => { if (!delegateLoading) setDelegateOpen(o); }}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Crown className="h-5 w-5 text-warning" />
+              {delegateStep === 'warn' ? 'Délégation requise' : 'Suppression du compte Admin Global'}
+            </DialogTitle>
+            <DialogDescription>
+              {delegateStep === 'choose' && !delegationDone &&
+                'Vous êtes administrateur global. Avant de supprimer votre compte, vous devez déléguer votre rôle à un autre utilisateur.'}
+              {delegateStep === 'warn' &&
+                'Vous êtes actuellement admin_global. Vous devez d\'abord déléguer votre rôle avant de pouvoir supprimer votre compte.'}
+              {delegateStep === 'select' &&
+                'Sélectionnez un utilisateur qui recevra le rôle d\'admin global, puis choisissez votre nouveau rôle.'}
+              {delegationDone &&
+                'La délégation est effective. Vous pouvez désormais supprimer votre compte en toute sécurité.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          {delegateStep === 'choose' && !delegationDone && (
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button
+                onClick={() => setDelegateStep('select')}
+                className="rounded-xl border border-border/60 bg-card p-4 text-left hover:border-primary/50 hover:shadow-md transition-all"
+              >
+                <UserCheck className="h-5 w-5 text-primary mb-2" />
+                <p className="font-medium text-sm">Déléguer mon rôle</p>
+                <p className="text-xs text-muted-foreground mt-1">Transférer admin_global à un autre utilisateur.</p>
+              </button>
+              <button
+                onClick={() => setDelegateStep('warn')}
+                className="rounded-xl border border-border/60 bg-card p-4 text-left hover:border-destructive/50 hover:shadow-md transition-all"
+              >
+                <Trash2 className="h-5 w-5 text-destructive mb-2" />
+                <p className="font-medium text-sm">Supprimer mon compte</p>
+                <p className="text-xs text-muted-foreground mt-1">Tenter la suppression directe.</p>
+              </button>
+            </div>
+          )}
+
+          {delegateStep === 'warn' && !delegationDone && (
+            <div className="rounded-xl border border-warning/30 bg-warning/5 p-4">
+              <div className="flex items-start gap-3">
+                <Crown className="h-5 w-5 text-warning shrink-0 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-foreground">
+                    Suppression bloquée.
+                  </p>
+                  <p className="text-muted-foreground mt-1">
+                    Votre rôle d'admin global doit être transféré à un autre utilisateur avant la suppression
+                    pour éviter de laisser la plateforme sans administrateur.
+                  </p>
+                </div>
+              </div>
+              <Button
+                className="w-full mt-4"
+                onClick={() => setDelegateStep('select')}
+              >
+                <UserCheck className="h-4 w-4" /> Déléguer mon rôle maintenant
+              </Button>
+            </div>
+          )}
+
+          {delegateStep === 'select' && !delegationDone && (
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Nouvel administrateur global *</Label>
+                <select
+                  value={delegateTarget}
+                  onChange={(e) => setDelegateTarget(e.target.value)}
+                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">— Sélectionner un utilisateur —</option>
+                  {users
+                    .filter(u => u.id !== currentUser?.id && !u.is_suspended)
+                    .map(u => (
+                      <option key={u.id} value={u.id}>
+                        {u.name || u.email} ({u.email})
+                      </option>
+                    ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label>Votre nouveau rôle</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['admin','editor','viewer'] as AppRole[]).map(r => (
+                    <label key={r}
+                      className={`flex items-center justify-center gap-2 px-3 py-2 rounded-md border cursor-pointer text-sm transition-all ${
+                        delegateNewRole === r
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'border-border/60 hover:bg-secondary/40'
+                      }`}>
+                      <input type="radio" className="sr-only"
+                        checked={delegateNewRole === r}
+                        onChange={() => setDelegateNewRole(r)} />
+                      {ROLE_LABELS[r]}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {delegationDone && (
+            <div className="rounded-xl border border-success/30 bg-success/5 p-4 text-sm">
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">Délégation effectuée avec succès.</p>
+                  <p className="text-muted-foreground mt-1">
+                    Vous pouvez maintenant supprimer votre compte. Cette action est irréversible.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            {!delegationDone ? (
+              <>
+                <Button variant="outline" onClick={() => setDelegateOpen(false)} disabled={delegateLoading}>
+                  Annuler
+                </Button>
+                {delegateStep === 'select' && (
+                  <Button onClick={performDelegation} disabled={!delegateTarget || delegateLoading}>
+                    {delegateLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                    Confirmer la délégation
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={() => setDelegateOpen(false)}>Plus tard</Button>
+                <Button
+                  variant="destructive"
+                  onClick={finalizeSelfDelete}
+                  disabled={delegateLoading}
+                >
+                  {delegateLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  <Trash2 className="h-4 w-4" /> Supprimer mon compte
+                </Button>
+              </>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

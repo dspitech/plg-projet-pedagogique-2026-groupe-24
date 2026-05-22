@@ -24,7 +24,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import { supabase } from '@/integrations/supabase/client';
 import { signScreenshotPaths } from '@/lib/scriptScreenshots';
 import {

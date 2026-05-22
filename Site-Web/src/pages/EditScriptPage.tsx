@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { z } from 'zod';
 import Editor, { type OnMount } from '@monaco-editor/react';
 import type * as Monaco from 'monaco-editor';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import {
   ArrowLeft,
   ChevronRight,
@@ -137,7 +137,7 @@ export default function EditScriptPage() {
   const [content, setContent] = useState('');
   const [criticality, setCriticality] = useState<'low' | 'medium' | 'high' | 'critical'>('medium');
   const [version, setVersion] = useState('1.0.0');
-  const [status, setStatus] = useState<'draft' | 'active' | 'inactive'>('draft');
+  const [status, setStatus] = useState<'draft' | 'active' | 'inactive' | 'archived' | 'deprecated'>('draft');
   const [visibility, setVisibility] = useState<'private' | 'public'>('private');
   const [categoryId, setCategoryId] = useState('');
   const [license, setLicense] = useState('MIT');
@@ -290,7 +290,7 @@ export default function EditScriptPage() {
             kind: monaco.languages.CompletionItemKind.Snippet,
             insertText: '# TODO: ${1:detail}',
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          },
+          } as any,
         ],
       }),
     });
@@ -335,7 +335,7 @@ export default function EditScriptPage() {
     const { error } = await supabase.from('scripts').update({
       name: name.trim(),
       description: description.trim(),
-      script_type: scriptTypeForDb,
+      script_type: scriptTypeForDb as any,
       content,
       features: features || null,
       prerequisites: prerequisites || null,

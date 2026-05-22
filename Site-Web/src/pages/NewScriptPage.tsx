@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 import Editor, { type OnMount } from '@monaco-editor/react';
 import type * as Monaco from 'monaco-editor';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 import {
   ChevronRight,
   FileCode2,
@@ -390,13 +390,13 @@ export default function NewScriptPage() {
             kind: monaco.languages.CompletionItemKind.Snippet,
             insertText: '# TODO: ${1:detail}',
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          },
+          } as any,
           {
             label: 'if',
             kind: monaco.languages.CompletionItemKind.Snippet,
             insertText: 'if ${1:condition}; then\n\t${2:# code}\nfi',
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          },
+          } as any,
         ];
         return { suggestions };
       },

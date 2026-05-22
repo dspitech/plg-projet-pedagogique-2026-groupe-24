@@ -73,7 +73,7 @@ import {
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 type Status = 'active' | 'inactive' | 'archived';
 
@@ -314,9 +314,12 @@ export default function CategoriesPage() {
 
   const remove = async () => {
     if (!toDelete) return;
+    const { moveToTrash } = await import('@/lib/trash');
+    const t = await moveToTrash({ resourceType: 'category', rows: [toDelete] });
+    if (!t.ok) return toast.error(t.error ?? 'Erreur');
     const { error } = await supabase.from('categories').delete().eq('id', toDelete.id);
     if (error) return toast.error(error.message);
-    toast.success('Catégorie supprimée');
+    toast.success('Catégorie déplacée dans la corbeille');
     setToDelete(null);
     load();
   };
@@ -383,9 +386,13 @@ export default function CategoriesPage() {
 
   const deleteSelected = async () => {
     if (selectedIds.length === 0) return;
+    const rows = items.filter((c) => selectedIds.includes(c.id));
+    const { moveToTrash } = await import('@/lib/trash');
+    const t = await moveToTrash({ resourceType: 'category', rows });
+    if (!t.ok) return toast.error(t.error ?? 'Erreur');
     const { error } = await supabase.from('categories').delete().in('id', selectedIds);
     if (error) return toast.error(error.message);
-    toast.success(`${selectedIds.length} catégories supprimées`);
+    toast.success(`${selectedIds.length} catégories déplacées dans la corbeille`);
     setSelectedIds([]);
     setBulkDeleteOpen(false);
     load();

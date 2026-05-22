@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { validatePasswordStrength } from '@/lib/passwordPolicy';
-import { toast } from 'sonner';
+import { toast } from '@/lib/toast';
 
 export default function SetPasswordPage() {
   const navigate = useNavigate();
