@@ -2118,3 +2118,153 @@ Les prochaines phases de développement porteront sur :
 
 L'objectif est de livrer une version complète et testée du projet d'ici fin juin 2026.
 
+---
+
+## Tâche - Refonte de la page **Ressources** (21/05/2026)
+
+### Objectif
+Créer une page Ressources de niveau professionnel pour centraliser et partager **liens, documents, fichiers, vidéos, images, dépôts** et autres contenus utiles à l'équipe, en réutilisant l'expérience CRUD avancée de la page Scripts et en l'adaptant au domaine ressources.
+
+### Base de données
+- Nouvelle table **`resources`** : `name`, `description`, `resource_type` (link/document/file/video/image/repository/other), `url`, `file_path`, `file_size`, `mime_type`, `category_id` (FK → `categories`), `tags[]`, `visibility` (public/private), `status` (active/draft/archived), `criticality` (low/medium/high/critical), `language`, `author_id`, `version`, `is_featured`, compteurs `views_count` / `downloads_count` / `favorites_count`.
+- Enums dédiés : `resource_type`, `resource_status`, `resource_visibility`, `resource_criticality`.
+- Index optimisés : `category`, `author`, `status`, `type`, `tags` (GIN).
+- Trigger `update_updated_at_column` pour `updated_at` automatique.
+- RLS :
+  - Lecture : ressources publiques visibles par tout authentifié ; privées réservées à l'auteur ou au staff (editor/admin/global_admin).
+  - Création / modification : auteur ou staff.
+  - Suppression : admin / global_admin uniquement.
+- Bucket Storage privé **`resources`** avec policies "owner folder" (téléversement et gestion par utilisateur) et lecture authentifiée.
+
+### Fonctionnalités UI
+- **6 cards statistiques animées** (Total, Actives, Archivées, Publiques, Mises en avant, Fichiers).
+- **Vues multiples** : Grille (cards riches) et Tableau (multi-sélection).
+- **Recherche temps réel** sur nom, description, URL, tags.
+- **Filtres multicritères** : type, statut, visibilité, criticité, catégorie — avec **sauvegarde locale** (`localStorage`) et bouton reset.
+- **Actions globales** : sélectionner tout, désélectionner, archiver, supprimer en lot.
+- **Actions par ligne** : ouvrir le lien, télécharger le fichier (URL signée), publier/masquer, modifier, supprimer.
+- **Formulaire complet** (modal 2 colonnes) : type, catégorie, URL, **upload fichier**, visibilité, statut, criticité, version, langue, tags, mise en avant.
+- **Exports** : PDF (jsPDF + autoTable) et JSON.
+- Loaders, états vides, animations fluides, pagination, design 100 % responsive.
+
+---
+
+## Tâche — Gating de l'inscription et compte Admin Global (21/05/2026)
+
+### Objectif
+Verrouiller l'inscription en libre-service dès qu'un administrateur global existe, et fournir une page d'information professionnelle aux visiteurs non autorisés.
+
+### Implémentation
+- Nouvelle fonction SQL **`public.global_admin_exists()`** (SECURITY DEFINER) accessible aux rôles `anon` et `authenticated`, qui retourne `true` si au moins un `global_admin` est défini, sans exposer la table `user_roles`.
+- **Page `/signup`** : appelle la RPC au chargement ; si un admin global existe, redirige automatiquement vers `/no-signup`. Re-vérification juste avant l'appel `signUp` pour éviter les courses concurrentes.
+- **Page `/login`** : appelle la RPC pour décider si le lien "S'inscrire" est affiché ; sinon affiche un lien "Demander un accès" pointant vers `/no-signup`.
+- **Nouvelle page `/no-signup`** (`NoSignupPage`) : design pro, icône d'avertissement, message clair `« Vous n'avez pas les droits nécessaires pour accéder à cette page. Veuillez contacter le support. »`, bouton **Retour à la connexion** et lien **Contacter le support**.
+
+---
+
+## Tâche - Délégation de l'Admin Global avant suppression de compte (21/05/2026)
+
+### Objectif
+Empêcher la suppression d'un compte `global_admin` sans transfert préalable des droits, pour ne jamais laisser la plateforme sans administrateur.
+
+### Implémentation (page **Dashboard → Utilisateurs**)
+- Lorsque l'utilisateur courant est `global_admin` et tente de supprimer **son propre compte**, l'action est interceptée et ouvre une **modal de délégation** structurée en 3 étapes :
+  1. **Choix** : "Déléguer mon rôle" ou "Supprimer mon compte".
+  2. **Avertissement** (si suppression directe choisie) : message `« Vous êtes actuellement admin_global. Vous devez d'abord déléguer votre rôle avant de pouvoir supprimer votre compte. »` + bouton **« Déléguer mon rôle maintenant »**.
+  3. **Sélection** : choix de l'utilisateur cible (exclut les comptes suspendus et soi-même) + choix du **nouveau rôle pour soi** (Admin / Éditeur / Lecteur).
+- À la confirmation :
+  1. Le rôle `global_admin` est ajouté à l'utilisateur cible.
+  2. Le rôle `global_admin` est retiré du compte courant.
+  3. Le rôle choisi est attribué au compte courant.
+  4. Un événement d'audit `delegate_global_admin` est journalisé.
+- Une fois la délégation effectuée, le bouton **« Supprimer mon compte »** devient actif et appelle l'edge function `admin-delete-user` puis déconnecte l'utilisateur.
+- Le contexte d'authentification (`refresh`) est rafraîchi à la volée pour refléter les nouveaux rôles.
+
+### Sécurité
+- Toute la logique passe par les RLS existantes sur `user_roles` (gérables uniquement par `global_admin`).
+- L'edge function `admin-delete-user` reste seule habilitée à supprimer un compte auth.
+- Aucun moyen de contourner la délégation côté UI ; les contraintes d'unicité (`unique(user_id, role)`) sont gérées proprement.
+
+---
+
+## Tâche - Refonte globale (22/05/2026)
+
+Cette itération apporte une refonte structurelle de la plateforme : nettoyage de la navigation, refonte de l'accueil, dashboard temps réel synchronisé avec toutes les pages, audit complet, corbeille universelle et archives 90 jours.
+
+### 1. Nettoyage de la navigation
+
+- **Pages supprimées** : `FavoritesPage`, `SharesPage`, `DownloadsPage`, `HistoryPage`, `ProviderPage` (AWS/Azure).
+- **Sidebar nettoyée** : suppression des entrées correspondantes et de la section *Fournisseurs Cloud*.
+- **Routes** retirées de `src/App.tsx` (`/favorites`, `/shares`, `/downloads`, `/history`, `/provider/:id`).
+
+### 2. Page Accueil (`src/pages/Index.tsx`)
+
+Refonte intégrale en page de présentation moderne :
+- Hero animé avec gradient et statistiques.
+- Section *Features* (6 cartes) — Scripts, Ressources, Catégories, RBAC, Audit/Archives, Corbeille.
+- Section *Multi-cloud* (badges fournisseurs).
+- Section *Comment ça marche* (4 étapes).
+- Section *Sécurité by design* (RLS, audit immuable, archivage automatique).
+- CTA final vers le dashboard.
+
+### 3. Dashboard temps réel (`src/pages/DashboardPage.tsx`)
+
+Nouvelle page séparée de l'accueil, accessible via `/dashboard` :
+- **10 KPI cards** : scripts, ressources, catégories, utilisateurs, logs 24h/7j, vues totales, téléchargements, favoris, archives, corbeille.
+- **Synchronisation en temps réel** via Supabase Realtime (`postgres_changes` sur scripts, resources, categories, audit_logs, trash_items) + rafraîchissement périodique 30s.
+- **Graphiques Recharts** : répartition par type de script (pie), top scripts par vues/téléchargements (bar).
+- **Flux d'activité récente** (8 derniers logs).
+
+### 4. Logs & Audit (`src/pages/AuditLogsPage.tsx`)
+
+Réécriture complète :
+- **Toutes les actions du site** sont tracées via `log_audit_event` (ajout d'une colonne `category` pour la classification).
+- **Onglets par catégorie** : Auth, Utilisateurs, Scripts, Ressources, Catégories, Système, avec compteurs.
+- **Suppression individuelle ou multiple** des logs par global_admin (nouvelle policy RLS).
+- **Export ZIP** (via `jszip` + `file-saver`) — un CSV par catégorie + `manifest.json` ; portées : tous / filtrés / sélectionnés.
+- **Bouton de rotation manuelle** vers les archives.
+- **Rotation automatique** des logs > 90 jours via `pg_cron` (`archive-audit-logs-daily` à 03:00 UTC).
+
+### 5. Page Archives (`src/pages/ArchivesPage.tsx`)
+
+- Consultation des logs archivés (table `archived_logs`).
+- Filtre par catégorie + recherche.
+- Sélection multiple, suppression définitive, export ZIP.
+- Accessible uniquement aux `global_admin`.
+
+### 6. Corbeille universelle (`src/pages/TrashPage.tsx`)
+
+- Nouvelle table `trash_items` avec snapshot JSON complet de la ligne supprimée.
+- **Helper `src/lib/trash.ts`** : `moveToTrash`, `restoreFromTrash`, `purgeFromTrash`.
+- Branchée sur **ScriptsPage**, **ResourcesPage** et **CategoriesPage** — toute suppression simple ou en lot passe désormais par la corbeille.
+- Restauration en un clic (upsert dans la table d'origine).
+- Suppression définitive avec confirmation.
+- Filtres par type + recherche + sélection multiple.
+
+### 7. Délégation de compte global_admin — fix RLS
+
+- **Bug corrigé** : `new row violates row-level security policy for table "user_roles"` apparaissait quand l'utilisateur tentait de s'attribuer un nouveau rôle après s'être retiré `global_admin`.
+- **Solution DB** : nouvelle policy `Roles: self insert` autorisant `user_id = auth.uid()`.
+- **Solution app** : réordonnancement des étapes dans `performDelegation` — insertion du nouveau rôle cible, puis du nouveau rôle pour soi, puis suppression du global_admin (l'utilisateur reste global_admin pendant tous les INSERT).
+- L'ancien rôle est effectivement persisté en base et le nouveau rôle activé immédiatement (refresh contextuel).
+
+### 8. Migrations SQL
+
+Fichier : `supabase/migrations/<timestamp>_trash_archives_audit.sql`
+- `audit_logs.category` (default `system`) + index + policy DELETE global_admin.
+- `user_roles` policy `Roles: self insert`.
+- Fonction `log_audit_event` étendue avec paramètre `_category`.
+- Table `trash_items` + RLS (staff read/insert, admin delete).
+- Table `archived_logs` + RLS (global_admin only).
+- Fonction `archive_old_audit_logs()` + extension `pg_cron` + job quotidien.
+
+### 9. Dépendances ajoutées
+
+```
+jszip ^3.10.1
+file-saver ^2.0.5
+@types/file-saver ^2.0.7
+```
+
+
+
