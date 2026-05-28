@@ -32,7 +32,7 @@ function toArchivedRows(rows: AuditLogRow[]) {
     resource: r.resource,
     resource_id: r.resource_id ?? null,
     category: r.category || 'system',
-    details: r.details ?? {},
+    details: (r.details ?? {}) as any,
     ip_address: r.ip_address ?? null,
     user_agent: r.user_agent ?? null,
     original_created_at: r.created_at,
@@ -54,16 +54,7 @@ async function archiveViaClient(rows: AuditLogRow[]): Promise<{ ok: boolean; cou
 /** Move audit logs into archived_logs (visible on Archives page). */
 export async function archiveAuditLogs(rows: AuditLogRow[]): Promise<{ ok: boolean; count?: number; error?: string }> {
   if (!rows.length) return { ok: false, error: 'Aucun log à archiver' };
-
-  const clientResult = await archiveViaClient(rows);
-  if (clientResult.ok) return clientResult;
-
-  const ids = rows.map((r) => r.id);
-  const { data, error } = await supabase.rpc('archive_audit_logs_by_ids', { _ids: ids });
-  if (!error) return { ok: true, count: data ?? rows.length };
-  if (!isMissingRpcError(error.message)) return { ok: false, error: error.message };
-
-  return clientResult;
+  return archiveViaClient(rows);
 }
 
 /** Soft-delete audit logs into trash_items (visible on Corbeille page). */

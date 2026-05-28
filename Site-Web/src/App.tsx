@@ -29,6 +29,14 @@ import ArchivesPage from "./pages/ArchivesPage";
 import TrashPage from "./pages/TrashPage";
 import { ForbiddenPage, SuspendedPage, NoSignupPage } from "./pages/AccessPages";
 import NotFound from "./pages/NotFound";
+import HomePage from "./pages/public/HomePage";
+import AboutPage from "./pages/public/AboutPage";
+import ScriptsPublicPage from "./pages/public/ScriptsPublicPage";
+import ScriptPublicDetailPage from "./pages/public/ScriptPublicDetailPage";
+import CategoriesPublicPage from "./pages/public/CategoriesPublicPage";
+import CategoryPublicPage from "./pages/public/CategoryPublicPage";
+import ResourcesPublicPage from "./pages/public/ResourcesPublicPage";
+import ContactPublicPage from "./pages/public/ContactPublicPage";
 
 const queryClient = new QueryClient();
 
@@ -50,7 +58,18 @@ const App = () => (
 
             <Route path="/set-password" element={<ProtectedRoute><SetPasswordPage /></ProtectedRoute>} />
 
-            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            {/* Public visitor site */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/qui-sommes-nous" element={<AboutPage />} />
+            <Route path="/nos-scripts" element={<ScriptsPublicPage />} />
+            <Route path="/nos-scripts/:scriptId" element={<ScriptPublicDetailPage />} />
+            <Route path="/nos-categories" element={<CategoriesPublicPage />} />
+            <Route path="/nos-categories/:categoryId" element={<CategoryPublicPage />} />
+            <Route path="/nos-ressources" element={<ResourcesPublicPage />} />
+            <Route path="/nous-contacter" element={<ContactPublicPage />} />
+
+            {/* Admin dashboard */}
+            <Route path="/admin" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/scripts" element={<ProtectedRoute><ScriptsPage /></ProtectedRoute>} />
             <Route path="/scripts/new" element={<ProtectedRoute permission={{ resource: 'scripts', action: 'create' }}><NewScriptPage /></ProtectedRoute>} />

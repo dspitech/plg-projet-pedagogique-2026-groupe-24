@@ -146,6 +146,54 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          category: string
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          ip_address: string | null
+          message: string
+          name: string
+          phone: string | null
+          status: string
+          subject: string
+          updated_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          category?: string
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          ip_address?: string | null
+          message: string
+          name: string
+          phone?: string | null
+          status?: string
+          subject: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          category?: string
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          ip_address?: string | null
+          message?: string
+          name?: string
+          phone?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       permissions: {
         Row: {
           action: string
@@ -342,6 +390,51 @@ export type Database = {
           },
         ]
       }
+      script_likes: {
+        Row: {
+          created_at: string
+          id: string
+          script_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          script_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          script_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      script_shares: {
+        Row: {
+          channel: string
+          created_at: string
+          id: string
+          script_id: string
+          user_id: string | null
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          id?: string
+          script_id: string
+          user_id?: string | null
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          id?: string
+          script_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       scripts: {
         Row: {
           author_id: string | null
@@ -361,10 +454,12 @@ export type Database = {
           is_validated: boolean
           language: string | null
           license: string | null
+          likes_count: number
           name: string
           prerequisites: string | null
           screenshots: string[]
           script_type: Database["public"]["Enums"]["script_type"]
+          shares_count: number
           status: Database["public"]["Enums"]["script_status"]
           tags: string[]
           updated_at: string
@@ -392,10 +487,12 @@ export type Database = {
           is_validated?: boolean
           language?: string | null
           license?: string | null
+          likes_count?: number
           name: string
           prerequisites?: string | null
           screenshots?: string[]
           script_type?: Database["public"]["Enums"]["script_type"]
+          shares_count?: number
           status?: Database["public"]["Enums"]["script_status"]
           tags?: string[]
           updated_at?: string
@@ -423,10 +520,12 @@ export type Database = {
           is_validated?: boolean
           language?: string | null
           license?: string | null
+          likes_count?: number
           name?: string
           prerequisites?: string | null
           screenshots?: string[]
           script_type?: Database["public"]["Enums"]["script_type"]
+          shares_count?: number
           status?: Database["public"]["Enums"]["script_status"]
           tags?: string[]
           updated_at?: string
@@ -505,7 +604,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      archive_audit_logs_by_ids: { Args: { _ids: string[] }; Returns: number }
       archive_old_audit_logs: { Args: never; Returns: number }
       global_admin_exists: { Args: never; Returns: boolean }
       has_permission: {
