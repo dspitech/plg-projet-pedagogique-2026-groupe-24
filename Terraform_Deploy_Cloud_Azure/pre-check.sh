@@ -2,15 +2,6 @@
 # ============================================================
 # pre-check.sh - Vérification pré-déploiement PLG - 2026 Groupe-24 ESTIAM - Paris
 # ============================================================
-# Ce fichier permet de détecter les problèmes courants : fichiers manquants, clés SSH, outils,
-# conflits de noms Azure, CIDR, etc.
-#
-# Usage :
-#   chmod +x pre-check.sh          
-#   ./pre-check.sh                 # exécute tous les checks
-#   ./pre-check.sh --skip-azure    # ignore les checks Azure CLI
-# ============================================================
-
 set -euo pipefail
 
 # ---- Couleurs -----------------------------------------------
@@ -36,14 +27,14 @@ done
 # ============================================================
 # Helpers
 # ============================================================
-pass()    { echo -e "  ${GREEN}✔${RESET}  $*"; ((PASSED++)); }
-warn()    { echo -e "  ${YELLOW}⚠${RESET}  $*"; ((WARNINGS++)); }
-fail()    { echo -e "  ${RED}✘${RESET}  $*"; ((ERRORS++)); }
+pass()    { echo -e "  ${GREEN}✔${RESET}  $*"; ((PASSED++)) || true; }
+warn()    { echo -e "  ${YELLOW}⚠${RESET}  $*"; ((WARNINGS++)) || true; }
+fail()    { echo -e "  ${RED}✘${RESET}  $*"; ((ERRORS++)) || true; }
 section() { echo -e "\n${CYAN}${BOLD}▶ $*${RESET}"; }
 info()    { echo -e "  ${BLUE}ℹ${RESET}  $*"; }
 
 # ============================================================
-# Ces variables doivent correspondre à terraform.tfvars)
+# Variables (doivent correspondre à terraform.tfvars)
 # ============================================================
 RG_NAME="RG-PLG-ESTIAM-Paris-2026"
 LOCATION="norwayeast"
@@ -58,7 +49,6 @@ FIREWALL_NAME="AzureFireWall"
 LB_NAME="LB-HUB-SPOKE"
 BASTION_NAME="AzureBastion"
 
-# CIDR (IP)
 HUB_CIDR="10.0.0.0/16"
 SPOKE1_CIDR="192.168.0.0/24"
 SPOKE2_CIDR="172.16.0.0/24"
@@ -85,7 +75,7 @@ check_tool() {
   local label="${2:-$1}"
   if command -v "$cmd" &>/dev/null; then
     local version
-    version=$("$cmd" --version 2>&1 | head -1 | tr -d '\n')
+    version=$("$cmd" --version 2>&1 | head -1 | tr -d '\n') || true
     pass "$label — $version"
   else
     fail "$label introuvable (installez-le ou lancez depuis Azure Cloud Shell)"
@@ -108,7 +98,7 @@ check_file() {
   local label="${2:-$f}"
   if [[ -f "$f" ]]; then
     local size
-    size=$(wc -c < "$f")
+    size=$(wc -c < "$f") || true
     pass "$label (${size} octets)"
   else
     fail "$label introuvable — chemin : $f"
@@ -122,13 +112,11 @@ check_file "outputs.tf"       "outputs.tf"
 check_file "$TFVARS_FILE"     "terraform.tfvars"
 check_file "$CLOUD_INIT_FILE" "cloud-init.yaml"
 
-# Vérification taille minimale du cloud-init (> 500 octets)
 if [[ -f "$CLOUD_INIT_FILE" ]]; then
-  CI_SIZE=$(wc -c < "$CLOUD_INIT_FILE")
+  CI_SIZE=$(wc -c < "$CLOUD_INIT_FILE") || true
   if (( CI_SIZE < 500 )); then
     warn "cloud-init.yaml semble trop petit (${CI_SIZE} octets) — vérifiez le contenu"
   fi
-  # Vérifie l'en-tête obligatoire
   if head -1 "$CLOUD_INIT_FILE" | grep -q "^#cloud-config"; then
     pass "cloud-init.yaml commence par #cloud-config"
   else
@@ -142,7 +130,6 @@ section "3. Clé SSH"
 
 if [[ -f "${SSH_KEY_PATH}" ]]; then
   pass "Clé privée trouvée : ${SSH_KEY_PATH}"
-  # Vérifier permissions (600)
   PERMS=$(stat -c "%a" "${SSH_KEY_PATH}" 2>/dev/null || stat -f "%Lp" "${SSH_KEY_PATH}" 2>/dev/null || echo "unknown")
   if [[ "$PERMS" == "600" ]]; then
     pass "Permissions clé privée : 600"
@@ -156,7 +143,6 @@ fi
 
 if [[ -f "${SSH_KEY_PATH}.pub" ]]; then
   pass "Clé publique trouvée : ${SSH_KEY_PATH}.pub"
-  # Vérification format RSA
   if head -1 "${SSH_KEY_PATH}.pub" | grep -q "^ssh-rsa "; then
     pass "Format clé publique : RSA valide"
   else
@@ -166,7 +152,6 @@ else
   fail "Clé publique introuvable : ${SSH_KEY_PATH}.pub"
 fi
 
-# Test passphrase (ne doit PAS en demander)
 if [[ -f "${SSH_KEY_PATH}" ]]; then
   if ssh-keygen -y -P "" -f "${SSH_KEY_PATH}" &>/dev/null; then
     pass "Clé privée sans passphrase (compatible Terraform/Bastion)"
@@ -184,7 +169,7 @@ check_tfvar() {
   local key="$1"
   local expected="$2"
   local actual
-  actual=$(grep -E "^\s*${key}\s*=" "$TFVARS_FILE" 2>/dev/null | head -1 | sed 's/.*=\s*//' | tr -d '"' | tr -d ' ' | tr -d '\r' || echo "")
+  actual=$(grep -E "^\s*${key}\s*=" "$TFVARS_FILE" 2>/dev/null | head -1 | sed 's/.*=\s*//' | tr -d '"' | tr -d ' ' | tr -d '\r') || actual=""
   if [[ -z "$actual" ]]; then
     warn "Variable '$key' absente de terraform.tfvars"
   elif [[ "$actual" == "$expected" ]]; then
@@ -195,11 +180,11 @@ check_tfvar() {
 }
 
 if [[ -f "$TFVARS_FILE" ]]; then
-  check_tfvar "rg_name"       "$RG_NAME"
-  check_tfvar "location"      "$LOCATION"
+  check_tfvar "rg_name"        "$RG_NAME"
+  check_tfvar "location"       "$LOCATION"
   check_tfvar "admin_username" "scripttools_plgEstiam"
-  check_tfvar "lb_name"       "$LB_NAME"
-  check_tfvar "firewall_name" "$FIREWALL_NAME"
+  check_tfvar "lb_name"        "$LB_NAME"
+  check_tfvar "firewall_name"  "$FIREWALL_NAME"
 else
   warn "terraform.tfvars introuvable — checks de cohérence ignorés"
 fi
@@ -209,30 +194,26 @@ section "5. Validation YAML cloud-init"
 # ============================================================
 
 if [[ -f "$CLOUD_INIT_FILE" ]]; then
-  # Vérification des sections critiques
-  for section_name in "package_update" "packages" "runcmd" "nginx" "pm2" "ufw"; do
-    if grep -q "$section_name" "$CLOUD_INIT_FILE"; then
-      pass "Section/mot-clé '$section_name' présent dans cloud-init.yaml"
+  for kw in "package_update" "packages" "runcmd" "nginx" "pm2" "ufw"; do
+    if grep -q "$kw" "$CLOUD_INIT_FILE"; then
+      pass "Mot-clé '$kw' présent dans cloud-init.yaml"
     else
-      warn "Section/mot-clé '$section_name' absente de cloud-init.yaml"
+      warn "Mot-clé '$kw' absent de cloud-init.yaml"
     fi
   done
 
-  # Vérification du endpoint /health Nginx
   if grep -q "/health" "$CLOUD_INIT_FILE"; then
     pass "Endpoint Nginx /health présent (requis pour le health probe LB)"
   else
     fail "Endpoint Nginx /health manquant — le Load Balancer ne pourra pas sonder les backends"
   fi
 
-  # Vérification proxy_pass vers :3000
   if grep -q "proxy_pass.*3000" "$CLOUD_INIT_FILE"; then
     pass "Nginx reverse proxy → :3000 configuré"
   else
     warn "proxy_pass vers :3000 non trouvé dans cloud-init.yaml"
   fi
 
-  # Validation syntaxe YAML si python3/PyYAML disponible
   if command -v python3 &>/dev/null; then
     if python3 -c "import yaml; yaml.safe_load(open('$CLOUD_INIT_FILE'))" 2>/dev/null; then
       pass "Syntaxe YAML valide (python3 yaml)"
@@ -249,25 +230,21 @@ section "6. Validation Terraform (fmt + validate)"
 # ============================================================
 
 if command -v terraform &>/dev/null; then
-
-  # terraform fmt --verification (formatage)
   if terraform fmt -check -recursive . &>/dev/null; then
     pass "terraform fmt : fichiers correctement formatés"
   else
     warn "terraform fmt : formatage à corriger — lancez : terraform fmt"
   fi
 
-  # terraform init (mode silencieux)
   info "Initialisation Terraform (terraform init)..."
   if terraform init -input=false -no-color &>/dev/null; then
     pass "terraform init réussi"
   else
-    fail "terraform init échoué - vérifiez la connectivité réseau et le provider"
+    fail "terraform init échoué — vérifiez la connectivité réseau et le provider"
   fi
 
-  # terraform validate
   info "Validation de la configuration (terraform validate)..."
-  VALIDATE_OUTPUT=$(terraform validate -no-color 2>&1)
+  VALIDATE_OUTPUT=$(terraform validate -no-color 2>&1) || true
   if echo "$VALIDATE_OUTPUT" | grep -q "Success"; then
     pass "terraform validate : configuration valide"
   else
@@ -285,9 +262,8 @@ section "7. Vérifications Azure (az cli)"
 if [[ "$SKIP_AZURE" == "true" ]]; then
   warn "Checks Azure ignorés (--skip-azure)"
 else
-  # Authentification
   if az account show &>/dev/null; then
-    ACCOUNT=$(az account show --query "{name:name, id:id, user:user.name}" -o tsv 2>/dev/null | tr '\t' ' ')
+    ACCOUNT=$(az account show --query "{name:name, id:id, user:user.name}" -o tsv 2>/dev/null | tr '\t' ' ') || ACCOUNT="inconnu"
     pass "Connecté à Azure : $ACCOUNT"
   else
     fail "Non connecté à Azure — lancez : az login"
@@ -298,31 +274,27 @@ fi
 
 if [[ "$SKIP_AZURE" != "true" ]]; then
 
-  # Région valide
   if az account list-locations --query "[?name=='${LOCATION}'].name" -o tsv 2>/dev/null | grep -q "$LOCATION"; then
     pass "Région '$LOCATION' disponible"
   else
     fail "Région '$LOCATION' introuvable dans votre abonnement"
   fi
 
-  # Resource Group existant ?
   if az group show -n "$RG_NAME" &>/dev/null; then
-    warn "Resource Group '$RG_NAME' existe déjà — terraform apply pourrait échouer si les ressources dedans sont en conflit"
+    warn "Resource Group '$RG_NAME' existe déjà — terraform apply pourrait échouer si les ressources sont en conflit"
     info "Pour repartir de zéro : terraform destroy, puis terraform apply"
   else
     pass "Resource Group '$RG_NAME' n'existe pas encore (sera créé)"
   fi
 
-  # Quotas Firewall (Standard) - vérifie que le SKU est disponible
   info "Vérification quota Azure Firewall Standard..."
-  FW_QUOTA=$(az vm list-usage --location "$LOCATION" --query "[?name.value=='standardBSFamily'].currentValue" -o tsv 2>/dev/null || echo "N/A")
-  if [[ "$FW_QUOTA" != "N/A" ]]; then
+  FW_QUOTA=$(az vm list-usage --location "$LOCATION" --query "[?name.value=='standardBSFamily'].currentValue" -o tsv 2>/dev/null) || FW_QUOTA=""
+  if [[ -n "$FW_QUOTA" ]]; then
     pass "Quota région accessible (Standard_B family : ${FW_QUOTA} utilisés)"
   else
     warn "Impossible de vérifier les quotas — vérifiez manuellement dans le portail Azure"
   fi
 
-  # VNets en conflit ?
   for vnet in "$HUB_VNET" "$SPOKE1_VNET" "$SPOKE2_VNET"; do
     if az network vnet show -g "$RG_NAME" -n "$vnet" &>/dev/null 2>&1; then
       warn "VNet '$vnet' existe déjà dans '$RG_NAME'"
@@ -331,21 +303,18 @@ if [[ "$SKIP_AZURE" != "true" ]]; then
     fi
   done
 
-  # Firewall existant ?
   if az network firewall show -g "$RG_NAME" -n "$FIREWALL_NAME" &>/dev/null 2>&1; then
     warn "Firewall '$FIREWALL_NAME' existe déjà dans '$RG_NAME'"
   else
     pass "Firewall '$FIREWALL_NAME' disponible (pas de conflit)"
   fi
 
-  # Load Balancer existant ?
   if az network lb show -g "$RG_NAME" -n "$LB_NAME" &>/dev/null 2>&1; then
     warn "Load Balancer '$LB_NAME' existe déjà dans '$RG_NAME'"
   else
     pass "Load Balancer '$LB_NAME' disponible (pas de conflit)"
   fi
 
-  # Bastion existant ?
   if az network bastion show -g "$RG_NAME" -n "$BASTION_NAME" &>/dev/null 2>&1; then
     warn "Bastion '$BASTION_NAME' existe déjà dans '$RG_NAME'"
   else
@@ -360,22 +329,20 @@ section "8. Résumé des CIDRs"
 
 info "Plan d'adressage attendu :"
 echo ""
-printf "  %-30s %s\n" "VNet Hub"          "$HUB_CIDR"
-printf "  %-30s %s\n" "  └─ AzureFirewallSubnet"   "$SUBNET_FW"
-printf "  %-30s %s\n" "  └─ AzureBastionSubnet"    "$SUBNET_BASTION"
-printf "  %-30s %s\n" "  └─ Prod (Hub)"             "$SUBNET_HUB_PROD"
-printf "  %-30s %s\n" "  └─ SubnetVM1 (VM-SPOKE-1)" "$SUBNET_VM1"
-printf "  %-30s %s\n" "  └─ SubnetVM2 (VM-SPOKE-2)" "$SUBNET_VM2"
-printf "  %-30s %s\n" "VNet Spoke 1"      "$SPOKE1_CIDR"
-printf "  %-30s %s\n" "  └─ Prod (Spoke1)"          "$SPOKE1_CIDR"
-printf "  %-30s %s\n" "VNet Spoke 2"      "$SPOKE2_CIDR"
-printf "  %-30s %s\n" "  └─ Prod (Spoke2)"          "$SPOKE2_CIDR"
+printf "  %-30s %s\n" "VNet Hub"                    "$HUB_CIDR"
+printf "  %-30s %s\n" "  └─ AzureFirewallSubnet"    "$SUBNET_FW"
+printf "  %-30s %s\n" "  └─ AzureBastionSubnet"     "$SUBNET_BASTION"
+printf "  %-30s %s\n" "  └─ Prod (Hub)"              "$SUBNET_HUB_PROD"
+printf "  %-30s %s\n" "  └─ SubnetVM1 (VM-SPOKE-1)"  "$SUBNET_VM1"
+printf "  %-30s %s\n" "  └─ SubnetVM2 (VM-SPOKE-2)"  "$SUBNET_VM2"
+printf "  %-30s %s\n" "VNet Spoke 1"                "$SPOKE1_CIDR"
+printf "  %-30s %s\n" "  └─ Prod (Spoke1)"           "$SPOKE1_CIDR"
+printf "  %-30s %s\n" "VNet Spoke 2"                "$SPOKE2_CIDR"
+printf "  %-30s %s\n" "  └─ Prod (Spoke2)"           "$SPOKE2_CIDR"
 echo ""
 
-# Vérification chevauchement basique
 overlap_check() {
   local name1="$1" cidr1="$2" name2="$3" cidr2="$4"
-  # Comparaison simple : même préfixe de classe
   local prefix1 prefix2
   prefix1=$(echo "$cidr1" | cut -d'.' -f1-2)
   prefix2=$(echo "$cidr2" | cut -d'.' -f1-2)
@@ -384,8 +351,8 @@ overlap_check() {
   fi
 }
 
-overlap_check "Hub" "$HUB_CIDR" "Spoke1" "$SPOKE1_CIDR"
-overlap_check "Hub" "$HUB_CIDR" "Spoke2" "$SPOKE2_CIDR"
+overlap_check "Hub"    "$HUB_CIDR"    "Spoke1" "$SPOKE1_CIDR"
+overlap_check "Hub"    "$HUB_CIDR"    "Spoke2" "$SPOKE2_CIDR"
 overlap_check "Spoke1" "$SPOKE1_CIDR" "Spoke2" "$SPOKE2_CIDR"
 pass "Vérification chevauchement CIDR (basique) terminée"
 
@@ -397,9 +364,9 @@ echo -e "${BOLD}╔════════════════════�
 echo -e "${BOLD}║   RÉSUMÉ                                             ║${RESET}"
 echo -e "${BOLD}╚══════════════════════════════════════════════════════╝${RESET}"
 echo ""
-echo -e "  ${GREEN}✔ Succès   :${RESET} $PASSED"
+echo -e "  ${GREEN}✔ Succès        :${RESET} $PASSED"
 echo -e "  ${YELLOW}⚠ Avertissements :${RESET} $WARNINGS"
-echo -e "  ${RED}✘ Erreurs  :${RESET} $ERRORS"
+echo -e "  ${RED}✘ Erreurs       :${RESET} $ERRORS"
 echo ""
 
 if (( ERRORS > 0 )); then

@@ -46,7 +46,7 @@ runcmd:
 
   # --- Docker ---
   - curl -fsSL https://get.docker.com | sh
-  - usermod -aG docker azure_admin
+  - usermod -aG docker scripttools_plgEstiam
   - systemctl enable docker
   - systemctl start docker
   - apt-get install -y docker-compose-plugin
@@ -59,8 +59,8 @@ runcmd:
   - npm install -g pm2 nodemon typescript ts-node prettier eslint
 
   # --- PM2 : démarrage automatique au reboot ---
-  - pm2 startup systemd -u azure_admin --hp /home/azure_admin
-  - systemctl enable pm2-azure_admin
+  - pm2 startup systemd -u scripttools_plgEstiam --hp /home/scripttools_plgEstiam
+  - systemctl enable pm2-scripttools_plgEstiam
 
   # --- Python packages ---
   - pip3 install --upgrade pip
@@ -135,7 +135,7 @@ runcmd:
   - systemctl start fail2ban
 
   # --- Dossier de travail ---
-  - mkdir -p /home/azure_admin/projects
-  - chown -R azure_admin:azure_admin /home/azure_admin/projects
+  - mkdir -p /home/scripttools_plgEstiam/projects
+  - chown -R scripttools_plgEstiam:scripttools_plgEstiam /home/scripttools_plgEstiam/projects
 
 final_message: "PLG - 2026 :  VM prête après $UPTIME secondes. Nginx, PM2 et tous les outils sont installés."
