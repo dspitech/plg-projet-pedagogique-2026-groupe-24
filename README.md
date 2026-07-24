@@ -1,7 +1,7 @@
 # Script Hub Manager
 
 **Projet pédagogique 2025 – 2026 · Groupe 24 · ESTIAM Paris**
-*En partenariat avec l'entreprise DSPI-TECH*
+*En partenariat avec l'entreprise DSPI-TECH* 
 
 Plateforme web centralisée destinée aux équipes IT (administrateurs systèmes, ingénieurs cloud, DevOps, cybersécurité) pour **cataloguer, documenter, partager, valider et exploiter** des scripts, outils et ressources techniques dans un environnement sécurisé, moderne et hautement disponible.
 
@@ -33,7 +33,7 @@ Plateforme web centralisée destinée aux équipes IT (administrateurs systèmes
 
 Le site se compose de deux espaces :
 
-- **Une vitrine publique** (sans compte requis) où tout visiteur peut parcourir, rechercher, aimer, partager et télécharger les scripts et ressources publics — avec un **mode invité** (simple pseudo) pour interagir sans créer de compte.
+- **Une vitrine publique** (sans compte requis) où tout visiteur peut parcourir, rechercher, aimer, partager et télécharger les scripts et ressources publics - avec un **mode invité** (simple pseudo) pour interagir sans créer de compte.
 - **Un espace d'administration protégé** (dashboard, gestion complète des scripts/catégories/ressources, import/export CSV/PDF/JSON, gestion des utilisateurs et des rôles, journal d'audit, corbeille, archives).
 
 Les scripts pris en charge couvrent un large spectre : PowerShell, Bash, Python, Terraform, Bicep, ARM, CloudFormation, Ansible, Kubernetes, Docker, SQL, JavaScript/TypeScript, YAML, JSON, Go, Ruby, Perl…
@@ -93,7 +93,7 @@ Tables principales définies dans les migrations SQL (`supabase/migrations/`) :
 | Table | Rôle |
 |---|---|
 | `profiles` | Profil étendu de chaque utilisateur (statut actif/suspendu, changement de mot de passe requis, dernière connexion…) |
-| `user_roles` | Association utilisateur ↔ rôle — table séparée de `profiles` pour empêcher toute auto-élévation de privilèges |
+| `user_roles` | Association utilisateur ↔ rôle - table séparée de `profiles` pour empêcher toute auto-élévation de privilèges |
 | `permissions` / `role_permissions` | Référentiel des permissions et association rôle ↔ permission (granularité ressource/action) |
 | `audit_logs` / `archived_logs` | Journal d'audit (action, IP, user-agent, horodatage) et logs archivés automatiquement après 90 jours |
 | `categories` | Catégories de classement des scripts/ressources |
@@ -123,7 +123,7 @@ L'accès aux routes protégées est contrôlé par un composant `ProtectedRoute`
 - **Row Level Security (RLS)** PostgreSQL sur toutes les tables : lecture publique restreinte au contenu visible, écriture réservée aux rôles autorisés.
 - **Edge Functions** Supabase pour toute opération sensible côté serveur (invitations, suppression de compte, contact).
 - **Politique de mot de passe stricte** (16 caractères min., score de robustesse) et journalisation d'audit complète.
-- Infrastructure Cloud **Microsoft Azure** en architecture **Hub & Spoke** : Load Balancer, Firewall, Bastion, VMs Ubuntu en haute disponibilité, NSG, VNet Peering — provisionnée en **Infrastructure as Code (Terraform)**.
+- Infrastructure Cloud **Microsoft Azure** en architecture **Hub & Spoke** : Load Balancer, Firewall, Bastion, VMs Ubuntu en haute disponibilité, NSG, VNet Peering - provisionnée en **Infrastructure as Code (Terraform)**.
 - Supervision via **Prometheus & Grafana**, CI/CD via **GitHub Actions**.
 
 ## Déploiement
@@ -218,7 +218,7 @@ Pour les membres de l'équipe :
 
 ## Licence
 
-Projet réalisé à des fins pédagogiques dans le cadre du module *Projet pédagogique 2025/2026* de l'ESTIAM Paris, en partenariat avec DSPI-TECH. Usage éducatif — aucune licence open-source n'est actuellement associée à ce dépôt.
+Projet réalisé à des fins pédagogiques dans le cadre du module *Projet pédagogique 2025/2026* de l'ESTIAM Paris, en partenariat avec DSPI-TECH. Usage éducatif - aucune licence open-source n'est actuellement associée à ce dépôt.
 
 ## Liens
 
