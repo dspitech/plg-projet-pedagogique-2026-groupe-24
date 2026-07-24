@@ -5,6 +5,8 @@
 
 Plateforme web centralisée destinée aux équipes IT (administrateurs systèmes, ingénieurs cloud, DevOps, cybersécurité) pour **cataloguer, documenter, partager, valider et exploiter** des scripts, outils et ressources techniques dans un environnement sécurisé, moderne et hautement disponible.
 
+<img width="1090" height="628" alt="image" src="https://github.com/user-attachments/assets/300c0817-6379-43e3-b539-67829391a840" />
+
 ---
 
 ## Sommaire
