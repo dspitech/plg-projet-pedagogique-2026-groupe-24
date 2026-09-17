@@ -1,0 +1,70 @@
+name: Deploy Web App
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  quality:
+    name: Lint & tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci --legacy-peer-deps
+      - run: npm run lint
+      - run: npm test
+
+  deploy-vm1:
+    name: Déploiement VM-SPOKE-1
+    needs: quality
+    runs-on: [self-hosted, vm-spoke-1]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/deploy.sh
+      - run: curl -f http://localhost:3000
+      - run: curl -f http://localhost/health
+
+  deploy-vm2:
+    name: Déploiement VM-SPOKE-2
+    needs: deploy-vm1
+    runs-on: [self-hosted, vm-spoke-2]
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/deploy.sh
+      - run: curl -f http://localhost:3000
+      - run: curl -f http://localhost/health
+
+  smoke-test:
+    name: Smoke test (Load Balancer)
+    needs: [deploy-vm1, deploy-vm2]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Vérifier le site via le Load Balancer
+        env:
+          PROD_URL: ${{ vars.PROD_URL }}
+        run: |
+          if [ -z "$PROD_URL" ]; then
+            echo "PROD_URL non défini, test ignoré."
+            exit 0
+          fi
+          for i in 1 2 3 4 5; do
+            if curl -fsS "$PROD_URL/health"; then
+              echo "Site OK via Load Balancer"
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1
