@@ -132,7 +132,7 @@ L'accès aux routes protégées est contrôlé par un composant `ProtectedRoute`
 
 Le déploiement de l'infrastructure Azure (Terraform, cloud-init, supervision) est géré dans un dépôt dédié : voir [Liens](#liens).
 
-Sur chaque VM, le script [`scripts/deploy.sh`](./scripts/deploy.sh) automatise le build et le redémarrage de l'application via un runner GitHub Actions auto-hébergé (build Vite, `pm2 reload`).
+Sur chaque VM, le script [`scripts/deploy.sh`](./scripts/deploy.sh) automatise le build et le redémarrage de l'application via un runner GitHub Actions auto-hébergé (build Vite, `pm2 reload`). Le pipeline [`deploy.yml`](./.github/workflows/deploy.yml) exécute d'abord le lint et les tests (`npm run lint`, `npm test`) avant tout déploiement, met à jour VM-SPOKE-1 puis VM-SPOKE-2 l'une après l'autre (rolling deploy, zéro coupure), restaure automatiquement le build précédent en cas d'échec du health check, puis vérifie le site en conditions réelles via l'IP publique du Load Balancer.
 
 ## Installation locale
 
