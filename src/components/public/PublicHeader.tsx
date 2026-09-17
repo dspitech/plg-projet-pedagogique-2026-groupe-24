@@ -76,7 +76,7 @@ export function PublicHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="gap-2">
                 <Globe className="h-4 w-4" />
-                Réseaux sociaux
+                Nos réseaux sociaux
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
